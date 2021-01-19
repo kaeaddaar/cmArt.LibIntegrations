@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmArt.LibIntegrations", "cmArt.LibIntegrations\cmArt.LibIntegrations.csproj", "{7BC294C0-1E78-4AD1-A5D0-7613718CDCE3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestUpdateOfCommonFields", "UnitTestUpdateOfCommonFields\UnitTestUpdateOfCommonFields.csproj", "{7AF2FCB7-E4F7-4B86-A79A-FFCB926094E1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7BC294C0-1E78-4AD1-A5D0-7613718CDCE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BC294C0-1E78-4AD1-A5D0-7613718CDCE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BC294C0-1E78-4AD1-A5D0-7613718CDCE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BC294C0-1E78-4AD1-A5D0-7613718CDCE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AF2FCB7-E4F7-4B86-A79A-FFCB926094E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AF2FCB7-E4F7-4B86-A79A-FFCB926094E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AF2FCB7-E4F7-4B86-A79A-FFCB926094E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AF2FCB7-E4F7-4B86-A79A-FFCB926094E1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {21EFAEED-6761-4552-8E22-987B0B4799F1}
+	EndGlobalSection
+EndGlobal
