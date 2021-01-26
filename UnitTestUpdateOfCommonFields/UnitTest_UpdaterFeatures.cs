@@ -11,8 +11,6 @@ namespace UnitTestUpdateOfCommonFields
     {
         const string firstItemStuff = "first item stuff";
         const string secondItemStuff = "second item stuff";
-        const string fakeStuff = "fake stuff";
-        const string newGuid2Data= "New Guid 2 data";
 
 
         [TestMethod]
