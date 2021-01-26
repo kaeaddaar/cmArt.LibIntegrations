@@ -9,10 +9,11 @@ using System.Linq;
 
 namespace cmArt.LibIntegrations
 {
-    public class Updater<TCommon, TKey> : IUpdater<TCommon, TKey>
+    public class UpdateProcess<TCommon, TKey> //: IUpdater<TCommon, TKey>
     {
         private IEnumerable<TCommon> _SourceRecords;
         private IEnumerable<TCommon> _DestRecords;
+
         public IEnumerable<TCommon> SourceRecords { 
             get 
             {
@@ -46,33 +47,71 @@ namespace cmArt.LibIntegrations
             }
         }
      
-        public Updater()
+        public UpdateProcess()
         {
-
         }
-        public IEnumerable<Tuple<TCommon,TCommon>> GetRsWithDiffs()
+        public IEnumerable<TCommon> GetUpdatesByKey // source records that match and have changes are the updated destination records
+        (
+            IEnumerable<TCommon> SrcRecords_UnfilteredIn
+            , IEnumerable<TCommon> DestRecords_UnfilteredIn
+            , Func<TCommon, TKey> fGetKey
+        )
         {
-            Type T = typeof(TCommon);
-            FieldInfo[] fields = T.GetFields();
+            IEnumerable<TCommon> SrcRecords_Unfiltered = SrcRecords_UnfilteredIn ?? new List<TCommon>();
+            IEnumerable<TCommon> DestRecords_Unfiltered = DestRecords_UnfilteredIn ?? new List<TCommon>();
 
-            Dictionary<string, string> diffs = new Dictionary<string, string>();
+            var SrcKeys = SrcRecords_Unfiltered.Select(x => fGetKey(x));
+            var DestKeys = DestRecords_Unfiltered.Select(x => fGetKey(x));
 
-            IEnumerable<TCommon> src;
-            IEnumerable<TCommon> dest;
-            src = _SourceRecords;
-            dest = _DestRecords;
+            var Matching_Keys =
+                from src in SrcKeys
+                join dest in DestKeys
+                on src equals dest
+                select src;
 
-            
+            var SrcRecords_Filtered =
+                from SrcRecord in SrcRecords_Unfiltered
+                join Key in Matching_Keys
+                on fGetKey(SrcRecord) equals Key
+                select SrcRecord;
 
-            foreach (var field in fields)
-            {
+            var DestRecords_Filtered =
+                from DestRecord in DestRecords_Unfiltered
+                join Key in Matching_Keys
+                on fGetKey(DestRecord) equals Key
+                select DestRecord;
 
-            }
+            var UpdatedDestRecords =
+                from SrcRecord in SrcRecords_Filtered
+                join DestRecord in DestRecords_Filtered
+                on fGetKey(SrcRecord) equals fGetKey(DestRecord)
+                where SrcRecord.GetHashCode() != DestRecord.GetHashCode()
+                select SrcRecord;
 
-            throw new NotImplementedException();
-            return new List<Tuple<TCommon, TCommon>>();
+            return UpdatedDestRecords;
         }
+        
+        public IEnumerable<Tuple<TCommon, TCommon>> GetUpdatesByCommonFields()
+        {
+            return GetUpdatesByCommonFields(SourceRecords: _SourceRecords, DestRecords: _DestRecords);
+        }
+        private IEnumerable<Tuple<TCommon, TCommon>> GetUpdatesByCommonFields
+        (
+            IEnumerable<TCommon> SourceRecords
+            , IEnumerable<TCommon> DestRecords)
+        {
+            IEnumerable<TCommon> srcRs = SourceRecords;
+            IEnumerable<TCommon> destRs = DestRecords;
 
+            var Common =
+                from src in srcRs
+                join dest in destRs
+                on _fGetKey(src) equals _fGetKey(dest)
+                where !src.Equals(dest)
+                select new Tuple<TCommon, TCommon>(src, dest);
+
+            return Common;
+        }
 
         // TCommon Source
         // TCommon Dest

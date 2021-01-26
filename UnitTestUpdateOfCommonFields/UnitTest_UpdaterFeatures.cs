@@ -18,25 +18,28 @@ namespace UnitTestUpdateOfCommonFields
         [TestMethod]
         public void Test_GetRsWithDiffs_OneOfTwoRecordsChanges()
         {
-            Updater<Data, Key> updater = new Updater<Data, Key>();
+            UpdateProcess<Data, Guid> updater = new UpdateProcess<Data, Guid>();
             updater.fGetKey = fGetKey;
 
             Guid guid1 = Guid.NewGuid();
             Guid guid2 = Guid.NewGuid();
 
             updater.SourceRecords = GetSourceRecords(guid1, guid2);
-            updater.DestRecords = GetSourceRecords(guid2, guid1);
+            updater.DestRecords = GetDifferentSourceRecords(guid1, guid2);
 
-            IEnumerable<Tuple<Data, Data>> ChangedRecords = updater.GetRsWithDiffs();
-            Tuple<Data, Data> UpdatedRecordPair = ChangedRecords.First();
+            IEnumerable<Tuple<Data, Data>> ChangedRecords = updater.GetUpdatesByCommonFields();
+            Tuple<Data, Data> UpdatedRecordPair = ChangedRecords.FirstOrDefault();
 
-            Assert.AreEqual(newGuid2Data, UpdatedRecordPair.Item1.Stuff);
+            Assert.AreEqual(guid2, UpdatedRecordPair.Item1.ID);
+            Assert.AreEqual(guid2, UpdatedRecordPair.Item2.ID);
+            Assert.AreNotEqual(UpdatedRecordPair.Item1.Stuff, UpdatedRecordPair.Item2.Stuff);
+            Assert.AreEqual(1, ChangedRecords.Count());
         }
 
         [TestMethod]
         public void Test_source_and_destination_records_cant_be_changed_externally_once_initialized()
         {
-            Updater<Data, Key> updater = new Updater<Data, Key>();
+            UpdateProcess<Data, Key> updater = new UpdateProcess<Data, Key>();
             IEnumerable<Data> Empty = new List<Data>();
             List<Data> OneRecord = new List<Data>();
             OneRecord.Add(new Data() { Stuff = string.Empty });
@@ -52,7 +55,7 @@ namespace UnitTestUpdateOfCommonFields
         [TestMethod]
         public void Test_source_and_destination_records_can_only_be_initialized()
         {
-            Updater<Data, Key> updater = new Updater<Data, Key>();
+            UpdateProcess<Data, Key> updater = new UpdateProcess<Data, Key>();
             IEnumerable<Data> Empty = new List<Data>();
             List<Data> OneRecord = new List<Data>();
             OneRecord.Add(new Data());
@@ -81,13 +84,13 @@ namespace UnitTestUpdateOfCommonFields
         [TestMethod]
         public void Test_fGetKey_Can_Only_Be_Initialized()
         {
-            Func<Data, Key> fGetFakeKey;
+            Func<Data, Guid> fGetFakeKey;
             fGetFakeKey = (x) =>
             {
-                return new Key() { Stuff = fakeStuff };
+                return Guid.NewGuid();
             };
 
-            Updater<Data, Key> updater = new Updater<Data, Key>();
+            UpdateProcess<Data, Guid> updater = new UpdateProcess<Data, Guid>();
             updater.fGetKey = fGetKey;
             updater.fGetKey = fGetFakeKey; // attempt to override fGetKey with Fake Key
 
@@ -96,17 +99,25 @@ namespace UnitTestUpdateOfCommonFields
 
             updater.SourceRecords = GetSourceRecords(guid1, guid2);
 
-            string result = updater.fGetKey(updater.SourceRecords.First()).Stuff;
+            Guid result = updater.fGetKey(updater.SourceRecords.First());
 
-            Assert.AreEqual(firstItemStuff, result);
+            Assert.AreEqual(guid1, result);
 
         }
 
         private IEnumerable<Data> GetSourceRecords(Guid guid1, Guid guid2)
         {
             List<Data> data = new List<Data>();
-            data.Add(new Data() { ID = guid1, Stuff = "first item stuff" });
-            data.Add(new Data() { ID = guid2, Stuff = "second item stuff" });
+            data.Add(new Data() { ID = guid1, Stuff = firstItemStuff });
+            data.Add(new Data() { ID = guid2, Stuff = secondItemStuff });
+            return data;
+        }
+
+        private IEnumerable<Data> GetDifferentSourceRecords(Guid guid1, Guid guid2)
+        {
+            List<Data> data = new List<Data>();
+            data.Add(new Data() { ID = guid1, Stuff = firstItemStuff});
+            data.Add(new Data() { ID = guid2, Stuff = secondItemStuff + " changed" });
             return data;
         }
 
@@ -119,11 +130,9 @@ namespace UnitTestUpdateOfCommonFields
         {
             public String Stuff { get; set; }
         }
-        public Key fGetKey(Data data)
+        public Guid fGetKey(Data data)
         {
-            Key key = new Key();
-            key.Stuff = data.Stuff;
-            return key;
+            return data.ID;
         }
     }
 }

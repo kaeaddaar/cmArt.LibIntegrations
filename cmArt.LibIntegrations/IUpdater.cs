@@ -9,6 +9,6 @@ namespace cmArt.LibIntegrations
         Func<TCommon, TKey> fGetKey { get; set; }
         IEnumerable<TCommon> SourceRecords { get; set; }
 
-        IEnumerable<Tuple<TCommon, TCommon>> GetRsWithDiffs();
+        IEnumerable<Tuple<TCommon, TCommon>> GetMatchingRecordSetWithDiffs();
     }
 }
