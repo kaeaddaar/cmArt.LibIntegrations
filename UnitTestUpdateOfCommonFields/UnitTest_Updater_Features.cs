@@ -7,7 +7,7 @@ using System.Linq;
 namespace UnitTestUpdateOfCommonFields
 {
     [TestClass]
-    public class UnitTest_UpdaterFeatures
+    public class UnitTest_Updater_Features
     {
         const string firstItemStuff = "first item stuff";
         const string secondItemStuff = "second item stuff";

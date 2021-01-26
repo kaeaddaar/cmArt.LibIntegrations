@@ -9,23 +9,25 @@ using System.Linq;
 
 namespace cmArt.LibIntegrations
 {
-    public class UpdateProcess<TCommon, TKey> //: IUpdater<TCommon, TKey>
+    public class UpdateProcess<TCommon, TKey> : IUpdateProcess<TCommon, TKey>
     {
         private IEnumerable<TCommon> _SourceRecords;
         private IEnumerable<TCommon> _DestRecords;
 
-        public IEnumerable<TCommon> SourceRecords { 
-            get 
+        public IEnumerable<TCommon> SourceRecords
+        {
+            get
             {
                 return _SourceRecords;
             }
             set
             {
                 _SourceRecords = _SourceRecords ?? value.AsEnumerable();
-            } 
+            }
         }
 
-        public IEnumerable<TCommon> DestRecords {
+        public IEnumerable<TCommon> DestRecords
+        {
             get
             {
                 return _DestRecords;
@@ -36,7 +38,8 @@ namespace cmArt.LibIntegrations
             }
         }
         private Func<TCommon, TKey> _fGetKey;
-        public Func<TCommon, TKey> fGetKey {
+        public Func<TCommon, TKey> fGetKey
+        {
             get
             {
                 return _fGetKey;
@@ -46,7 +49,7 @@ namespace cmArt.LibIntegrations
                 _fGetKey = _fGetKey ?? value;
             }
         }
-     
+
         public UpdateProcess()
         {
         }
@@ -59,7 +62,7 @@ namespace cmArt.LibIntegrations
                 , fGetKey: _fGetKey
             );
         }
-        public IEnumerable<TCommon> GetUpdatesByKeys // source records that match and have changes are the updated destination records
+        private IEnumerable<TCommon> GetUpdatesByKeys // source records that match and have changes are the updated destination records
         (
             IEnumerable<TCommon> SrcRecords_UnfilteredIn
             , IEnumerable<TCommon> DestRecords_UnfilteredIn
@@ -99,7 +102,7 @@ namespace cmArt.LibIntegrations
 
             return UpdatedDestRecords;
         }
-        
+
         public IEnumerable<Tuple<TCommon, TCommon>> GetUpdatesByCommonFields()
         {
             return GetUpdatesByCommonFields(SourceRecords: _SourceRecords, DestRecords: _DestRecords);
@@ -122,9 +125,5 @@ namespace cmArt.LibIntegrations
             return Common;
         }
 
-        // TCommon Source
-        // TCommon Dest
-        // Key for TCommon
-        // Routine that Updates fields in Dest based on matching source
     }
 }
