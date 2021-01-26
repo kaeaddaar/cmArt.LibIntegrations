@@ -14,9 +14,9 @@ namespace UnitTestUpdateOfCommonFields
         const string fakeStuff = "fake stuff";
         const string newGuid2Data= "New Guid 2 data";
 
-        
+
         [TestMethod]
-        public void Test_GetRsWithDiffs_OneOfTwoRecordsChanges()
+        public void Test_GetUpdatesByCommonFields_OneOfTwoRecordsChanges()
         {
             UpdateProcess<Data, Guid> updater = new UpdateProcess<Data, Guid>();
             updater.fGetKey = fGetKey;
@@ -33,6 +33,25 @@ namespace UnitTestUpdateOfCommonFields
             Assert.AreEqual(guid2, UpdatedRecordPair.Item1.ID);
             Assert.AreEqual(guid2, UpdatedRecordPair.Item2.ID);
             Assert.AreNotEqual(UpdatedRecordPair.Item1.Stuff, UpdatedRecordPair.Item2.Stuff);
+            Assert.AreEqual(1, ChangedRecords.Count());
+        }
+        [TestMethod]
+        public void Test_GetUpdatesByKeys_OneOfTwoRecordsChanges()
+        {
+            UpdateProcess<Data, Guid> updater = new UpdateProcess<Data, Guid>();
+            updater.fGetKey = fGetKey;
+
+            Guid guid1 = Guid.NewGuid();
+            Guid guid2 = Guid.NewGuid();
+
+            updater.SourceRecords = GetSourceRecords(guid1, guid2);
+            updater.DestRecords = GetDifferentSourceRecords(guid1, guid2);
+
+            IEnumerable<Data> ChangedRecords = updater.GetUpdatesByKeys();
+            Data UpdatedRecord = ChangedRecords.FirstOrDefault();
+
+            Assert.AreEqual(guid2, UpdatedRecord.ID);
+            Assert.AreEqual(secondItemStuff, UpdatedRecord.Stuff); // src = original text so remove changes
             Assert.AreEqual(1, ChangedRecords.Count());
         }
 

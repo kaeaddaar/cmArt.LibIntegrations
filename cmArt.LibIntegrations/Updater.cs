@@ -50,7 +50,16 @@ namespace cmArt.LibIntegrations
         public UpdateProcess()
         {
         }
-        public IEnumerable<TCommon> GetUpdatesByKey // source records that match and have changes are the updated destination records
+        public IEnumerable<TCommon> GetUpdatesByKeys()
+        {
+            return GetUpdatesByKeys
+            (
+                SrcRecords_UnfilteredIn: _SourceRecords
+                , DestRecords_UnfilteredIn: _DestRecords
+                , fGetKey: _fGetKey
+            );
+        }
+        public IEnumerable<TCommon> GetUpdatesByKeys // source records that match and have changes are the updated destination records
         (
             IEnumerable<TCommon> SrcRecords_UnfilteredIn
             , IEnumerable<TCommon> DestRecords_UnfilteredIn
@@ -85,7 +94,7 @@ namespace cmArt.LibIntegrations
                 from SrcRecord in SrcRecords_Filtered
                 join DestRecord in DestRecords_Filtered
                 on fGetKey(SrcRecord) equals fGetKey(DestRecord)
-                where SrcRecord.GetHashCode() != DestRecord.GetHashCode()
+                where !SrcRecord.Equals(DestRecord)
                 select SrcRecord;
 
             return UpdatedDestRecords;
