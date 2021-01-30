@@ -1,10 +1,70 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace cmArt.BevNet
+﻿namespace cmArt.BevNet
 {
     public interface IPriceFile
     {
+        string ASST_SIZE { get; set; }
+        string BDESC { get; set; }
+        decimal BESTBOT { get; set; }
+        decimal BOT_PRICE { get; set; }
+        int BOTPERCASE { get; set; }
+        decimal CALE_SHELF { get; set; }
+        decimal CASE_PRICE { get; set; }
+        string D_TYPE1__ { get; set; }
+        string D_TYPE2__ { get; set; }
+        string D_TYPE3__ { get; set; }
+        string D_TYPE4__ { get; set; }
+        string D_TYPE5__ { get; set; }
+        string D_TYPE6__ { get; set; }
+        string D_TYPE7__ { get; set; }
+        string D_TYPE8__ { get; set; }
+        string D_TYPE9__ { get; set; }
+        string DATE { get; set; }
+        decimal DEPOSIT { get; set; }
+        string DESCRIPTIO { get; set; }
+        float DISCOUNT1_ { get; set; }
+        float DISCOUNT2_ { get; set; }
+        float DISCOUNT3_ { get; set; }
+        float DISCOUNT4_ { get; set; }
+        float DISCOUNT5_ { get; set; }
+        float DISCOUNT6_ { get; set; }
+        float DISCOUNT7_ { get; set; }
+        float DISCOUNT8_ { get; set; }
+        float DISCOUNT9_ { get; set; }
+        string DIV1___ { get; set; }
+        string DIV10___ { get; set; }
+        string DIV11___ { get; set; }
+        string DIV12___ { get; set; }
+        string DIV2___ { get; set; }
+        string DIV3___ { get; set; }
+        string DIV4___ { get; set; }
+        string DIV5___ { get; set; }
+        string DIV6___ { get; set; }
+        string DIV7___ { get; set; }
+        string DIV8___ { get; set; }
+        string DIV9___ { get; set; }
+        decimal FRONT_NYC { get; set; }
+        string FULLCASE { get; set; }
+        string LWBN { get; set; }
+        decimal POSTOFF { get; set; }
+        string PROD_ITEM { get; set; }
+        float QTY1__ { get; set; }
+        float QTY2__ { get; set; }
+        float QTY3__ { get; set; }
+        float QTY4__ { get; set; }
+        float QTY5__ { get; set; }
+        float QTY6__ { get; set; }
+        float QTY7__ { get; set; }
+        float QTY8__ { get; set; }
+        float QTY9__ { get; set; }
+        int SECPACK { get; set; }
+        int SIZE { get; set; }
+        string TRUEVINT { get; set; }
+        string TYPE_DESC { get; set; }
+        string UNIV_CAT { get; set; }
+        string UNIV_PROD { get; set; }
+        string UPC { get; set; }
+        string VINTAGE { get; set; }
+        string WHOLE_NAME { get; set; }
+        string WHOLESALER { get; set; }
     }
 }

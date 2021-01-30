@@ -62,6 +62,27 @@ namespace cmArt.LibIntegrations
                 , fGetKey: _fGetKey
             );
         }
+        public IEnumerable<TKey> GetMatchingKeys
+        (
+            IEnumerable<TCommon> SrcRecords_UnfilteredIn
+            , IEnumerable<TCommon> DestRecords_UnfilteredIn
+            , Func<TCommon, TKey> fGetKey
+        )
+        {
+            IEnumerable<TCommon> SrcRecords_Unfiltered = SrcRecords_UnfilteredIn ?? new List<TCommon>();
+            IEnumerable<TCommon> DestRecords_Unfiltered = DestRecords_UnfilteredIn ?? new List<TCommon>();
+
+            var SrcKeys = SrcRecords_Unfiltered.Select(x => fGetKey(x));
+            var DestKeys = DestRecords_Unfiltered.Select(x => fGetKey(x));
+
+            var Matching_Keys =
+                from src in SrcKeys
+                join dest in DestKeys
+                on src equals dest
+                select src;
+            return Matching_Keys;
+        }
+
         private IEnumerable<TCommon> GetUpdatesByKeys // source records that match and have changes are the updated destination records
         (
             IEnumerable<TCommon> SrcRecords_UnfilteredIn
