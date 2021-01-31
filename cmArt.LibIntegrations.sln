@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.LibIntegrations", "cm
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTestUpdateOfCommonFields", "UnitTestUpdateOfCommonFields\UnitTestUpdateOfCommonFields.csproj", "{7AF2FCB7-E4F7-4B86-A79A-FFCB926094E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmArt.BevNet", "BevNet\cmArt.BevNet.csproj", "{AB6C1EA9-6D1A-44AC-9C07-28D3A3FCB12A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.BevNet", "BevNet\cmArt.BevNet.csproj", "{AB6C1EA9-6D1A-44AC-9C07-28D3A3FCB12A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTest_cmArt.LibIntegrations", "IntegrationTest_cmArt.LibIntegrations\IntegrationTest_cmArt.LibIntegrations.csproj", "{B472CF77-FD2A-47A3-961B-84134EEF0D20}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTest_cmArt.LibIntegrations", "IntegrationTest_cmArt.LibIntegrations\IntegrationTest_cmArt.LibIntegrations.csproj", "{B472CF77-FD2A-47A3-961B-84134EEF0D20}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmArt.BevNet.Changes", "cmArt.BevNet.Changes\cmArt.BevNet.Changes.csproj", "{7977CAF7-21DE-449E-9A6E-D3ECC8E4770E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{B472CF77-FD2A-47A3-961B-84134EEF0D20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B472CF77-FD2A-47A3-961B-84134EEF0D20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B472CF77-FD2A-47A3-961B-84134EEF0D20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7977CAF7-21DE-449E-9A6E-D3ECC8E4770E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7977CAF7-21DE-449E-9A6E-D3ECC8E4770E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7977CAF7-21DE-449E-9A6E-D3ECC8E4770E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7977CAF7-21DE-449E-9A6E-D3ECC8E4770E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
