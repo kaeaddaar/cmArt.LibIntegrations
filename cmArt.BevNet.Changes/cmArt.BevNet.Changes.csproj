@@ -11,6 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BevNet\cmArt.BevNet.csproj" />
+    <ProjectReference Include="..\cmArt.LibIntegrations\cmArt.LibIntegrations.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
