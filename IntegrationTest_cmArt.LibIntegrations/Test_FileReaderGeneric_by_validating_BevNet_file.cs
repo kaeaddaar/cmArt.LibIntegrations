@@ -9,13 +9,13 @@ using System.Linq;
 namespace IntegrationTest_cmArt.LibIntegrations
 {
     [TestClass]
-    public class TestFileReaderGeneric
+    public class Test_FileReaderGeneric_by_validating_BevNet_file
     {
         [TestMethod]
         public void Test_Read_BevNet_File_With_Header_And_Three_Records()
         {
             IEnumerable<PriceFile> priceFile;
-            priceFile = FileReaderGeneric<PriceFile>.ReadFile("C:\\_P\\Tools\\JsonTools\\cmArt.LibIntegrations\\" +
+            priceFile = FileReaderGeneric<PriceFile>.ReadFile("C:\\_P\\Tools\\cmArt.LibIntegrations\\" +
                 "IntegrationTest_cmArt.LibIntegrations\\BevNet_Small.csv");
             Assert.AreEqual(3, priceFile.Count());
         }
@@ -24,7 +24,7 @@ namespace IntegrationTest_cmArt.LibIntegrations
         public void ValidateContents_Of_BevNet_File_With_Header_And_First_Of_Three_Records()
         {
             IEnumerable<PriceFile> priceFile;
-            priceFile = FileReaderGeneric<PriceFile>.ReadFile("C:\\_P\\Tools\\JsonTools\\cmArt.LibIntegrations\\" +
+            priceFile = FileReaderGeneric<PriceFile>.ReadFile("C:\\_P\\Tools\\cmArt.LibIntegrations\\" +
                 "IntegrationTest_cmArt.LibIntegrations\\BevNet_Small.csv");
             Assert.AreEqual(3, priceFile.Count());
 

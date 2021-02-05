@@ -6,6 +6,10 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.1.1" />
@@ -15,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\cmArt.LibIntegrations\cmArt.LibIntegrations.csproj" />
+    <ProjectReference Include="..\cmArt.System5.Data\cmArt.System5.Data.csproj" />
   </ItemGroup>
 
 </Project>
