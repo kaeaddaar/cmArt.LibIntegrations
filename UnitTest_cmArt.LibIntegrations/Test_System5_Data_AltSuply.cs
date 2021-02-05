@@ -7,7 +7,7 @@ using System;
 namespace UnitTest_cmArt.LibIntegrations
 {
     [TestClass]
-    public class Test_System_5Data
+    public class Test_System5_Data_AltSuply
     {
         const string HelloWorld_NoTrailingSpaces = " Hello World";
         const string HelloWorld_TwoTrailingSpaces = " Hello World  ";
