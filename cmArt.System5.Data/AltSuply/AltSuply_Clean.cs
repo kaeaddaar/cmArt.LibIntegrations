@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,14 +7,18 @@ namespace cmArt.System5.Data
 {
     public class AltSuply_Clean : IAltSuply
     {
-        private AltSuply _AltSuply;
+        private IAltSuply _AltSuply;
 
-        public AltSuply_Clean(AltSuply altSuply)
+        public AltSuply_Clean(IAltSuply altSuply)
         {
             _AltSuply = altSuply ?? new AltSuply();
-            ((IAltSuply)_AltSuply).CopyFrom(altSuply);
+            
+            // Perform null string checks
+            _AltSuply.PackSize = _AltSuply.PackSize ?? string.Empty;
+            _AltSuply.PartNumber = _AltSuply.PartNumber ?? string.Empty;
+            _AltSuply.Preferred = _AltSuply.Preferred ?? string.Empty;
 
-            Clean(); // for advanced scenarios
+            ((IAltSuply)this).CopyFrom(altSuply); // performs clean through properties being set during copy from
         }
         public void Clean()
         {
@@ -22,19 +27,19 @@ namespace cmArt.System5.Data
 
         public void Clean_PartNumber()
         {
-            _AltSuply.PartNumber = _AltSuply.PartNumber.TrimEnd();
+            _AltSuply.PartNumber = (_AltSuply.PartNumber ?? string.Empty).TrimEnd();
         }
 
         public string PartNumber_Raw
         {
-            get { return _AltSuply.PartNumber; } // for performance, may not be clean
+            get { return (_AltSuply.PartNumber ?? string.Empty); } // for performance, may not be clean
         }
 
         public string Barcode => PartNumber;
 
         public string PartNumber
         {
-            get {return _AltSuply.PartNumber.TrimEnd(); } // don't clean, just return cleaned
+            get {return PartNumber_Raw.TrimEnd(); } // don't clean, just return cleaned
             set { _AltSuply.PartNumber = value; Clean_PartNumber(); }
         }
 
@@ -43,9 +48,9 @@ namespace cmArt.System5.Data
         public double Extra { get => _AltSuply.Extra; set => _AltSuply.Extra = value; }
         public short FileNo { get => _AltSuply.FileNo; set => _AltSuply.FileNo = value; }
         public double Freight { get => _AltSuply.Freight; set => _AltSuply.Freight = value; }
-        public string PackSize { get => _AltSuply.PackSize; set => _AltSuply.PackSize = value; }
+        public string PackSize { get => _AltSuply.PackSize ?? string.Empty; set => _AltSuply.PackSize = value ?? string.Empty; }
         public int Part { get => _AltSuply.Part; set => _AltSuply.Part = value; }
-        public string Preferred { get => _AltSuply.Preferred; set => _AltSuply.Preferred = value; }
+        public string Preferred { get => _AltSuply.Preferred ?? string.Empty; set => _AltSuply.Preferred = value ?? string.Empty; }
         public double Price { get => _AltSuply.Price; set => _AltSuply.Price = value; }
         public int RecordNo { get => _AltSuply.RecordNo; set => _AltSuply.RecordNo = value; }
     }
