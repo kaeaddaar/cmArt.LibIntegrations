@@ -30,10 +30,7 @@ namespace cmArt.System5.Data
             _AltSuply.PartNumber = (_AltSuply.PartNumber ?? string.Empty).TrimEnd();
         }
 
-        public string PartNumber_Raw
-        {
-            get { return (_AltSuply.PartNumber ?? string.Empty); } // for performance, may not be clean
-        }
+        public string PartNumber_Raw { get { return (_AltSuply.PartNumber ?? string.Empty); } }
 
         public string Barcode => PartNumber;
 
