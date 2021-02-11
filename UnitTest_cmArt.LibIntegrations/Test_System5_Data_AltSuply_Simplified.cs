@@ -57,12 +57,9 @@ namespace UnitTest_cmArt.LibIntegrations
         public void Test_that_null_values_dont_break_clean_field_methods()
         {
             Funcs f = new Funcs(GetNewObj_Clean);
-            List<(Func<IAltSuply, string> GetField, Func<IAltSuply, string, int> SetField)> GetField_SetField_Pairs =
-                Get_GetField_SetField_Pairs();
-
             Generic_Tests<AltSuply, AltSuply_Clean, IAltSuply>.Test_that_null_values_dont_break_clean_field_methods
             (
-                GetField_SetField_Pairs
+                Get_GetField_SetField_Pairs()
                 , f.GetNewObj
                 , f.GetNewObj_Clean
             );
@@ -78,21 +75,15 @@ namespace UnitTest_cmArt.LibIntegrations
         public void Test_that_nullable_props_remove_null()
         {
             Funcs f = new Funcs(GetNewObj_Clean);
-            List<(Func<IAltSuply, string> GetField, Func<IAltSuply, string, int> SetField)> GetField_SetField_Pairs =
-                Get_GetField_SetField_Pairs();
-
             Generic_Tests<AltSuply, AltSuply_Clean, IAltSuply>
-                .Test_that_nullable_props_remove_null(GetField_SetField_Pairs, f.GetNewObj, f.GetNewObj_Clean);
+                .Test_that_nullable_props_remove_null(Get_GetField_SetField_Pairs(), f.GetNewObj, f.GetNewObj_Clean);
         }
         [TestMethod]
         public void Test_For_null_values_in_uninitialized_AltSuply() // putting any brains in the IAltSuply_clean
         {
             Funcs f = new Funcs(GetNewObj_Clean);
-            List<(Func<IAltSuply, string> GetField, Func<IAltSuply, string, int> SetField)> GetField_SetField_Pairs =
-                Get_GetField_SetField_Pairs();
-
             Generic_Tests<AltSuply, AltSuply_Clean, IAltSuply>
-                .Test_For_null_values_in_uninitialized_Obj(GetField_SetField_Pairs, f.GetNewObj, f.GetNewObj_Clean);
+                .Test_For_null_values_in_uninitialized_Obj(Get_GetField_SetField_Pairs(), f.GetNewObj, f.GetNewObj_Clean);
         }
         private List<(Func<IAltSuply, string> GetField, Func<IAltSuply, string, int> SetField)> Get_GetField_SetField_Pairs()
         {
