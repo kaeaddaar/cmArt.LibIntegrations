@@ -22,16 +22,20 @@ namespace UnitTest_cmArt.LibIntegrations
 
             public Funcs(Func<AltSuply, AltSuply_Clean> GetNewObj_Clean) : base(GetNewObj_Clean)
             {
-                // I should be able to have this code below, plus add a reference to Clean() and all other tests can be automated
                 IAltSuply p = new AltSuply();
                 AltSuply_Clean p_clean = new AltSuply_Clean(p);
+
                 _Trailing_Spaces_Field_Method_Name_Pairs = new List<(string FieldName, string CleanField_MethodName)>();
+                // -- trim end fields to check
                 _Trailing_Spaces_Field_Method_Name_Pairs.Add((nameof(p.PartNumber), nameof(p_clean.Clean_PartNumber)));
+                // --
 
                 _Nullable_String_Field_Names = new List<string>();
+                // -- null fields to check
                 _Nullable_String_Field_Names.Add(nameof(p.PartNumber));
                 _Nullable_String_Field_Names.Add(nameof(p.PackSize));
                 _Nullable_String_Field_Names.Add(nameof(p.Preferred));
+                // --
             }
         }
 
@@ -57,9 +61,10 @@ namespace UnitTest_cmArt.LibIntegrations
         public void Test_that_null_values_dont_break_clean_field_methods()
         {
             Funcs f = new Funcs(GetNewObj_Clean);
+            IEnumerable<string> fieldNames = f.Nullable_String_Field_Names;
             Generic_Tests<AltSuply, AltSuply_Clean, IAltSuply>.Test_that_null_values_dont_break_clean_field_methods
             (
-                Get_GetField_SetField_Pairs()
+                Get_GetField_SetField_Pairs(fieldNames)
                 , f.GetNewObj
                 , f.GetNewObj_Clean
             );
@@ -75,29 +80,32 @@ namespace UnitTest_cmArt.LibIntegrations
         public void Test_that_nullable_props_remove_null()
         {
             Funcs f = new Funcs(GetNewObj_Clean);
+            IEnumerable<string> fieldNames = f.Nullable_String_Field_Names;
             Generic_Tests<AltSuply, AltSuply_Clean, IAltSuply>
-                .Test_that_nullable_props_remove_null(Get_GetField_SetField_Pairs(), f.GetNewObj, f.GetNewObj_Clean);
+                .Test_that_nullable_props_remove_null(Get_GetField_SetField_Pairs(fieldNames), f.GetNewObj, f.GetNewObj_Clean);
         }
         [TestMethod]
         public void Test_For_null_values_in_uninitialized_AltSuply() // putting any brains in the IAltSuply_clean
         {
             Funcs f = new Funcs(GetNewObj_Clean);
+            IEnumerable<string> fieldNames = f.Nullable_String_Field_Names;
             Generic_Tests<AltSuply, AltSuply_Clean, IAltSuply>
-                .Test_For_null_values_in_uninitialized_Obj(Get_GetField_SetField_Pairs(), f.GetNewObj, f.GetNewObj_Clean);
+                .Test_For_null_values_in_uninitialized_Obj(Get_GetField_SetField_Pairs(fieldNames), f.GetNewObj, f.GetNewObj_Clean);
         }
-        private List<(Func<IAltSuply, string> GetField, Func<IAltSuply, string, int> SetField)> Get_GetField_SetField_Pairs()
+        private List<(Func<IAltSuply, string> GetField, Func<IAltSuply, string, int> SetField)> Get_GetField_SetField_Pairs(IEnumerable<string> FieldNames)
         {
             List<(Func<IAltSuply, string> GetField, Func<IAltSuply, string, int> SetField)> GetField_SetField_Pairs =
                 new List<(Func<IAltSuply, string> GetField, Func<IAltSuply, string, int> SetField)>();
 
             IAltSuply p = new AltSuply();
-
-            GetField_SetField_Pairs.Add(Build_GetSet_ForField(nameof(p.PartNumber)));
-            GetField_SetField_Pairs.Add(Build_GetSet_ForField(nameof(p.PackSize)));
-            GetField_SetField_Pairs.Add(Build_GetSet_ForField(nameof(p.Preferred)));
-
+            foreach (var fieldName in FieldNames)
+            {
+                GetField_SetField_Pairs.Add(Build_GetSet_ForField(fieldName));
+            }
             return GetField_SetField_Pairs;
         }
+
+
     }
 
 }
