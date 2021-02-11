@@ -14,7 +14,7 @@ namespace cmArt.System5.Data
 
         public Comments_Clean(IComments comments)
         {
-            _Comments = _Comments ?? new Comments();
+            _Comments = comments ?? new Comments();
 
             _Comments.Comment = _Comments.Comment ?? string.Empty;
             ((IComments)this).CopyFrom(comments);
