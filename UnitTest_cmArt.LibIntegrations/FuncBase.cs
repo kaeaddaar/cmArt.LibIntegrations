@@ -19,7 +19,7 @@ namespace UnitTest_cmArt.LibIntegrations
             set { _Trailing_Spaces_Field_Method_Name_Pairs = value.ToList(); }
         }
 
-        private List<string> _Nullable_String_Field_Names;
+        protected List<string> _Nullable_String_Field_Names;
         public IEnumerable<string> Nullable_String_Field_Names
         {
             get { return _Nullable_String_Field_Names; }

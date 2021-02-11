@@ -17,37 +17,21 @@ namespace UnitTest_cmArt.LibIntegrations
 
         public class Funcs : FuncBase<AltSuply, AltSuply_Clean, IAltSuply>
         {
-            public Func<IAltSuply, string> GetPartNumber = (obj) => { return obj.PartNumber; };
-            public Func<IAltSuply, string, int> SetPartNumber = (obj, value) => { obj.PartNumber = value; return 1; };
-            public Func<AltSuply> GetNewObj = () => { return new AltSuply(); };
-            //public Func<AltSuply, AltSuply_Clean> GetNewObj_Clean = (obj) => { return new AltSuply_Clean(obj); };
             public Func<AltSuply_Clean, int> Clean = (objClean) => { objClean.Clean(); return 1; };
             public Func<AltSuply_Clean, int> Clean_Field = (objClean) => { objClean.Clean_PartNumber(); return 1; };
-
-            private List<(string FieldName, string CleanField_MethodName)> _Trailing_Spaces_Field_Method_Name_Pairs;
-            public IEnumerable<(string FieldName, string CleanField_MethodName)> Trailing_Spaces_Field_Method_Name_Pairs
-            {
-                get { return _Trailing_Spaces_Field_Method_Name_Pairs; }
-                set { _Trailing_Spaces_Field_Method_Name_Pairs = value.ToList(); }
-            }
-
-            private List<string> _Nullable_String_Field_Names;
-            public IEnumerable<string> Nullable_String_Field_Names
-            {
-                get { return _Nullable_String_Field_Names; }
-                set { _Nullable_String_Field_Names = value.ToList(); }
-            }
 
             public Funcs(Func<AltSuply, AltSuply_Clean> GetNewObj_Clean) : base(GetNewObj_Clean)
             {
                 // I should be able to have this code below, plus add a reference to Clean() and all other tests can be automated
+                IAltSuply p = new AltSuply();
+                AltSuply_Clean p_clean = new AltSuply_Clean(p);
                 _Trailing_Spaces_Field_Method_Name_Pairs = new List<(string FieldName, string CleanField_MethodName)>();
-                _Trailing_Spaces_Field_Method_Name_Pairs.Add(("PartNumber", "Clean_PartNumber"));
+                _Trailing_Spaces_Field_Method_Name_Pairs.Add((nameof(p.PartNumber), nameof(p_clean.Clean_PartNumber)));
 
                 _Nullable_String_Field_Names = new List<string>();
-                _Nullable_String_Field_Names.Add("PartNumber");
-                _Nullable_String_Field_Names.Add("PackSize");
-                _Nullable_String_Field_Names.Add("Preferred");
+                _Nullable_String_Field_Names.Add(nameof(p.PartNumber));
+                _Nullable_String_Field_Names.Add(nameof(p.PackSize));
+                _Nullable_String_Field_Names.Add(nameof(p.Preferred));
             }
         }
 
@@ -85,11 +69,10 @@ namespace UnitTest_cmArt.LibIntegrations
         }
         private (Func<IAltSuply, string> GetField, Func<IAltSuply, string, int> SetField) Build_GetSet_ForField(string FieldName)
         {
-            PropertyInfo pInfo_PartNumber = typeof(IAltSuply).GetProperty(FieldName);
-
-            Func<IAltSuply, string> GetPartNumber = (obj) => { return (string)pInfo_PartNumber.GetValue(obj); };
-            Func<IAltSuply, string, int> SetPartNumber = (obj, value) => { pInfo_PartNumber.SetValue(obj, value); return 1; };
-            return (GetPartNumber, SetPartNumber);
+            PropertyInfo pInfo_Field = typeof(IAltSuply).GetProperty(FieldName);
+            Func<IAltSuply, string> GetField = (obj) => { return (string)pInfo_Field.GetValue(obj); };
+            Func<IAltSuply, string, int> SetField = (obj, value) => { pInfo_Field.SetValue(obj, value); return 1; };
+            return (GetField, SetField);
         }
         [TestMethod]
         public void Test_that_nullable_props_remove_null()
@@ -116,9 +99,11 @@ namespace UnitTest_cmArt.LibIntegrations
             List<(Func<IAltSuply, string> GetField, Func<IAltSuply, string, int> SetField)> GetField_SetField_Pairs =
                 new List<(Func<IAltSuply, string> GetField, Func<IAltSuply, string, int> SetField)>();
 
-            GetField_SetField_Pairs.Add(Build_GetSet_ForField("PartNumber"));
-            GetField_SetField_Pairs.Add(Build_GetSet_ForField("PackSize"));
-            GetField_SetField_Pairs.Add(Build_GetSet_ForField("Preferred"));
+            IAltSuply p = new AltSuply();
+
+            GetField_SetField_Pairs.Add(Build_GetSet_ForField(nameof(p.PartNumber)));
+            GetField_SetField_Pairs.Add(Build_GetSet_ForField(nameof(p.PackSize)));
+            GetField_SetField_Pairs.Add(Build_GetSet_ForField(nameof(p.Preferred)));
 
             return GetField_SetField_Pairs;
         }
