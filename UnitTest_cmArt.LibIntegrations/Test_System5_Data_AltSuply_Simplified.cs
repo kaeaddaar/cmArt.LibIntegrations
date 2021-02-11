@@ -13,13 +13,14 @@ namespace UnitTest_cmArt.LibIntegrations
     {
         const string HelloWorld_NoTrailingSpaces = " Hello World";
         const string HelloWorld_TwoTrailingSpaces = " Hello World  ";
-        
-        public class Funcs
+        Func<AltSuply, AltSuply_Clean> GetNewObj_Clean = (obj) => { return new AltSuply_Clean(obj); };
+
+        public class Funcs : FuncBase<AltSuply, AltSuply_Clean, IAltSuply>
         {
             public Func<IAltSuply, string> GetPartNumber = (obj) => { return obj.PartNumber; };
             public Func<IAltSuply, string, int> SetPartNumber = (obj, value) => { obj.PartNumber = value; return 1; };
             public Func<AltSuply> GetNewObj = () => { return new AltSuply(); };
-            public Func<AltSuply, AltSuply_Clean> GetNewObj_Clean = (obj) => { return new AltSuply_Clean(obj); };
+            //public Func<AltSuply, AltSuply_Clean> GetNewObj_Clean = (obj) => { return new AltSuply_Clean(obj); };
             public Func<AltSuply_Clean, int> Clean = (objClean) => { objClean.Clean(); return 1; };
             public Func<AltSuply_Clean, int> Clean_Field = (objClean) => { objClean.Clean_PartNumber(); return 1; };
 
@@ -37,8 +38,9 @@ namespace UnitTest_cmArt.LibIntegrations
                 set { _Nullable_String_Field_Names = value.ToList(); }
             }
 
-            public Funcs()
+            public Funcs(Func<AltSuply, AltSuply_Clean> GetNewObj_Clean) : base(GetNewObj_Clean)
             {
+                // I should be able to have this code below, plus add a reference to Clean() and all other tests can be automated
                 _Trailing_Spaces_Field_Method_Name_Pairs = new List<(string FieldName, string CleanField_MethodName)>();
                 _Trailing_Spaces_Field_Method_Name_Pairs.Add(("PartNumber", "Clean_PartNumber"));
 
@@ -52,7 +54,7 @@ namespace UnitTest_cmArt.LibIntegrations
         [TestMethod]
         public void Test_that_AltSuply_Clean_Trims_Trailing_Spaces_from_required_fields()
         {
-            Funcs f = new Funcs();
+            Funcs f = new Funcs(GetNewObj_Clean);
             foreach (var pair in f.Trailing_Spaces_Field_Method_Name_Pairs)
             {
                 var GetSet = Build_GetSet_ForField(pair.FieldName);
@@ -70,7 +72,7 @@ namespace UnitTest_cmArt.LibIntegrations
         [TestMethod]
         public void Test_that_null_values_dont_break_clean_field_methods()
         {
-            Funcs f = new Funcs();
+            Funcs f = new Funcs(GetNewObj_Clean);
             List<(Func<IAltSuply, string> GetField, Func<IAltSuply, string, int> SetField)> GetField_SetField_Pairs =
                 Get_GetField_SetField_Pairs();
 
@@ -92,7 +94,7 @@ namespace UnitTest_cmArt.LibIntegrations
         [TestMethod]
         public void Test_that_nullable_props_remove_null()
         {
-            Funcs f = new Funcs();
+            Funcs f = new Funcs(GetNewObj_Clean);
             List<(Func<IAltSuply, string> GetField, Func<IAltSuply, string, int> SetField)> GetField_SetField_Pairs =
                 Get_GetField_SetField_Pairs();
 
@@ -102,7 +104,7 @@ namespace UnitTest_cmArt.LibIntegrations
         [TestMethod]
         public void Test_For_null_values_in_uninitialized_AltSuply() // putting any brains in the IAltSuply_clean
         {
-            Funcs f = new Funcs();
+            Funcs f = new Funcs(GetNewObj_Clean);
             List<(Func<IAltSuply, string> GetField, Func<IAltSuply, string, int> SetField)> GetField_SetField_Pairs =
                 Get_GetField_SetField_Pairs();
 
