@@ -9,45 +9,47 @@ using System.Linq;
 namespace UnitTest_cmArt.LibIntegrations
 {
     [TestClass]
-    public class Test_System5_Data_Comments
+    public class Test_System5_Data_Stok
     {
         const string HelloWorld_NoTrailingSpaces = " Hello World";
         const string HelloWorld_TwoTrailingSpaces = " Hello World  ";
-        Func<Comments, Comments_Clean> GetNewObj_Clean = (obj) => { return new Comments_Clean(obj); };
+        Func<Stok, Stok_Clean> GetNewObj_Clean = (obj) => { return new Stok_Clean(obj); };
 
-        public class Funcs : FuncBase<Comments, Comments_Clean, IComments>
+        public class Funcs : FuncBase<Stok, Stok_Clean, IStok>
         {
-            public Func<Comments_Clean, int> Clean = (objClean) => { objClean.Clean(); return 1; };
+            public Func<Stok_Clean, int> Clean = (objClean) => { objClean.Clean(); return 1; };
 
-            public Funcs(Func<Comments, Comments_Clean> GetNewObj_Clean) : base(GetNewObj_Clean)
+            public Funcs(Func<Stok, Stok_Clean> GetNewObj_Clean) : base(GetNewObj_Clean)
             {
-                IComments p = new Comments();
-                Comments_Clean p_clean = new Comments_Clean(p);
+                IStok p = new Stok();
+                Stok_Clean p_clean = new Stok_Clean(p);
 
                 _Trailing_Spaces_Field_Method_Name_Pairs = new List<(string FieldName, string CleanField_MethodName)>();
                 // -- trim end fields to check
-                _Trailing_Spaces_Field_Method_Name_Pairs.Add((nameof(p.Comment), nameof(p_clean.Clean_Comment)));
+                _Trailing_Spaces_Field_Method_Name_Pairs.Add((nameof(p.Number), nameof(p_clean.Clean_Number)));
                 // --
 
                 _Nullable_String_Field_Names = new List<string>();
                 // -- null fields to check
-                _Nullable_String_Field_Names.Add(nameof(p.Comment));
+                _Nullable_String_Field_Names.Add(nameof(p.Number));
+                _Nullable_String_Field_Names.Add(nameof(p.Country));
+                _Nullable_String_Field_Names.Add(nameof(p.Description));
                 // --
             }
         }
 
         [TestMethod]
-        public void Test_that_Comments_Clean_Trims_Trailing_Spaces_from_required_fields()
+        public void Test_that_Stok_Clean_Trims_Trailing_Spaces_from_required_fields()
         {
             Funcs f = new Funcs(GetNewObj_Clean);
             foreach (var pair in f.Trailing_Spaces_Field_Method_Name_Pairs)
             {
                 var GetSet = Build_GetSet_ForField(pair.FieldName);
 
-                MethodInfo Clean_Method = typeof(Comments_Clean).GetMethod(pair.CleanField_MethodName);
-                Func<Comments_Clean, int> Clean_Field = (objClean) => { Clean_Method.Invoke(objClean, null); return 1; };
+                MethodInfo Clean_Method = typeof(Stok_Clean).GetMethod(pair.CleanField_MethodName);
+                Func<Stok_Clean, int> Clean_Field = (objClean) => { Clean_Method.Invoke(objClean, null); return 1; };
 
-                Generic_Tests<Comments, Comments_Clean, IComments>.Perform_test_showing_that_Obj_Clean_Trims_Trailing_Spaces_from_field
+                Generic_Tests<Stok, Stok_Clean, IStok>.Perform_test_showing_that_Obj_Clean_Trims_Trailing_Spaces_from_field
                 (
                     GetSet.GetField
                     , GetSet.SetField
@@ -63,18 +65,18 @@ namespace UnitTest_cmArt.LibIntegrations
         {
             Funcs f = new Funcs(GetNewObj_Clean);
             IEnumerable<string> fieldNames = f.Nullable_String_Field_Names;
-            Generic_Tests<Comments, Comments_Clean, IComments>.Test_that_null_values_dont_break_clean_field_methods
+            Generic_Tests<Stok, Stok_Clean, IStok>.Test_that_null_values_dont_break_clean_field_methods
             (
                 Get_GetField_SetField_Pairs(fieldNames)
                 , f.GetNewObj
                 , f.GetNewObj_Clean
             );
         }
-        private (Func<IComments, string> GetField, Func<IComments, string, int> SetField) Build_GetSet_ForField(string FieldName)
+        private (Func<IStok, string> GetField, Func<IStok, string, int> SetField) Build_GetSet_ForField(string FieldName)
         {
-            PropertyInfo pInfo_Field = typeof(IComments).GetProperty(FieldName);
-            Func<IComments, string> GetField = (obj) => { return (string)pInfo_Field.GetValue(obj); };
-            Func<IComments, string, int> SetField = (obj, value) => { pInfo_Field.SetValue(obj, value); return 1; };
+            PropertyInfo pInfo_Field = typeof(IStok).GetProperty(FieldName);
+            Func<IStok, string> GetField = (obj) => { return (string)pInfo_Field.GetValue(obj); };
+            Func<IStok, string, int> SetField = (obj, value) => { pInfo_Field.SetValue(obj, value); return 1; };
             return (GetField, SetField);
         }
         [TestMethod]
@@ -82,23 +84,23 @@ namespace UnitTest_cmArt.LibIntegrations
         {
             Funcs f = new Funcs(GetNewObj_Clean);
             IEnumerable<string> fieldNames = f.Nullable_String_Field_Names;
-            Generic_Tests<Comments, Comments_Clean, IComments>
+            Generic_Tests<Stok, Stok_Clean, IStok>
                 .Test_that_nullable_props_remove_null(Get_GetField_SetField_Pairs(fieldNames), f.GetNewObj, f.GetNewObj_Clean);
         }
         [TestMethod]
-        public void Test_For_null_values_in_uninitialized_Comments() // putting any brains in the IComments_clean
+        public void Test_For_null_values_in_uninitialized_Stok() // putting any brains in the IStok_clean
         {
             Funcs f = new Funcs(GetNewObj_Clean);
             IEnumerable<string> fieldNames = f.Nullable_String_Field_Names;
-            Generic_Tests<Comments, Comments_Clean, IComments>
+            Generic_Tests<Stok, Stok_Clean, IStok>
                 .Test_For_null_values_in_uninitialized_Obj(Get_GetField_SetField_Pairs(fieldNames), f.GetNewObj, f.GetNewObj_Clean);
         }
-        private List<(Func<IComments, string> GetField, Func<IComments, string, int> SetField)> Get_GetField_SetField_Pairs(IEnumerable<string> FieldNames)
+        private List<(Func<IStok, string> GetField, Func<IStok, string, int> SetField)> Get_GetField_SetField_Pairs(IEnumerable<string> FieldNames)
         {
-            List<(Func<IComments, string> GetField, Func<IComments, string, int> SetField)> GetField_SetField_Pairs =
-                new List<(Func<IComments, string> GetField, Func<IComments, string, int> SetField)>();
+            List<(Func<IStok, string> GetField, Func<IStok, string, int> SetField)> GetField_SetField_Pairs =
+                new List<(Func<IStok, string> GetField, Func<IStok, string, int> SetField)>();
 
-            IComments p = new Comments();
+            IStok p = new Stok();
             foreach (var fieldName in FieldNames)
             {
                 GetField_SetField_Pairs.Add(Build_GetSet_ForField(fieldName));

@@ -18,7 +18,6 @@ namespace UnitTest_cmArt.LibIntegrations
         public class Funcs : FuncBase<AltSuply, AltSuply_Clean, IAltSuply>
         {
             public Func<AltSuply_Clean, int> Clean = (objClean) => { objClean.Clean(); return 1; };
-            public Func<AltSuply_Clean, int> Clean_Field = (objClean) => { objClean.Clean_PartNumber(); return 1; };
 
             public Funcs(Func<AltSuply, AltSuply_Clean> GetNewObj_Clean) : base(GetNewObj_Clean)
             {
@@ -46,6 +45,10 @@ namespace UnitTest_cmArt.LibIntegrations
             foreach (var pair in f.Trailing_Spaces_Field_Method_Name_Pairs)
             {
                 var GetSet = Build_GetSet_ForField(pair.FieldName);
+
+                MethodInfo Clean_Method = typeof(AltSuply_Clean).GetMethod(pair.CleanField_MethodName);
+                Func<AltSuply_Clean, int> Clean_Field = (objClean) => { Clean_Method.Invoke(objClean, null); return 1; };
+
                 Generic_Tests<AltSuply, AltSuply_Clean, IAltSuply>.Perform_test_showing_that_Obj_Clean_Trims_Trailing_Spaces_from_field
                 (
                     GetSet.GetField
@@ -53,7 +56,7 @@ namespace UnitTest_cmArt.LibIntegrations
                     , f.GetNewObj
                     , f.GetNewObj_Clean
                     , f.Clean
-                    , f.Clean_Field
+                    , Clean_Field
                 );
             }
         }
