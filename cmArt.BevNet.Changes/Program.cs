@@ -29,7 +29,7 @@ namespace cmArt.BevNet.Changes
             int MaxRecordsToDisplay = 10;
             for (int i = 0; i < MaxRecordsToDisplay; i++)
             {
-                Console.WriteLine(BevNetRecords.Skip(i).FirstOrDefault().PROD_ITEM);
+                Console.WriteLine((BevNetRecords.Skip(i).FirstOrDefault() ?? new PriceFile()).PROD_ITEM);
             }
 
             Console.WriteLine($"Path: {config["SourceDirectory"]}");
