@@ -14,6 +14,17 @@ namespace cmArt.BevNet
             ((ICommonFields)this).CopyFrom(From);
             return this;
         }
+        public string SupplierPartNumber
+        {
+            get
+            {
+                return _state.PROD_ITEM ?? string.Empty;
+            }
+            set
+            {
+                _state.PROD_ITEM = value ?? _state.PROD_ITEM ?? string.Empty;
+            }
+        }
         public string SupplierName
         {
             get
