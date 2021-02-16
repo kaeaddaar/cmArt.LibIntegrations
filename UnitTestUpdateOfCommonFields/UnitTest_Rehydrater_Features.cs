@@ -14,8 +14,6 @@ namespace UnitTestUpdateOfCommonFields
         [TestMethod]
         public void Test_simple_rehydration_scenario()
         {
-            //Rehydrater<IPriceFile, ICommonFields, (string SupplierCode, string SupplierPart), PriceFileAdapter, CommonFields, IAdapter<PriceFile, ICommonFields, IPriceFile>, PriceFile> rehydrater =
-            //    new Rehydrater<IPriceFile, ICommonFields, (string SupplierCode, string SupplierPart), PriceFileAdapter, CommonFields, IAdapter<PriceFile, ICommonFields, IPriceFile>, PriceFile>();
             Rehydrater
             <
                 PriceFile_Clean
@@ -24,7 +22,8 @@ namespace UnitTestUpdateOfCommonFields
                 , ICommonFields
                 , PriceFileAdapter
                 , (string SupplierCode, string SupplierPart)
-            > rehydrater = new Rehydrater
+            > rehydrater 
+                = new Rehydrater
                 <
                     PriceFile_Clean
                     , IPriceFile
@@ -49,13 +48,6 @@ namespace UnitTestUpdateOfCommonFields
             IPriceFile record2 = Default_PriceFile.SingleRecord();
             record2.PROD_ITEM = record2.PROD_ITEM + "_2";
 
-            List<IPriceFile> PriceFileRecords = new List<IPriceFile>();
-            PriceFileRecords.Add(record0);
-            PriceFileRecords.Add(record1);
-            PriceFileRecords.Add(record2);
-
-            rehydrater.IntegrationRecords = PriceFileRecords;
-
             // get common fields with updated info
             PriceFileAdapter adapter0 = new PriceFileAdapter();
             adapter0.Init(record0);
@@ -73,25 +65,19 @@ namespace UnitTestUpdateOfCommonFields
             cf1.CopyFrom(adapter1);
             cf2.CopyFrom(adapter2);
 
-            //// perform in rehydrater
-            //// update price info
-            //cf0.PriceSchedule2_MinPrice = NewPrice0;
-            //cf1.PriceSchedule2_MinPrice = NewPrice1;
-            //cf2.PriceSchedule2_MinPrice = NewPrice2;
+            // Make sure the common fields being compared to have different info
+            cf0.PriceSchedule2_MinPrice = NewPrice0;
+            cf1.PriceSchedule2_MinPrice = NewPrice1;
+            cf2.PriceSchedule2_MinPrice = NewPrice2;
 
-            List<ICommonFields> commonFields = new List<ICommonFields>();
-            commonFields.Add(cf0);
-            commonFields.Add(cf1);
-            commonFields.Add(cf2);
+            List<(IPriceFile IFrom, ICommonFields ITo)> pairs = new List<(IPriceFile, ICommonFields)>();
+            pairs.Add(new ValueTuple<IPriceFile, ICommonFields>(record0, cf0));
+            pairs.Add(new ValueTuple<IPriceFile, ICommonFields>(record1, cf1));
+            pairs.Add(new ValueTuple<IPriceFile, ICommonFields>(record2, cf2));
 
-            rehydrater.CommonFieldRecords = commonFields;
-            rehydrater.IntegrationRecords = PriceFileRecords;
+            rehydrater.From_To_Pairs = pairs;
 
-            //// perform in rehydrater
-            //adapter0.CopyFrom(cf0);
-            //adapter1.CopyFrom(cf1);
-            //adapter2.CopyFrom(cf2);
-
+            rehydrater.UpdateIntegrationRecords();
 
             Assert.AreEqual(NewPrice0, record0.BOT_PRICE);
             Assert.AreEqual(NewPrice1, record1.BOT_PRICE);

@@ -20,33 +20,20 @@ namespace cmArt.LibIntegrations
         where TTo : ITo, new()
         where T_Adapter : IAdapter<TFrom_Clean, IFrom_Clean, TTo, ITo>, new()
     {
-        private IEnumerable<IFrom_Clean> _IntegrationRecords;
-        private IEnumerable<ITo> _CommonFieldRecords;
+        private IEnumerable<(IFrom_Clean IFrom, ITo ITo)> _From_To_Pairs;
         private Func<ITo, IKey> _fKey;
 
-        public IEnumerable<IFrom_Clean> IntegrationRecords 
+        public IEnumerable<ValueTuple<IFrom_Clean, ITo>> From_To_Pairs
         {
             get
             {
-                _IntegrationRecords = _IntegrationRecords ?? new List<IFrom_Clean>();
-                return _IntegrationRecords;
+                _From_To_Pairs = _From_To_Pairs ?? new List<ValueTuple<IFrom_Clean, ITo>>();
+                return _From_To_Pairs;
             }
             set
             {
-                _IntegrationRecords = value ?? _IntegrationRecords ?? new List<IFrom_Clean>();
+                _From_To_Pairs = value ?? _From_To_Pairs ?? new List<ValueTuple<IFrom_Clean, ITo>>();
             }
-        }
-        public IEnumerable<ITo> CommonFieldRecords 
-        {
-            get
-            {
-                _CommonFieldRecords = _CommonFieldRecords ?? new List<ITo>();
-                return _CommonFieldRecords;
-            }
-            set
-            {
-                _CommonFieldRecords = value ?? _CommonFieldRecords ?? new List<ITo>();
-            } 
         }
         public Func<ITo, IKey> fKey
         {
@@ -56,11 +43,12 @@ namespace cmArt.LibIntegrations
 
         public void UpdateIntegrationRecords()
         {
-            IEnumerable<T_Adapter> adapters = _IntegrationRecords.Select(ConvertToAdapter());
-
-            // if the following is done on a T_Clean then the result will be cleaned _IntegrationRecords
-            // won't clean if the base object is passed in
-            IEnumerable<ITo> commonFields = adapters.Select(CopyFrom_CommonFieldsRecords_To_Adapters());
+            foreach (var pair in _From_To_Pairs)
+            {
+                T_Adapter adapter = new T_Adapter();
+                adapter.Init(pair.IFrom);
+                adapter.CopyFrom(pair.ITo);
+            }
         }
 
         private static Func<T_Adapter, ITo> CopyFrom_CommonFieldsRecords_To_Adapters()
@@ -82,8 +70,6 @@ namespace cmArt.LibIntegrations
                 return a;
             };
         }
-        // Loader
-        // Common Fields
-        // Key for TCommon
+
     }
 }
