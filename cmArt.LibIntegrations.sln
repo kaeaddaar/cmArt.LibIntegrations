@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.System5.Data", "cmArt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.System5.Inventory", "cmArt.System5.Inventory\cmArt.System5.Inventory.csproj", "{6B01A658-03E5-43E4-BF94-93F562A7C4E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest_cmArt.LibIntegrations", "UnitTest_cmArt.LibIntegrations\UnitTest_cmArt.LibIntegrations.csproj", "{402E393D-8CF4-48EB-AE56-1F1A377C7C55}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest_cmArt.LibIntegrations", "UnitTest_cmArt.LibIntegrations\UnitTest_cmArt.LibIntegrations.csproj", "{402E393D-8CF4-48EB-AE56-1F1A377C7C55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestAssembleS5Inventory", "UnitTestAssembleS5Inventory\UnitTestAssembleS5Inventory.csproj", "{748E8F0E-2294-4CD0-B489-C41E28E98B5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{402E393D-8CF4-48EB-AE56-1F1A377C7C55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{402E393D-8CF4-48EB-AE56-1F1A377C7C55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{402E393D-8CF4-48EB-AE56-1F1A377C7C55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{748E8F0E-2294-4CD0-B489-C41E28E98B5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{748E8F0E-2294-4CD0-B489-C41E28E98B5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{748E8F0E-2294-4CD0-B489-C41E28E98B5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{748E8F0E-2294-4CD0-B489-C41E28E98B5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
