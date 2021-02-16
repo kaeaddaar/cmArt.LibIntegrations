@@ -60,9 +60,9 @@ namespace UnitTestUpdateOfCommonFields
             PriceFileAdapter adapter0 = new PriceFileAdapter();
             adapter0.Init(record0);
             PriceFileAdapter adapter1 = new PriceFileAdapter();
-            adapter0.Init(record1);
+            adapter1.Init(record1);
             PriceFileAdapter adapter2 = new PriceFileAdapter();
-            adapter0.Init(record2);
+            adapter2.Init(record2);
 
 
             ICommonFields cf0 = new CommonFields();
@@ -73,21 +73,30 @@ namespace UnitTestUpdateOfCommonFields
             cf1.CopyFrom(adapter1);
             cf2.CopyFrom(adapter2);
 
-            // update price info
-            cf0.PriceSchedule2_MinPrice = NewPrice0;
-            cf1.PriceSchedule2_MinPrice = NewPrice1;
-            cf2.PriceSchedule2_MinPrice = NewPrice2;
+            //// perform in rehydrater
+            //// update price info
+            //cf0.PriceSchedule2_MinPrice = NewPrice0;
+            //cf1.PriceSchedule2_MinPrice = NewPrice1;
+            //cf2.PriceSchedule2_MinPrice = NewPrice2;
 
             List<ICommonFields> commonFields = new List<ICommonFields>();
             commonFields.Add(cf0);
             commonFields.Add(cf1);
             commonFields.Add(cf2);
 
-            adapter0.CopyFrom(cf0);
-            adapter1.CopyFrom(cf1);
-            adapter2.CopyFrom(cf2);
+            rehydrater.CommonFieldRecords = commonFields;
+            rehydrater.IntegrationRecords = PriceFileRecords;
 
-            Assert.IsTrue(false);
+            //// perform in rehydrater
+            //adapter0.CopyFrom(cf0);
+            //adapter1.CopyFrom(cf1);
+            //adapter2.CopyFrom(cf2);
+
+
+            Assert.AreEqual(NewPrice0, record0.BOT_PRICE);
+            Assert.AreEqual(NewPrice1, record1.BOT_PRICE);
+            Assert.AreEqual(NewPrice2, record2.BOT_PRICE);
+
         }
         [TestMethod]
         public void Test_simple_rehydration_scenario_without_Rehydrator()
@@ -113,9 +122,9 @@ namespace UnitTestUpdateOfCommonFields
             PriceFileAdapter adapter0 = new PriceFileAdapter();
             adapter0.Init(record0);
             PriceFileAdapter adapter1 = new PriceFileAdapter();
-            adapter0.Init(record1);
+            adapter1.Init(record1);
             PriceFileAdapter adapter2 = new PriceFileAdapter();
-            adapter0.Init(record2);
+            adapter2.Init(record2);
 
             ICommonFields cf0 = new CommonFields();
             ICommonFields cf1 = new CommonFields();
@@ -136,7 +145,7 @@ namespace UnitTestUpdateOfCommonFields
 
             Assert.AreEqual(NewPrice0, record0.BOT_PRICE);
             Assert.AreEqual(NewPrice1, record1.BOT_PRICE);
-            Assert.AreEqual(NewPrice1, record1.BOT_PRICE);
+            Assert.AreEqual(NewPrice2, record2.BOT_PRICE);
         }
         [TestMethod]
         public void Test_records_can_only_be_initialized()

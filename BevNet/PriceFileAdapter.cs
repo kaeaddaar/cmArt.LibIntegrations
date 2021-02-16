@@ -9,6 +9,11 @@ namespace cmArt.BevNet
         public PriceFileAdapter()
         {
         }
+        public override ICommonFields CopyFrom(ICommonFields From)
+        {
+            ((ICommonFields)this).CopyFrom(From);
+            return this;
+        }
         public string SupplierName
         {
             get

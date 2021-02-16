@@ -13,10 +13,7 @@ namespace cmArt.BevNet
         public Adapter()
         {
         }
-        public ITo CopyFrom(ITo From)
-        {
-            return this.CopyFrom(From);
-        }
+        public abstract ITo CopyFrom(ITo From);
 
         public void Init(IFrom InterfaceToAdaptFrom)
         {
