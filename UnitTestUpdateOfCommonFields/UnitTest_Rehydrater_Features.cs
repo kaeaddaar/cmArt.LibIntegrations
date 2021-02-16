@@ -14,8 +14,26 @@ namespace UnitTestUpdateOfCommonFields
         [TestMethod]
         public void Test_simple_rehydration_scenario()
         {
-            Rehydrater<IPriceFile, ICommonFields, (string SupplierCode, string SupplierPart)> rehydrater =
-                new Rehydrater<IPriceFile, ICommonFields, (string SupplierCode, string SupplierPart)>();
+            //Rehydrater<IPriceFile, ICommonFields, (string SupplierCode, string SupplierPart), PriceFileAdapter, CommonFields, IAdapter<PriceFile, ICommonFields, IPriceFile>, PriceFile> rehydrater =
+            //    new Rehydrater<IPriceFile, ICommonFields, (string SupplierCode, string SupplierPart), PriceFileAdapter, CommonFields, IAdapter<PriceFile, ICommonFields, IPriceFile>, PriceFile>();
+            Rehydrater
+            <
+                PriceFile_Clean
+                , IPriceFile
+                , CommonFields
+                , ICommonFields
+                , PriceFileAdapter
+                , (string SupplierCode, string SupplierPart)
+            > rehydrater = new Rehydrater
+                <
+                    PriceFile_Clean
+                    , IPriceFile
+                    , CommonFields
+                    , ICommonFields
+                    , PriceFileAdapter
+                    , (string SupplierCode, string SupplierPart)
+                >()
+            ;
 
             // Move most of below into Rehydrater code
 
@@ -36,10 +54,16 @@ namespace UnitTestUpdateOfCommonFields
             PriceFileRecords.Add(record1);
             PriceFileRecords.Add(record2);
 
+            rehydrater.IntegrationRecords = PriceFileRecords;
+
             // get common fields with updated info
-            PriceFileAdapter adapter0 = new PriceFileAdapter(record0);
-            PriceFileAdapter adapter1 = new PriceFileAdapter(record1);
-            PriceFileAdapter adapter2 = new PriceFileAdapter(record2);
+            PriceFileAdapter adapter0 = new PriceFileAdapter();
+            adapter0.Init(record0);
+            PriceFileAdapter adapter1 = new PriceFileAdapter();
+            adapter0.Init(record1);
+            PriceFileAdapter adapter2 = new PriceFileAdapter();
+            adapter0.Init(record2);
+
 
             ICommonFields cf0 = new CommonFields();
             ICommonFields cf1 = new CommonFields();
@@ -53,6 +77,11 @@ namespace UnitTestUpdateOfCommonFields
             cf0.PriceSchedule2_MinPrice = NewPrice0;
             cf1.PriceSchedule2_MinPrice = NewPrice1;
             cf2.PriceSchedule2_MinPrice = NewPrice2;
+
+            List<ICommonFields> commonFields = new List<ICommonFields>();
+            commonFields.Add(cf0);
+            commonFields.Add(cf1);
+            commonFields.Add(cf2);
 
             adapter0.CopyFrom(cf0);
             adapter1.CopyFrom(cf1);
@@ -81,9 +110,12 @@ namespace UnitTestUpdateOfCommonFields
             PriceFileRecords.Add(record2);
 
             // get common fields with updated info
-            PriceFileAdapter adapter0 = new PriceFileAdapter(record0);
-            PriceFileAdapter adapter1 = new PriceFileAdapter(record1);
-            PriceFileAdapter adapter2 = new PriceFileAdapter(record2);
+            PriceFileAdapter adapter0 = new PriceFileAdapter();
+            adapter0.Init(record0);
+            PriceFileAdapter adapter1 = new PriceFileAdapter();
+            adapter0.Init(record1);
+            PriceFileAdapter adapter2 = new PriceFileAdapter();
+            adapter0.Init(record2);
 
             ICommonFields cf0 = new CommonFields();
             ICommonFields cf1 = new CommonFields();

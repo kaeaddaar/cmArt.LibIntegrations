@@ -4,68 +4,66 @@ using System.Text;
 
 namespace cmArt.BevNet
 {
-    public class PriceFileAdapter : ICommonFields
+    public class PriceFileAdapter : Adapter<PriceFile_Clean, IPriceFile, CommonFields, ICommonFields>, ICommonFields
     {
-        private IPriceFile _PriceFile;
-        public PriceFileAdapter(IPriceFile PriceFile)
+        public PriceFileAdapter()
         {
-            _PriceFile = PriceFile ?? (IPriceFile)(new PriceFile());
         }
-
-        public string SupplierName 
-        {
-            get 
-            {
-                return _PriceFile.WHOLE_NAME ?? string.Empty;
-            }
-            set
-            {
-                _PriceFile.WHOLE_NAME = value ?? _PriceFile.WHOLE_NAME ?? string.Empty;
-            }
-        }
-        public string SupplierCode 
+        public string SupplierName
         {
             get
             {
-                return _PriceFile.WHOLESALER ?? string.Empty;
+                return _state.WHOLE_NAME ?? string.Empty;
             }
             set
             {
-                _PriceFile.WHOLESALER = value ?? _PriceFile.WHOLESALER ?? string.Empty;
-            } 
+                _state.WHOLE_NAME = value ?? _state.WHOLE_NAME ?? string.Empty;
+            }
         }
-        public decimal WholesaleCost 
+        public string SupplierCode
         {
             get
             {
-                return _PriceFile.BESTBOT;
+                return _state.WHOLESALER ?? string.Empty;
             }
             set
             {
-                _PriceFile.BESTBOT = value;
-            } 
+                _state.WHOLESALER = value ?? _state.WHOLESALER ?? string.Empty;
+            }
+        }
+        public decimal WholesaleCost
+        {
+            get
+            {
+                return _state.BESTBOT;
+            }
+            set
+            {
+                _state.BESTBOT = value;
+            }
         }
         public decimal PriceSchedule1_MSRP // MSRP
-        { 
+        {
             get
             {
-                return _PriceFile.FRONT_NYC;
+                return _state.FRONT_NYC;
             }
             set
             {
-                _PriceFile.FRONT_NYC = value;
-            } 
+                _state.FRONT_NYC = value;
+            }
         }
         public decimal PriceSchedule2_MinPrice // minimum price
         {
             get
             {
-                return _PriceFile.BOT_PRICE;
+                return _state.BOT_PRICE;
             }
             set
             {
-                _PriceFile.BOT_PRICE = value;
+                _state.BOT_PRICE = value;
             }
         }
+
     }
 }
