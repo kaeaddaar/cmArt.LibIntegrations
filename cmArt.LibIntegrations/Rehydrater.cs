@@ -10,9 +10,12 @@ namespace cmArt.LibIntegrations
     /// Update T from TCommon. We need to be able to turn T to TCommon and visa versa, and this code will
     /// use TCommon to update T
     /// </summary>
-    /// <typeparam name="I"></typeparam>
-    /// <typeparam name="ICommon"></typeparam>
-    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TFrom_Clean"></typeparam>
+    /// <typeparam name="IFrom_Clean"></typeparam>
+    /// <typeparam name="TTo"></typeparam>
+    /// <typeparam name="ITo"></typeparam>
+    /// <typeparam name="T_Adapter"></typeparam>
+    /// <typeparam name="IKey"></typeparam>
     //public class Rehydrater<I, ICommon, TKey, TAdapter, TCommon, IAdapter> where TAdapter : IAdapter<ICommon>, ICloneable, ICommon, new()
     //    where TCommon : ICommon, new()
     public class Rehydrater<TFrom_Clean, IFrom_Clean, TTo, ITo, T_Adapter, IKey>

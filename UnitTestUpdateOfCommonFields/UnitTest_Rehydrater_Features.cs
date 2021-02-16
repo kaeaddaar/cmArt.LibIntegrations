@@ -14,27 +14,11 @@ namespace UnitTestUpdateOfCommonFields
         [TestMethod]
         public void Test_simple_rehydration_scenario()
         {
-            Rehydrater
-            <
-                PriceFile_Clean
-                , IPriceFile
-                , CommonFields
-                , ICommonFields
-                , PriceFileAdapter
-                , (string SupplierCode, string SupplierPart)
-            > rehydrater 
-                = new Rehydrater
-                <
-                    PriceFile_Clean
-                    , IPriceFile
-                    , CommonFields
-                    , ICommonFields
-                    , PriceFileAdapter
-                    , (string SupplierCode, string SupplierPart)
-                >()
-            ;
+            Rehydrater<PriceFile_Clean, IPriceFile, CommonFields, ICommonFields, PriceFileAdapter
+                , (string SupplierCode, string SupplierPart)> rehydrater;
 
-            // Move most of below into Rehydrater code
+            rehydrater = new Rehydrater<PriceFile_Clean, IPriceFile, CommonFields, ICommonFields, PriceFileAdapter
+                    , (string SupplierCode, string SupplierPart)>();
 
             const decimal NewPrice0 = (decimal)9.0;
             const decimal NewPrice1 = (decimal)9.1;
@@ -82,7 +66,6 @@ namespace UnitTestUpdateOfCommonFields
             Assert.AreEqual(NewPrice0, record0.BOT_PRICE);
             Assert.AreEqual(NewPrice1, record1.BOT_PRICE);
             Assert.AreEqual(NewPrice2, record2.BOT_PRICE);
-
         }
         [TestMethod]
         public void Test_simple_rehydration_scenario_without_Rehydrator()
