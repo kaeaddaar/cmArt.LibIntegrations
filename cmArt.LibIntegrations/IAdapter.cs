@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace cmArt.BevNet
+namespace cmArt.LibIntegrations
 {
     public interface IAdapter<TFrom, IFrom, TTo, ITo> : ICopyable<ITo>
     {

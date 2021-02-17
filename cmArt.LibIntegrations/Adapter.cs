@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace cmArt.BevNet
+namespace cmArt.LibIntegrations
 {
     //public abstract class Adapter<TFrom, ITo> : ICloneable, IAdapter<TFrom> where TFrom : ITo, new()
     public abstract class Adapter<TFrom, IFrom, TTo, ITo> : IAdapter<TFrom, IFrom, TTo, ITo>

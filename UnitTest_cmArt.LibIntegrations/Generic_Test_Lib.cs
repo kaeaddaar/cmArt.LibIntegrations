@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace UnitTest_cmArt.LibIntegrations
 {
-    public static class Generic_Tests<TObj, TObjClean, IObj> where TObj : IObj, new() where TObjClean : IObj
+    public static class Generic_Test_Lib<TObj, TObjClean, IObj> where TObj : IObj, new() where TObjClean : IObj
     {
         const string HelloWorld_NoTrailingSpaces = " Hello World";
         const string HelloWorld_TwoTrailingSpaces = " Hello World  ";

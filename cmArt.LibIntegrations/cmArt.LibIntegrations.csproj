@@ -13,7 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BevNet\cmArt.BevNet.csproj" />
     <ProjectReference Include="..\cmArt.System5.Data\cmArt.System5.Data.csproj" />
   </ItemGroup>
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace cmArt.BevNet
+namespace cmArt.LibIntegrations
 {
     public class Copyable<T, I> : State<I>, ICopyable<I>
         where T : I

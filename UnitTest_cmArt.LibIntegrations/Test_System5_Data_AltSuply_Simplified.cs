@@ -49,7 +49,7 @@ namespace UnitTest_cmArt.LibIntegrations
                 MethodInfo Clean_Method = typeof(AltSuply_Clean).GetMethod(pair.CleanField_MethodName);
                 Func<AltSuply_Clean, int> Clean_Field = (objClean) => { Clean_Method.Invoke(objClean, null); return 1; };
 
-                Generic_Tests<AltSuply, AltSuply_Clean, IAltSuply>.Perform_test_showing_that_Obj_Clean_Trims_Trailing_Spaces_from_field
+                Generic_Test_Lib<AltSuply, AltSuply_Clean, IAltSuply>.Perform_test_showing_that_Obj_Clean_Trims_Trailing_Spaces_from_field
                 (
                     GetSet.GetField
                     , GetSet.SetField
@@ -65,7 +65,7 @@ namespace UnitTest_cmArt.LibIntegrations
         {
             Funcs f = new Funcs(GetNewObj_Clean);
             IEnumerable<string> fieldNames = f.Nullable_String_Field_Names;
-            Generic_Tests<AltSuply, AltSuply_Clean, IAltSuply>.Test_that_null_values_dont_break_clean_field_methods
+            Generic_Test_Lib<AltSuply, AltSuply_Clean, IAltSuply>.Test_that_null_values_dont_break_clean_field_methods
             (
                 Get_GetField_SetField_Pairs(fieldNames)
                 , f.GetNewObj
@@ -84,7 +84,7 @@ namespace UnitTest_cmArt.LibIntegrations
         {
             Funcs f = new Funcs(GetNewObj_Clean);
             IEnumerable<string> fieldNames = f.Nullable_String_Field_Names;
-            Generic_Tests<AltSuply, AltSuply_Clean, IAltSuply>
+            Generic_Test_Lib<AltSuply, AltSuply_Clean, IAltSuply>
                 .Test_that_nullable_props_remove_null(Get_GetField_SetField_Pairs(fieldNames), f.GetNewObj, f.GetNewObj_Clean);
         }
         [TestMethod]
@@ -92,7 +92,7 @@ namespace UnitTest_cmArt.LibIntegrations
         {
             Funcs f = new Funcs(GetNewObj_Clean);
             IEnumerable<string> fieldNames = f.Nullable_String_Field_Names;
-            Generic_Tests<AltSuply, AltSuply_Clean, IAltSuply>
+            Generic_Test_Lib<AltSuply, AltSuply_Clean, IAltSuply>
                 .Test_For_null_values_in_uninitialized_Obj(Get_GetField_SetField_Pairs(fieldNames), f.GetNewObj, f.GetNewObj_Clean);
         }
         private List<(Func<IAltSuply, string> GetField, Func<IAltSuply, string, int> SetField)> Get_GetField_SetField_Pairs(IEnumerable<string> FieldNames)
