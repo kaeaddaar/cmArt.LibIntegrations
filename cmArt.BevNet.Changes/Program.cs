@@ -7,7 +7,7 @@ using System.Linq;
 using cmArt.LibIntegrations.OdbcService;
 using cmArt.System5.Inventory;
 
-namespace cmArt.BevNet.Changes
+namespace cmArt.BevNet.App
 {
     class Program
     {
@@ -44,7 +44,7 @@ namespace cmArt.BevNet.Changes
             GetXRefFromSupplierRecords();
 
             // B: Attach BankInfo / wholesaler to Assembled Inventory to make InvAss, wholesaler pairs
-            //   - UpdateProcess<TCommon, TKey> usage via example here: Test_GetUpdatesByCommonFields_OneOfTwoRecordsChanges()
+            //   GenericJoins service will do this
 
             // C: create a facade to go from InvAss, wholesaler pairs to a data load format
 

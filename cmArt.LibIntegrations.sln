@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.BevNet", "BevNet\cmAr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTest_cmArt.LibIntegrations", "IntegrationTest_cmArt.LibIntegrations\IntegrationTest_cmArt.LibIntegrations.csproj", "{B472CF77-FD2A-47A3-961B-84134EEF0D20}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.BevNet.Changes", "cmArt.BevNet.Changes\cmArt.BevNet.Changes.csproj", "{7977CAF7-21DE-449E-9A6E-D3ECC8E4770E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.BevNet.App", "cmArt.BevNet.Changes\cmArt.BevNet.App.csproj", "{7977CAF7-21DE-449E-9A6E-D3ECC8E4770E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.System5.Data", "cmArt.System5.Data\cmArt.System5.Data.csproj", "{FF697594-26A8-42AA-B4C0-0D2882657A7B}"
 EndProject
@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest_cmArt.LibIntegrati
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTestAssembleS5Inventory", "UnitTestAssembleS5Inventory\UnitTestAssembleS5Inventory.csproj", "{748E8F0E-2294-4CD0-B489-C41E28E98B5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestBevNetHelperMethods", "UnitTestBevNetHelperMethods\UnitTestBevNetHelperMethods.csproj", "{3126BACB-FE0F-4F27-B3E1-DC75BB9826A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTestBevNetHelperMethods", "UnitTestBevNetHelperMethods\UnitTestBevNetHelperMethods.csproj", "{3126BACB-FE0F-4F27-B3E1-DC75BB9826A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

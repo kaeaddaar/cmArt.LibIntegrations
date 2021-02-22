@@ -19,17 +19,17 @@ namespace cmArt.LibIntegrations.OdbcService
 
         protected abstract List<T> LoadTableFromDatabase
         (
-            string QueryOrTableName
-            , string Query
-            , Func<T, OdbcDataReader, bool> LoadFromReader
-            , OdbcConnection conn
+            //string QueryOrTableName
+            //, string Query
+            //, Func<T, OdbcDataReader, bool> LoadFromReader
+            OdbcConnection conn
         );
         public void init
         (
             Options OdbcOptions
-            , string Query
-            , Func<T, OdbcDataReader, bool> LoadFromReader
-            , string QueryOrTableName
+            //, string Query
+            //, Func<T, OdbcDataReader, bool> LoadFromReader
+            //, string QueryOrTableName
         )
         {
             string strConn = JsonSerializer.Deserialize<string>(OdbcOptions.JSON);
@@ -39,10 +39,10 @@ namespace cmArt.LibIntegrations.OdbcService
             // check connection open
             _Records = LoadTableFromDatabase
             (
-                QueryOrTableName
-                , Query
-                , LoadFromReader
-                , conn
+                //QueryOrTableName
+                //, Query
+                //, LoadFromReader
+                conn
             );
 
         }
