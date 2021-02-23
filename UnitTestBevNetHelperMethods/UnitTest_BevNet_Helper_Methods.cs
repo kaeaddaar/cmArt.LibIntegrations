@@ -18,6 +18,18 @@ namespace IntegrationTestBevNetHelperMethods
     public class IntegrationTest_Custom_Query_Scenario
     {
         [TestMethod]
+        public void Test_facade_to_wrap_InvAss_Wholesaler_pairs_to_a_data_load_format()
+        {
+            // C: create a facade to go from InvAss, wholesaler pairs to a data load format
+            // Data load fields (ICommonFields + InvUnique, Cat, and PartNumber): InvUnique, Cat, PartNumber
+            // ICommonFields: SupplierName, SupplierPartNumber, SupplierCode WholesaleCost, PriceSchedule1_MSRP
+            //      , PriceSchedule2_MinPrice
+
+            
+
+        }
+
+        [TestMethod]
         public void Test_Get_XRef_from_Supplier_Account_For_Aunique_BankInfo_Pairs()
         {
             // A: Get XRef from Account for AUnique,BankInfo pairs
