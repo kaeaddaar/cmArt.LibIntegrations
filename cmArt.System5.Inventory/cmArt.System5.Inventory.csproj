@@ -8,4 +8,8 @@
     <ProjectReference Include="..\cmArt.System5.Data\cmArt.System5.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="PriceCalculations\" />
+  </ItemGroup>
+
 </Project>
