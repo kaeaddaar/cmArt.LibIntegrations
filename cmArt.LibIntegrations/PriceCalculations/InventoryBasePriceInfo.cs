@@ -7,7 +7,7 @@ namespace cmArt.LibIntegrations.PriceCalculations
 {
     public class InventoryBasePriceInfo : IInventoryBasePriceInfo
     {
-        public Inventry_27 src_Inventry_27 { get; set; } // reference to original source data
+        public IInventry_27 src_Inventry_27 { get; set; } // reference to original source data
         public string SKU { get; set; }
         public int PartUnique { get; set; }
         public Int16 Department { get; set; }

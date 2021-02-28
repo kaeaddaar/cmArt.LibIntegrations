@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using cmArt.LibIntegrations.PriceCalculations;
+
 
 namespace UnitTestAssembleS5Inventory
 {
@@ -18,8 +20,9 @@ namespace UnitTestAssembleS5Inventory
             S5Inventory InvRaw = Get_Sample_S5Inventory_for_one_Inventory_Item();
 
             IEnumerable<IS5InvAssembled> InvAss = InvRaw.ToAssembled();
-            var First = InvAss.First();
-            
+            var FirstRecord = InvAss.First();
+            FirstRecord.InvPrices_PerInventry_27.CalculateBasePriceSchedules(FirstRecord.Inv, 0,0,0);
+
             Assert.IsTrue(false);
         }
         private S5Inventory Get_Sample_S5Inventory_for_one_Inventory_Item()

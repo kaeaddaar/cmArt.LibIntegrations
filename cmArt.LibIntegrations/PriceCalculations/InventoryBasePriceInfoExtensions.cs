@@ -67,7 +67,7 @@ namespace cmArt.LibIntegrations.PriceCalculations
         public static IEnumerable<PriceScheduleView> CalculatePrices
         (
             this IInventoryBasePriceInfo info
-            , IEnumerable<InvPrice> invPrices
+            , IEnumerable<IInvPrice> invPrices
         )
         {
             double WholesaleCost = info.WholesaleCost;
@@ -87,7 +87,7 @@ namespace cmArt.LibIntegrations.PriceCalculations
             string info_json = string.Empty;
             string nl = Environment.NewLine;
 
-            Func<InvPrice, double> calc = (x) =>
+            Func<IInvPrice, double> calc = (x) =>
             {
                 try
                 {
@@ -117,14 +117,10 @@ namespace cmArt.LibIntegrations.PriceCalculations
                 price => new PriceScheduleView()
                 {
                     Code = price.RScheduleType
-                    ,
-                    InventoryUnique = price.PartUnique
-                    ,
-                    Level = price.ScheduleLevel
-                    ,
-                    Percentage = price.RegularPrice
-                    ,
-                    Price = (decimal)calc(price)
+                    , InventoryUnique = price.PartUnique
+                    , Level = price.ScheduleLevel
+                    , Percentage = price.RegularPrice
+                    , Price = (decimal)calc(price)
                 }
             );
 
@@ -140,14 +136,10 @@ namespace cmArt.LibIntegrations.PriceCalculations
                         new PriceScheduleView()
                         {
                             Code = price.RScheduleType
-                            ,
-                            InventoryUnique = price.PartUnique
-                            ,
-                            Level = price.ScheduleLevel
-                            ,
-                            Percentage = price.RegularPrice
-                            ,
-                            Price = (decimal)calc(price)
+                            , InventoryUnique = price.PartUnique
+                            , Level = price.ScheduleLevel
+                            , Percentage = price.RegularPrice
+                            , Price = (decimal)calc(price)
                         }
                     );
                 }

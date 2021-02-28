@@ -14,7 +14,7 @@ namespace cmArt.LibIntegrations.PriceCalculations
     {
         public static IEnumerable<IEnumerable<PriceScheduleView>> ToPriceView
         (
-            this IEnumerable<InvPrice> TodaysPrices
+            this IEnumerable<IInvPrice> TodaysPrices
             , short Schedule_0
             , short Schedule_List
             , short Schedule_Cash
@@ -25,7 +25,7 @@ namespace cmArt.LibIntegrations.PriceCalculations
 
             var ManyPriceInfoPairs = ManyPrices.Select
             (
-                p => new ValueTuple<IEnumerable<InvPrice>, IInventoryBasePriceInfo>
+                p => new ValueTuple<IEnumerable<IInvPrice>, IInventoryBasePriceInfo>
                 (
                     p
                     , p.CalculateBasePriceSchedules
@@ -44,14 +44,14 @@ namespace cmArt.LibIntegrations.PriceCalculations
             #region duplicate of linq code using foreach
             if (false)
             {
-                List<ValueTuple<IEnumerable<InvPrice>, IInventoryBasePriceInfo>> b;
-                b = new List<ValueTuple<IEnumerable<InvPrice>, IInventoryBasePriceInfo>>();
+                List<ValueTuple<IEnumerable<IInvPrice>, IInventoryBasePriceInfo>> b;
+                b = new List<ValueTuple<IEnumerable<IInvPrice>, IInventoryBasePriceInfo>>();
 
                 foreach (var prices in ManyPrices)
                 {
                     b.Add
                     (
-                        new ValueTuple<IEnumerable<InvPrice>, IInventoryBasePriceInfo>
+                        new ValueTuple<IEnumerable<IInvPrice>, IInventoryBasePriceInfo>
                         (
                             prices
                             , prices.CalculateBasePriceSchedules(new Inventry_27() { InvUnique = prices.First().PartUnique }, 0, 0, 0)
@@ -68,20 +68,20 @@ namespace cmArt.LibIntegrations.PriceCalculations
 
         public static IEnumerable<PriceScheduleView> ToPriceView
         (
-            this IEnumerable<InvPrice> TodaysPrices_ForPart
+            this IEnumerable<IInvPrice> TodaysPrices_ForPart
             , Inventry_27 InventoryPricesAreFor
             , short Schedule_0
             , short Schedule_List
             , short Schedule_Cash
         )
         {
-            var mp = new ValueTuple<int, IEnumerable<InvPrice>>
+            var mp = new ValueTuple<int, IEnumerable<IInvPrice>>
             (
                 InvPrice_Indexes.InventoryUnique(TodaysPrices_ForPart.First())
                 , TodaysPrices_ForPart
             );
 
-            var mpp = new ValueTuple<IEnumerable<InvPrice>, IInventoryBasePriceInfo>
+            var mpp = new ValueTuple<IEnumerable<IInvPrice>, IInventoryBasePriceInfo>
             (
                 TodaysPrices_ForPart
                 , TodaysPrices_ForPart.CalculateBasePriceSchedules
@@ -114,14 +114,14 @@ namespace cmArt.LibIntegrations.PriceCalculations
 
         public static InventoryBasePriceInfo CalculateBasePriceSchedules // single part
         (
-            this IEnumerable<InvPrice> InvPrices_TodaysPrices
-            , Inventry_27 InventoryItem
+            this IEnumerable<IInvPrice> InvPrices_TodaysPrices
+            , IInventry_27 InventoryItem
             , short Schedule_0
             , short Schedule_List
             , short Schedule_Cash
         )
         {
-            List<Inventry_27> invItems = new List<Inventry_27>();
+            List<IInventry_27> invItems = new List<IInventry_27>();
             invItems.Add(InventoryItem);
 
             IEnumerable<InventoryBasePriceInfo> BasePricesForSingleInventoryItem;
@@ -139,8 +139,8 @@ namespace cmArt.LibIntegrations.PriceCalculations
 
         public static IEnumerable<InventoryBasePriceInfo> CalculateBasePriceSchedules // many parts
         (
-            this IEnumerable<InvPrice> InvPrices_TodaysPrices
-            , IEnumerable<Inventry_27> Inventry_27s
+            this IEnumerable<IInvPrice> InvPrices_TodaysPrices
+            , IEnumerable<IInventry_27> Inventry_27s
             , short Schedule_0
             , short Schedule_List
             , short Schedule_Cash
@@ -156,9 +156,9 @@ namespace cmArt.LibIntegrations.PriceCalculations
 
             List<InventoryBasePriceInfo> BasePrices = new List<InventoryBasePriceInfo>();
 
-            IEnumerable<IEnumerable<InvPrice>> TodaysPrices_By_InventoryUnique;
+            IEnumerable<IEnumerable<IInvPrice>> TodaysPrices_By_InventoryUnique;
             TodaysPrices_By_InventoryUnique = 
-                GenericAggregateToLists<InvPrice, int>.ToLists(InvPrices_TodaysPrices, InvPrice_Indexes.InventoryUnique);
+                GenericAggregateToLists<IInvPrice, int>.ToLists(InvPrices_TodaysPrices, InvPrice_Indexes.InventoryUnique);
             
             foreach (var TodaysPrices in TodaysPrices_By_InventoryUnique)
             {
@@ -177,15 +177,15 @@ namespace cmArt.LibIntegrations.PriceCalculations
             return BasePrices;
         }
 
-        public static List<InvPrice> GetTodaysPrices
+        public static List<IInvPrice> GetTodaysPrices
         (
-            this IEnumerable<InvPrice> unfilteredPrices
+            this IEnumerable<IInvPrice> unfilteredPrices
             , List<Int16> priceSchedulesToInclude
             , DateTime AsOfDate
             , Int16 DepartmentToInclude = 0
         )
         {
-            IEnumerable<InvPrice> _prices;
+            IEnumerable<IInvPrice> _prices;
             _prices = unfilteredPrices;
 
             _prices = unfilteredPrices.Where
@@ -217,7 +217,7 @@ namespace cmArt.LibIntegrations.PriceCalculations
                 equals
                 new { PartUnique = InvPrice1.PartUnique, StartDate = InvPrice1.StartDate
                     , ScheduleLevel = InvPrice1.ScheduleLevel, Department = InvPrice1.Department }
-                select new InvPrice
+                select (IInvPrice)(new InvPrice
                 {
                     InvUnique = InvPrice1.InvUnique
                     , Department = InvPrice1.Department
@@ -230,15 +230,15 @@ namespace cmArt.LibIntegrations.PriceCalculations
                     , ScheduleLevel = InvPrice1.ScheduleLevel
                     , SScheduleType = InvPrice1.SScheduleType
                     , StartDate = InvPrice1.StartDate
-                };
+                });
 
             return RecentPrices.ToList();
         }
 
         public static InventoryBasePriceInfo GetBasePriceInfo
         (
-            this IEnumerable<InvPrice> TodaysPrices
-            , IEnumerable<Inventry_27> Inventry_27s
+            this IEnumerable<IInvPrice> TodaysPrices
+            , IEnumerable<IInventry_27> Inventry_27s
             , short Schedule_0
             , short Schedule_List
             , short Schedule_Cash
@@ -289,98 +289,6 @@ namespace cmArt.LibIntegrations.PriceCalculations
             PriceInfo.CalculateBasePrices();
             return PriceInfos.First();
         }
-
-        #region Load From Reader Functionality
-        public static bool LoadFromReader(InvPrice invPrice, OdbcDataReader reader)
-        {
-            return invPrice.LoadFromReader_Ext(reader);
-        }
-
-        public static bool LoadFromReader_Ext(this InvPrice invPrice, OdbcDataReader reader)
-        {
-            invPrice = invPrice ?? new InvPrice();
-
-            bool loadSucceeded = true;
-            try
-            {
-                //invPrice.Department = (Int16)reader["Department"];
-                invPrice.Department = (Int16)TryAssign("Department", reader, 0, loadSucceeded, out loadSucceeded);
-                invPrice.EndDate = (DateTime)(reader["EndDate"]).CDbNull(new DateTime(1000, 1, 1));
-                //invPrice.EndDate = (DateTime)TryAssign("EndDate", reader, new DateTime(1000, 1, 1), loadSucceeded, out loadSucceeded);
-                invPrice.InvUnique = (int)TryAssign("InvUnique", reader, 0, loadSucceeded, out loadSucceeded);
-                invPrice.PartUnique = (int)TryAssign("PartUnique", reader, 0, loadSucceeded, out loadSucceeded);
-                invPrice.QuanDisc = (Single)TryAssign("QuanDisc", reader, 0, loadSucceeded, out loadSucceeded);
-                invPrice.RegularPrice = (double)TryAssign("RegularPrice", reader, 0, loadSucceeded, out loadSucceeded);
-                invPrice.RScheduleType = (string)TryAssign("RScheduleType", reader, "", loadSucceeded, out loadSucceeded);
-                invPrice.SalePrice = (double)TryAssign("SalePrice", reader, 0, loadSucceeded, out loadSucceeded);
-                invPrice.ScheduleLevel = (Int16)TryAssign("ScheduleLevel", reader, 0, loadSucceeded, out loadSucceeded);
-                invPrice.SScheduleType = (string)TryAssign("SScheduleType", reader, "", loadSucceeded, out loadSucceeded);
-                invPrice.StartDate = (DateTime)(reader["StartDate"]).CDbNull(new DateTime(1000, 1, 1));
-                loadSucceeded = true;
-            }
-            catch (Exception e)
-            {
-                loadSucceeded = false;
-
-                string str = GetReaderInfo(reader);
-                Console.WriteLine(str);
-            }
-            return loadSucceeded;
-        }
-
-        private static string GetReaderInfo(OdbcDataReader reader)
-        {
-            string str = string.Empty;
-            try
-            {
-                object[] fields = new object[reader.VisibleFieldCount];
-                reader.GetValues(fields);
-                str = string.Empty;
-                int index = 0;
-                foreach (var field in fields)
-                {
-                    str += reader.GetName(index) + ": " + field.ToString() + ",";
-                }
-            }
-            catch (OdbcException e)
-            {
-                str = $"GetReaderInfo failed with message: {e.Message}";
-            }
-            return str;
-        }
-
-        private static object TryAssign(string FieldName, OdbcDataReader reader, object DefaultValue, bool LoadSuccededIn, out bool LoadSucceeded)
-        {
-            try
-            {
-                if (LoadSuccededIn) // don't change loadsucceded if already false
-                {
-                    LoadSucceeded = true;
-                }
-                else
-                {
-                    LoadSucceeded = false;
-                }
-                object val = reader[FieldName];
-                if (val == null)
-                {
-                    LoadSucceeded = false;
-                    return DefaultValue;
-                }    
-                else
-                {
-                    return reader[FieldName];
-                }
-            }
-            catch (OdbcException e)
-            {
-                LoadSucceeded = false;
-                return DefaultValue;
-            }
-        }
-
-        #endregion Load From Reader Functionality
-
 
     }
 }

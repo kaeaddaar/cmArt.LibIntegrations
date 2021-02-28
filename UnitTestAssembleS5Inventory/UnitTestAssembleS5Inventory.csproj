@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\cmArt.System5.Data\cmArt.System5.Data.csproj" />
     <ProjectReference Include="..\cmArt.System5.Inventory\cmArt.System5.Inventory.csproj" />
+    <ProjectReference Include="..\IntegrationTest_cmArt.LibIntegrations\IntegrationTest_cmArt.LibIntegrations.csproj" />
   </ItemGroup>
 
 </Project>
