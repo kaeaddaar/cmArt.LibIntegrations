@@ -28,7 +28,7 @@ namespace cmArt.LibIntegrations.PriceCalculations
                 p => new ValueTuple<IEnumerable<IInvPrice>, IInventoryBasePriceInfo>
                 (
                     p
-                    , p.CalculateBasePriceSchedules
+                    , p.PopulateBasePriceSchedInfo_NoPrice
                     (
                         new Inventry_27() { InvUnique = p.First().PartUnique }
                         , Schedule_0
@@ -54,7 +54,7 @@ namespace cmArt.LibIntegrations.PriceCalculations
                         new ValueTuple<IEnumerable<IInvPrice>, IInventoryBasePriceInfo>
                         (
                             prices
-                            , prices.CalculateBasePriceSchedules(new Inventry_27() { InvUnique = prices.First().PartUnique }, 0, 0, 0)
+                            , prices.PopulateBasePriceSchedInfo_NoPrice(new Inventry_27() { InvUnique = prices.First().PartUnique }, 0, 0, 0)
                         )
                     );
                 }
@@ -84,7 +84,7 @@ namespace cmArt.LibIntegrations.PriceCalculations
             var mpp = new ValueTuple<IEnumerable<IInvPrice>, IInventoryBasePriceInfo>
             (
                 TodaysPrices_ForPart
-                , TodaysPrices_ForPart.CalculateBasePriceSchedules
+                , TodaysPrices_ForPart.PopulateBasePriceSchedInfo_NoPrice
                 (
                     InventoryPricesAreFor
                     , Schedule_0
@@ -112,7 +112,7 @@ namespace cmArt.LibIntegrations.PriceCalculations
             return view;
         }
 
-        public static InventoryBasePriceInfo CalculateBasePriceSchedules // single part
+        public static InventoryBasePriceInfo PopulateBasePriceSchedInfo_NoPrice // single part
         (
             this IEnumerable<IInvPrice> InvPrices_TodaysPrices
             , IInventry_27 InventoryItem

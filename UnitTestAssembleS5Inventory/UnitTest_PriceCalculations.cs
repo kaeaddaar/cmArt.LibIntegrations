@@ -15,15 +15,21 @@ namespace UnitTestAssembleS5Inventory
     public class UnitTest_PriceCalculations
     {
         [TestMethod]
-        public void Test_Calculating_Prices()
+        public void Test_Calculating_Prices_Simple()
         {
             S5Inventory InvRaw = Get_Sample_S5Inventory_for_one_Inventory_Item();
 
             IEnumerable<IS5InvAssembled> InvAss = InvRaw.ToAssembled();
             var FirstRecord = InvAss.First();
-            FirstRecord.InvPrices_PerInventry_27.CalculateBasePriceSchedules(FirstRecord.Inv, 0,0,0);
 
-            Assert.IsTrue(false);
+            var Bases = FirstRecord.InvPrices_PerInventry_27.PopulateBasePriceSchedInfo_NoPrice(FirstRecord.Inv, 0,0,0);
+            // in CalculateBasePriceSchedules the prices for those base price schedules aren't calculated, but should be
+            var prices = Bases.CalculatePrices(FirstRecord.InvPrices_PerInventry_27);
+
+            const decimal sched0 = (decimal)69.99;
+            Assert.AreEqual(sched0, prices.First().Price);
+            const decimal sched1 = (decimal)59.99;
+            Assert.AreEqual(sched1, prices.Last().Price);
         }
         private S5Inventory Get_Sample_S5Inventory_for_one_Inventory_Item()
         {
