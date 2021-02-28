@@ -45,10 +45,11 @@ namespace cmArt.BevNet.App
 
             // B: Attach BankInfo / wholesaler to Assembled Inventory to make InvAss, wholesaler pairs
             //   GenericJoins service will do this
+            MakePairs();
 
             // C: create a facade to go from InvAss, wholesaler pairs to a data load format
 
-            // D: create an adapter to go from the data load format to Common fields
+            // D: create an adapter to go from the data load format to Common fields - PriceFileAdapter
 
             // E: get common fields form BevNets PriceFileAdapter
 
@@ -58,6 +59,10 @@ namespace cmArt.BevNet.App
 
             Console.WriteLine("Done");
             Console.ReadKey();
+        }
+        private static void MakePairs()
+        {
+
         }
         private static void GetXRefFromSupplierRecords()
         {

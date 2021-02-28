@@ -24,13 +24,45 @@ namespace IntegrationTestBevNetHelperMethods
             // Data load fields (ICommonFields + InvUnique, Cat, and PartNumber): InvUnique, Cat, PartNumber
             // ICommonFields: SupplierName, SupplierPartNumber, SupplierCode WholesaleCost, PriceSchedule1_MSRP
             //      , PriceSchedule2_MinPrice
+            const int commonId = 3;
+            const string matching_supplier_code = "matching_code";
+            const string supp_part_num = "SamplePartNum";
+            const string supp_name = "Some Supplier Name";
 
-            
+            S5Inventory InvRaw = Get_Sample_S5Inventory_for_one_Inventory_Item();
+
+            IEnumerable<IS5InvAssembled> InvAss = InvRaw.ToAssembled();
+            var First = InvAss.First();
+
+            First.Inv.Supplier = commonId;
+            First.Inv.SuppPart = supp_part_num;
+
+            QryAccount acct = new QryAccount();
+            acct.AName = supp_name;
+            acct.AUnique = commonId;
+            acct.BankInfo = matching_supplier_code;
+
+            (IS5InvAssembled InvAss, QryAccount ExtraInfo) pair = new ValueTuple<IS5InvAssembled, QryAccount>(First, acct);
+
+            IDataLoadFormat DataLoadRecord;
+            AdaptToDataLoadFormat adapter = new AdaptToDataLoadFormat();
+            adapter.Init(pair);
+            DataLoadRecord = adapter;
+
+            Assert.AreEqual(matching_supplier_code, adapter.SupplierCode);
+            Assert.AreEqual("211545", adapter.PartNumber);
+            Assert.AreEqual(12018, adapter.InvUnique);
+            //confirm that the prices below are correct by geting real data to sample
+            Assert.AreEqual((decimal)59.99, adapter.PriceSchedule1_MSRP);
+            Assert.AreEqual((decimal)69.99, adapter.PriceSchedule2_MinPrice);
+            Assert.AreEqual(supp_name, adapter.SupplierName);
+            Assert.AreEqual(supp_part_num, adapter.SupplierPartNumber);
+            Assert.AreEqual(29, adapter.WholesaleCost);
 
         }
 
         [TestMethod]
-        public void Test_Get_XRef_from_Supplier_Account_For_Aunique_BankInfo_Pairs()
+        public void IntegrationTest_Get_XRef_from_Supplier_Account_For_Aunique_BankInfo_Pairs() // convert to unit test
         {
             // A: Get XRef from Account for AUnique,BankInfo pairs
             QryAccountContext context = new QryAccountContext();
