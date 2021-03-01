@@ -10,16 +10,6 @@ namespace cmArt.BevNet
     [DelimitedRecord(",")]
     public class DataLoadFormat : ICommonFields, IDataLoadFormat, ICopyable<IDataLoadFormat>
     {
-        [FieldHidden]
-        private ICommonFields _CommonFields;
-        public DataLoadFormat()
-        {
-            _CommonFields = new CommonFields();
-        }
-        public void init(ICommonFields CommonFields)
-        {
-            _CommonFields = CommonFields ?? new CommonFields();
-        }
         public IDataLoadFormat CopyFrom(IDataLoadFormat IFrom)
         {
             this.Cat = IFrom.Cat;
@@ -43,15 +33,15 @@ namespace cmArt.BevNet
         public string PartNumber { get; set; }
         [FieldQuoted]
         [FieldNullValue(typeof(string), "")]
-        public string SupplierName { get => _CommonFields.SupplierName; set => _CommonFields.SupplierName = value; }
+        public string SupplierName { get; set; }
         [FieldQuoted]
         [FieldNullValue(typeof(string), "")]
-        public string SupplierPartNumber { get => _CommonFields.SupplierPartNumber; set => _CommonFields.SupplierPartNumber = value; }
+        public string SupplierPartNumber { get; set; }
         [FieldQuoted]
         [FieldNullValue(typeof(string), "")]
-        public string SupplierCode { get => _CommonFields.SupplierCode; set => _CommonFields.SupplierCode = value; }
-        public decimal WholesaleCost { get => _CommonFields.WholesaleCost; set => _CommonFields.WholesaleCost = value; }
-        public decimal PriceSchedule1_MSRP { get => _CommonFields.PriceSchedule1_MSRP; set => _CommonFields.PriceSchedule1_MSRP = value; }
-        public decimal PriceSchedule2_MinPrice { get => _CommonFields.PriceSchedule2_MinPrice; set => _CommonFields.PriceSchedule2_MinPrice = value; }
+        public string SupplierCode { get; set; }
+        public decimal WholesaleCost { get; set; }
+        public decimal PriceSchedule1_MSRP { get; set; }
+        public decimal PriceSchedule2_MinPrice { get; set; }
     }
 }
