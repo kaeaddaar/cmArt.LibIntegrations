@@ -75,19 +75,6 @@ namespace cmArt.BevNet.App
                 return tmp;
             });
 
-
-            // D: create an adapter to go from the data load format to Common fields - PriceFileAdapter
-
-            // E: get common fields from BevNets PriceFileAdapter
-
-
-            // F: apply rehydrator to step Ds adapter and step Es common fields
-            Rehydrater<PriceFile_Clean, IPriceFile, CommonFields, ICommonFields, PriceFileAdapter
-                , (string SupplierCode, string SupplierPart)> rehydrater;
-
-            rehydrater = new Rehydrater<PriceFile_Clean, IPriceFile, CommonFields, ICommonFields, PriceFileAdapter
-                , (string SupplierCode, string SupplierPart)>();
-
             List<(IPriceFile IFrom, ICommonFields ITo)> pairs = new List<(IPriceFile, ICommonFields)>();
             //  - Assemble pairs of matching records that need to be updated from each other. 
             //      - DataLoadFormat is ICommonFields
@@ -107,21 +94,20 @@ namespace cmArt.BevNet.App
                 .InnerJoin(BevNetRecords, DataLoad, keyBevNet, keyDataLoad);
             pairs = updatePairs.Select(p => new ValueTuple<IPriceFile, ICommonFields>(p.Item1, p.Item2)).ToList();
 
-            rehydrater.From_To_Pairs = pairs;
-
-            // Broken - attempts to rehydrate backwards
-            //rehydrater.UpdateIntegrationRecords();
-            foreach (var pair in rehydrater.From_To_Pairs)
+            foreach (var pair in pairs)
             {
                 PriceFileAdapter adapter = new PriceFileAdapter();
                 adapter.Init(pair.Item1);
-                adapter.CopyFrom(pair.Item2);
                 pair.Item2.CopyFrom(adapter);
             }
 
-            DataLoad = rehydrater.From_To_Pairs.Select(p => (DataLoadFormat)p.Item2); 
-            // Write the file
+            DataLoad = pairs.Select(p => (DataLoadFormat)p.Item2);
+
+            // export the resulting data load object to CSV
             var engine = new FileHelperAsyncEngine<DataLoadFormat>();
+            engine.HeaderText = "InvUnique, Cat, PartNumber, SupplierName, SupplierPartNumber, SupplierCode " +
+                ", WholesaleCost, PriceSchedule1_MSRP, PriceSchedule2_MinPrice, S5Orig_WholesaleCost" +
+                ", S5Orig_ListPrice, S5Orig_MinPrice, Change_WholesaleCost, Change_ListPrice, Change_MinPrice";
             using (engine.BeginWriteFile(config["SourceDirectory"] + "S5InventoryDataLoad.csv"))
             {
                 foreach (var record in DataLoad)
@@ -132,8 +118,6 @@ namespace cmArt.BevNet.App
                     engine.WriteNext(record);
                 }
             }
-
-            // G: export the resulting data load object to CSV
 
             Console.WriteLine("Done");
             Console.ReadKey();
