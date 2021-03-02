@@ -108,7 +108,17 @@ namespace cmArt.BevNet.App
             pairs = updatePairs.Select(p => new ValueTuple<IPriceFile, ICommonFields>(p.Item1, p.Item2)).ToList();
 
             rehydrater.From_To_Pairs = pairs;
-            rehydrater.UpdateIntegrationRecords();
+
+            // Broken - attempts to rehydrate backwards
+            //rehydrater.UpdateIntegrationRecords();
+            foreach (var pair in rehydrater.From_To_Pairs)
+            {
+                PriceFileAdapter adapter = new PriceFileAdapter();
+                adapter.Init(pair.Item1);
+                adapter.CopyFrom(pair.Item2);
+                pair.Item2.CopyFrom(adapter);
+            }
+
             DataLoad = rehydrater.From_To_Pairs.Select(p => (DataLoadFormat)p.Item2); 
             // Write the file
             var engine = new FileHelperAsyncEngine<DataLoadFormat>();
