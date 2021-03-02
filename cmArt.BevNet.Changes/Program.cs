@@ -10,6 +10,7 @@ using cmArt.System5.Inventory;
 using cmArt.BevNet.System5;
 using cmArt.LibIntegrations.GenericJoinsService;
 using FileHelpers;
+using cmArt.LibIntegrations;
 
 namespace cmArt.BevNet.App
 {
@@ -69,21 +70,50 @@ namespace cmArt.BevNet.App
                 return tmp;
             });
 
-            var engine = new FileHelperAsyncEngine<DataLoadFormat>();
-            using (engine.BeginWriteFile(config["SourceDirectory"] + "S5InventoryDataLoad.csv"))
-            {
-                foreach(var record in DataLoad)
-                {
-                    engine.WriteNext(record);
-                }
-            }
-            
+
             // D: create an adapter to go from the data load format to Common fields - PriceFileAdapter
 
             // E: get common fields from BevNets PriceFileAdapter
 
 
             // F: apply rehydrator to step Ds adapter and step Es common fields
+            Rehydrater<PriceFile_Clean, IPriceFile, CommonFields, ICommonFields, PriceFileAdapter
+                , (string SupplierCode, string SupplierPart)> rehydrater;
+
+            rehydrater = new Rehydrater<PriceFile_Clean, IPriceFile, CommonFields, ICommonFields, PriceFileAdapter
+                , (string SupplierCode, string SupplierPart)>();
+
+            List<(IPriceFile IFrom, ICommonFields ITo)> pairs = new List<(IPriceFile, ICommonFields)>();
+            //  - Assemble pairs of matching records that need to be updated from each other. 
+            //      - DataLoadFormat is ICommonFields
+            //      - BevNetRecords is IPriceFile
+            //      - Join them together into pairs and perorm the update
+            Func<ICommonFields, (string SupplierCode, string SupplierPart)> keyDataLoad = (common) =>
+            {
+                return new ValueTuple<string, string>(common.SupplierCode, common.SupplierPartNumber);
+            };
+            Func<IPriceFile, ValueTuple<string, string>> keyBevNet = (priceRecord) =>
+            {
+                return new ValueTuple<string, string>(priceRecord.WHOLESALER, priceRecord.UNIV_PROD);
+            };
+
+            IEnumerable<Tuple<IPriceFile, ICommonFields>> updatePairs
+                = GenericJoins<IPriceFile, ICommonFields, (string SupplierCode, string SupplierPart)>
+                .InnerJoin(BevNetRecords, DataLoad, keyBevNet, keyDataLoad);
+            pairs = updatePairs.Select(p => new ValueTuple<IPriceFile, ICommonFields>(p.Item1, p.Item2)).ToList();
+
+            rehydrater.From_To_Pairs = pairs;
+            rehydrater.UpdateIntegrationRecords();
+
+            // Write the file
+            var engine = new FileHelperAsyncEngine<DataLoadFormat>();
+            using (engine.BeginWriteFile(config["SourceDirectory"] + "S5InventoryDataLoad.csv"))
+            {
+                foreach (var record in DataLoad)
+                {
+                    engine.WriteNext(record);
+                }
+            }
 
             // G: export the resulting data load object to CSV
 
