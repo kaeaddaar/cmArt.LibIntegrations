@@ -43,5 +43,11 @@ namespace cmArt.BevNet
         public decimal WholesaleCost { get; set; }
         public decimal PriceSchedule1_MSRP { get; set; }
         public decimal PriceSchedule2_MinPrice { get; set; }
+        public decimal S5Orig_WholesaleCost { get; set; }
+        public decimal S5Orig_ListPrice { get; set; }
+        public decimal S5Orig_MinPrice { get; set; }
+        public decimal Change_WholesaleCost { get; set; }
+        public decimal Change_ListPrice { get; set; }
+        public decimal Change_MinPrice { get; set; }
     }
 }

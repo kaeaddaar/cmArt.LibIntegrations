@@ -11,6 +11,7 @@ using cmArt.BevNet.System5;
 using cmArt.LibIntegrations.GenericJoinsService;
 using FileHelpers;
 using cmArt.LibIntegrations;
+using cmArt.System5.Data;
 
 namespace cmArt.BevNet.App
 {
@@ -67,6 +68,10 @@ namespace cmArt.BevNet.App
             {
                 DataLoadFormat tmp = new DataLoadFormat();
                 tmp.CopyFrom(a); // .CopyFrom is from ICopyable
+                tmp.SupplierPartNumber = tmp.SupplierPartNumber.TrimEnd();
+                tmp.S5Orig_ListPrice = a.PriceSchedule1_MSRP;
+                tmp.S5Orig_MinPrice = a.PriceSchedule2_MinPrice;
+                tmp.S5Orig_WholesaleCost = a.WholesaleCost;
                 return tmp;
             });
 
@@ -90,11 +95,11 @@ namespace cmArt.BevNet.App
             //      - Join them together into pairs and perorm the update
             Func<ICommonFields, (string SupplierCode, string SupplierPart)> keyDataLoad = (common) =>
             {
-                return new ValueTuple<string, string>(common.SupplierCode, common.SupplierPartNumber);
+                return new ValueTuple<string, string>(common.SupplierCode.ToUpper(), common.SupplierPartNumber);
             };
             Func<IPriceFile, ValueTuple<string, string>> keyBevNet = (priceRecord) =>
             {
-                return new ValueTuple<string, string>(priceRecord.WHOLESALER, priceRecord.UNIV_PROD);
+                return new ValueTuple<string, string>(priceRecord.WHOLESALER.ToUpper(), priceRecord.PROD_ITEM);
             };
 
             IEnumerable<Tuple<IPriceFile, ICommonFields>> updatePairs
@@ -104,13 +109,16 @@ namespace cmArt.BevNet.App
 
             rehydrater.From_To_Pairs = pairs;
             rehydrater.UpdateIntegrationRecords();
-
+            DataLoad = rehydrater.From_To_Pairs.Select(p => (DataLoadFormat)p.Item2); 
             // Write the file
             var engine = new FileHelperAsyncEngine<DataLoadFormat>();
             using (engine.BeginWriteFile(config["SourceDirectory"] + "S5InventoryDataLoad.csv"))
             {
                 foreach (var record in DataLoad)
                 {
+                    record.Change_ListPrice = record.PriceSchedule1_MSRP - record.S5Orig_ListPrice;
+                    record.Change_MinPrice = record.PriceSchedule2_MinPrice - record.S5Orig_MinPrice;
+                    record.Change_WholesaleCost = record.WholesaleCost - record.S5Orig_WholesaleCost;
                     engine.WriteNext(record);
                 }
             }
