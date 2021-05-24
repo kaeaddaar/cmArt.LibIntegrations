@@ -1,0 +1,58 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using cmArt.LibIntegrations;
+using FileHelpers;
+
+
+namespace cmArt.Shopify.App.Data
+{
+    [DelimitedRecord(",")]
+    public class ShopifyDataLoadFormat : IShopifyCommonFields, ICopyable<IShopifyDataLoadFormat>, IShopifyDataLoadFormat
+    {
+        private List<Decimal> prices;
+        public ShopifyDataLoadFormat()
+        {
+            prices = new List<decimal>();
+        }
+        public IShopifyDataLoadFormat CopyFrom(IShopifyDataLoadFormat IFrom)
+        {
+            this.Cat = IFrom.Cat;
+            this.InvUnique = IFrom.InvUnique;
+            this.PartNumber = IFrom.PartNumber;
+            
+
+            this.WholesaleCost = IFrom.WholesaleCost;
+            return this;
+        }
+
+        public int InvUnique { get; set; }
+        [FieldQuoted]
+        [FieldNullValue(typeof(string), "")]
+        public string Cat { get; set; }
+        [FieldQuoted]
+        [FieldNullValue(typeof(string), "")]
+        public string PartNumber { get; set; }
+        [FieldQuoted]
+        [FieldNullValue(typeof(string), "")]
+        public string Description { get; set; }
+        public decimal WholesaleCost { get; set; }
+        public IEnumerable<decimal> Prices 
+        {
+            get
+            {
+                return prices.AsEnumerable();
+            }
+            set
+            {
+                prices.RemoveAll((x) => { return true; });
+                foreach(var price in value)
+                {
+                    prices.Add(price);
+                }
+            }
+        }
+    }
+
+}
