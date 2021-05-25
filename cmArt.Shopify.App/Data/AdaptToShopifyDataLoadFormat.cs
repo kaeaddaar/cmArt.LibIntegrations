@@ -25,28 +25,18 @@ namespace cmArt.Shopify.App.Data
         public int InvUnique { get => _InvAss.Inv.InvUnique; set => _InvAss.Inv.InvUnique = value; }
         public string PartNumber { get => _InvAss.Inv.Part; set => _InvAss.Inv.Part = value ?? string.Empty; }
         public string Description { get => _InvAss.Inv.Description; set => _InvAss.Inv.Description = value ?? string.Empty; }
-        public decimal PriceSchedule1_MSRP
-        {
-            get => (decimal)GetPriceSchedule(1).Price;
-            set => throw new NotImplementedException("Doesn't yet support converting a price back into percentage " +
-                "based on a formula");
-        }
-        public decimal PriceSchedule2_MinPrice
-        {
-            get => (decimal)GetPriceSchedule(0).Price;
-            set => throw new NotImplementedException("Doesn't yet support converting a price back into percentage " +
-                "based on a formula");
-        }
+
         public decimal WholesaleCost { get => (decimal)_InvAss.Inv.Wholesale_1; set => _InvAss.Inv.Wholesale_1 = (double)value; }
-        public IEnumerable<decimal> Prices 
+        public IEnumerable<pair> Prices 
         { 
             get
             {
-                List<decimal> prices = new List<decimal>();
+                List<pair> prices = new List<pair>();
                 var FirstRecord = _InvAss;
                 foreach (var sched in FirstRecord.InvPrices_PerInventry_27)
                 {
-                    decimal tmpPrice = GetPriceSchedule(sched.ScheduleLevel).Price;
+                    PriceScheduleView tmpPriceSchedule = GetPriceSchedule(sched.ScheduleLevel);
+                    pair tmpPrice = new pair(tmpPriceSchedule.Level, tmpPriceSchedule.Price);
                     prices.Add(tmpPrice);
                 }
                 return prices;

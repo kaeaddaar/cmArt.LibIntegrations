@@ -11,10 +11,10 @@ namespace cmArt.Shopify.App.Data
     [DelimitedRecord(",")]
     public class ShopifyDataLoadFormat : IShopifyCommonFields, ICopyable<IShopifyDataLoadFormat>, IShopifyDataLoadFormat
     {
-        private List<Decimal> prices;
+        private List<pair> prices;
         public ShopifyDataLoadFormat()
         {
-            prices = new List<decimal>();
+            prices = new List<pair>();
         }
         public IShopifyDataLoadFormat CopyFrom(IShopifyDataLoadFormat IFrom)
         {
@@ -38,7 +38,7 @@ namespace cmArt.Shopify.App.Data
         [FieldNullValue(typeof(string), "")]
         public string Description { get; set; }
         public decimal WholesaleCost { get; set; }
-        public IEnumerable<decimal> Prices 
+        public IEnumerable<pair> Prices 
         {
             get
             {
@@ -49,7 +49,7 @@ namespace cmArt.Shopify.App.Data
                 prices.RemoveAll((x) => { return true; });
                 foreach(var price in value)
                 {
-                    prices.Add(price);
+                    prices.Add(new pair(price.Level, price.Price));
                 }
             }
         }
