@@ -14,7 +14,7 @@ namespace cmArt.Shopify.App
     {
         public static string[] Args { get; set; }
 
-        public static void MainX(string[] args)
+        public static void Mainx(string[] args)
         {
             Args = args;
             CreateHostBuilder(args).Build().Run();

@@ -13,6 +13,46 @@ using System.Net;
 
 namespace cmArt.Shopify.App
 {
+    class StaticSettings
+    {
+        public StaticSettings(IConfiguration config)
+        {
+            CachedFiles = config["CachedFiles"] ?? string.Empty;
+            CSVFiles = config["CSVFiles"] ?? string.Empty;
+            OutputDirectory = config["OutputDirectory"] ?? string.Empty;
+            DSNinfo = config["DSNinfo"] ?? string.Empty;
+            Cachinginfo = config["Cachinginfo"] ?? string.Empty;
+            SupressUpload = config["SupressUpload"] ?? string.Empty;
+            LogfilePath = config["LogfilePath"] ?? string.Empty;
+            Hours = config["Hours"] ?? string.Empty;
+            Minutes = config["Minutes"] ?? string.Empty;
+            Seconds = config["Seconds"] ?? string.Empty;
+            errormail = config["errormail"] ?? string.Empty;
+            smtpaddress = config["smtpaddress"] ?? string.Empty;
+            smtpport = config["smptport"] ?? string.Empty;
+            enableSSL = config["enableSSL"] ?? string.Empty;
+            fromemailaddress = config["fromemailaddress"] ?? string.Empty;
+            fromemailpassword = config["fromemailpassword"] ?? string.Empty;
+        }
+        public string CachedFiles { get; }
+        public string CSVFiles { get; }
+        public string OutputDirectory { get; }
+        public string DSNinfo { get; }
+        public string Cachinginfo { get; }
+        public string SupressUpload { get; }
+        public string LogfilePath { get; }
+        public string Hours { get; }
+        public string Minutes { get; }
+        public string Seconds { get; }
+        public string errormail { get; }
+        public string smtpaddress { get; }
+        public string smtpport { get; }
+        public string enableSSL { get; }
+        public string fromemailaddress { get; }
+        public string fromemailpassword { get; }
+
+    }
+
     public class Worker : BackgroundService
     {
         private readonly IConfiguration Configuration;
@@ -36,6 +76,8 @@ namespace cmArt.Shopify.App
         {
             while (!stoppingToken.IsCancellationRequested)
             {
+                StaticSettings settings = new StaticSettings(Configuration);
+
                 //ConsoleExportPSQLQuery.Program.WriteLogFile($"Worker running at: {DateTimeOffset.Now}");
 
                 //_logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
