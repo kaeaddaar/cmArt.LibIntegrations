@@ -91,7 +91,7 @@ namespace cmArt.LibIntegrations.PriceCalculations
             {
                 try
                 {
-                    return CalcPrice
+                    return (double)(decimal)CalcPrice
                     (
                         x.RScheduleType
                         , x.RegularPrice
@@ -108,6 +108,12 @@ namespace cmArt.LibIntegrations.PriceCalculations
                     Console.WriteLine($"Error: failed to calculate Web Price" +
                         $"({info.ScheduleLevel_List}). " + "Details: " + e.Message + nl + info_json);
                     return 0;
+                }
+                catch (OverflowException e)
+                {
+                    Console.WriteLine($"Error: Overflow exception. x.RegularPrice={x.RegularPrice}, WholesaleCost={WholesaleCost}" +
+                        $", LandedCost={LandedCost}, SalePrice={SalePrice}, ListPrice={ListPrice}");
+                    return 100000;
                 }
 
             };
