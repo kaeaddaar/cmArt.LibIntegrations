@@ -10,6 +10,7 @@ namespace cmArt.Shopify.App.Data
         string Description { get; set; }
         IEnumerable<pair> Prices { get; set; }
         decimal WholesaleCost { get; set; }
+        decimal InStock { get; set; }
 
         IShopifyDataLoadFormat CopyFrom(IShopifyDataLoadFormat IFrom);
     }

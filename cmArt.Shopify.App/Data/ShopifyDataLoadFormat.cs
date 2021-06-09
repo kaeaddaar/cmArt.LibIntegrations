@@ -21,9 +21,13 @@ namespace cmArt.Shopify.App.Data
             this.Cat = IFrom.Cat;
             this.InvUnique = IFrom.InvUnique;
             this.PartNumber = IFrom.PartNumber;
-            
-
+            this.Description = IFrom.Description;
+            this.InStock = IFrom.InStock;
             this.WholesaleCost = IFrom.WholesaleCost;
+            foreach (var p in IFrom.Prices)
+            {
+                this.prices.Add(p);
+            }
             return this;
         }
 
@@ -38,6 +42,9 @@ namespace cmArt.Shopify.App.Data
         [FieldNullValue(typeof(string), "")]
         public string Description { get; set; }
         public decimal WholesaleCost { get; set; }
+        [FieldQuoted]
+        [FieldNullValue(typeof(string), "")]
+        public decimal InStock { get; set; }
         public IEnumerable<pair> Prices 
         {
             get
@@ -53,6 +60,7 @@ namespace cmArt.Shopify.App.Data
                 }
             }
         }
+
     }
 
 }

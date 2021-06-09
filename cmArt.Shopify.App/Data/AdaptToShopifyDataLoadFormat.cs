@@ -45,6 +45,24 @@ namespace cmArt.Shopify.App.Data
             set => throw new NotImplementedException("Doesn't yet support setting the price");
         }
 
+        public decimal InStock
+        {
+            get 
+            {
+                _InvAss = _InvAss ?? new S5InvAssembled();
+                decimal tmpQty = (decimal)
+                    (
+                        _InvAss.StokLines_PerInventry_27.Select(stok => stok.CostQuantity).Sum()
+                        - _InvAss.StokLines_PerInventry_27.Where(stok => stok.StockStatus == 39 || stok.StockStatus == 40
+                        || stok.StockStatus == 16 || stok.StockStatus == 17).Select(stok => stok.PriceQty).Sum()
+                    );
+                return tmpQty;
+            }
+
+                
+            set => throw new NotImplementedException("You can't really load a qty into the records that make the quantity up. Possible, but does it really make sense?"); 
+        }
+
         protected PriceScheduleView GetPriceSchedule(short ScheduleNum)
         {
             var FirstRecord = _InvAss;

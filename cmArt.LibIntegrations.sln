@@ -25,7 +25,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTestBevNetHelperMethods
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Shopify.App", "cmArt.Shopify.App\cmArt.Shopify.App.csproj", "{3BF8AF4F-75C1-47FE-8BA9-05C804B52D4F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmArt.Shopify.Testing", "cmArt.Shopify.Testing\cmArt.Shopify.Testing.csproj", "{B96850C0-647D-46EE-A7D6-7FEF0B9A206E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Shopify.Testing", "cmArt.Shopify.Testing\cmArt.Shopify.Testing.csproj", "{B96850C0-647D-46EE-A7D6-7FEF0B9A206E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestShopifyApp", "UnitTestShopifyApp\UnitTestShopifyApp.csproj", "{CE7C4E73-BCC3-4CC7-9241-EA386EF5302C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +83,10 @@ Global
 		{B96850C0-647D-46EE-A7D6-7FEF0B9A206E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B96850C0-647D-46EE-A7D6-7FEF0B9A206E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B96850C0-647D-46EE-A7D6-7FEF0B9A206E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE7C4E73-BCC3-4CC7-9241-EA386EF5302C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE7C4E73-BCC3-4CC7-9241-EA386EF5302C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE7C4E73-BCC3-4CC7-9241-EA386EF5302C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE7C4E73-BCC3-4CC7-9241-EA386EF5302C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
