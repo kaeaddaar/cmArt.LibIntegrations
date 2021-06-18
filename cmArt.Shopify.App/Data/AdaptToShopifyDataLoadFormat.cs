@@ -50,12 +50,32 @@ namespace cmArt.Shopify.App.Data
             get 
             {
                 _InvAss = _InvAss ?? new S5InvAssembled();
-                decimal tmpQty = (decimal)
+                decimal tmpQty = (decimal)0;
+                double dblQty = 0;
+                try
+                {
+                    dblQty =
                     (
                         _InvAss.StokLines_PerInventry_27.Select(stok => stok.CostQuantity).Sum()
                         - _InvAss.StokLines_PerInventry_27.Where(stok => stok.StockStatus == 39 || stok.StockStatus == 40
                         || stok.StockStatus == 16 || stok.StockStatus == 17).Select(stok => stok.PriceQty).Sum()
                     );
+
+                }
+                catch
+                {
+                    dblQty = 0;
+                }
+
+                try
+                {
+                    tmpQty = (decimal)dblQty;
+                }
+                catch
+                {
+                    tmpQty = 0;
+                }
+
                 return tmpQty;
             }
 

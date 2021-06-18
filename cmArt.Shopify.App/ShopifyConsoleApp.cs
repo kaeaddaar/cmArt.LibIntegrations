@@ -21,6 +21,16 @@ using System.Text.Json;
 
 namespace cmArt.Shopify.App
 {
+    [Serializable]
+    public class Exception_WhileGettingData : Exception
+    {
+        public Exception_WhileGettingData() : base() { }
+        public Exception_WhileGettingData(string message) : base(message) { }
+        public Exception_WhileGettingData(string message, Exception inner) : base(message, inner) { }
+        protected Exception_WhileGettingData(System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+    }
+
     public class ShopifyConsoleApp
     {
         class StaticSettings
@@ -64,7 +74,7 @@ namespace cmArt.Shopify.App
             public string fromemailpassword { get; }
 
         }
-        static void Main(string[] args)
+        public static void Main_Console(string[] args)
         {
             Console.WriteLine("Begin");
 
@@ -127,7 +137,15 @@ namespace cmArt.Shopify.App
 
             Console.WriteLine("Loading Inventory From Real Windward");
 
-            IEnumerable<IS5InvAssembled> InvAss = GetDataFromSystemFive(config);
+            IEnumerable<IS5InvAssembled> InvAss;
+            try
+            {
+                InvAss = GetDataFromSystemFive(config);
+            }
+            catch (Exception e)
+            {
+                throw new Exception_WhileGettingData("An error occured Getting Data From System Five.", e);
+            }
             Console.WriteLine("Finished - Loading Inventory From Real Windward");
 
             // Use facade to create data load format from Assembled Inventory Data
@@ -138,8 +156,56 @@ namespace cmArt.Shopify.App
                 return tmp;
             }
             );
+
+            string result = string.Empty;
+            try
+            {
+                result = JsonSerializer.Serialize(adapters, typeof(IEnumerable<AdaptToShopifyDataLoadFormat>));
+            }
+            catch (Exception e)
+            {
+                List<IShopifyDataLoadFormat> FromAdapters = new List<IShopifyDataLoadFormat>();
+                List<IShopifyDataLoadFormat> AdapterRecordsNotSerializable = new List<IShopifyDataLoadFormat>();
+
+                // only copy serializable records and try again
+                string tmp = string.Empty;
+                int i = 0;
+
+                foreach (var adapter in adapters)
+                {
+                    try
+                    {
+                        tmp = JsonSerializer.Serialize(adapter, typeof(AdaptToShopifyDataLoadFormat));
+                        FromAdapters.Add(adapter);
+                    }
+                    catch (Exception Ex)
+                    {
+                        // Count bad records
+                        i++;
+                        IShopifyDataLoadFormat dataLoadFormat = new ShopifyDataLoadFormat();
+                        try
+                        {
+                            dataLoadFormat.CopyFrom(adapter);
+                            AdapterRecordsNotSerializable.Add(dataLoadFormat);
+                        }
+                        catch
+                        {
+                            throw new Exception("Failed to .CopyFrom the adapter record into a data load format object for a single record "
+                                + "that also failed to serialize. See Inner Exception.", e);
+                        }
+                    }
+                }
+
+                try
+                {
+                    result = JsonSerializer.Serialize(FromAdapters, typeof(IEnumerable<AdaptToShopifyDataLoadFormat>));
+                }
+                catch
+                {
+                    throw new Exception($"Failed to serialize sanitized records from the Shopify Data Load File. See Inner Exception.", e);
+                }
+            }
             
-            string result = JsonSerializer.Serialize(adapters, typeof(IEnumerable<AdaptToShopifyDataLoadFormat>));
             //Console.WriteLine(result);
             File.WriteAllText("c:\\temp\\results.txt", result);
 
@@ -218,6 +284,7 @@ namespace cmArt.Shopify.App
             Console.WriteLine("Done");
             Console.ReadKey();
         }
+        
         //private static IEnumerable<Tuple<IS5InvAssembled, QryAccount>> MakePairs(IEnumerable<IS5InvAssembled> InvAss, IEnumerable<QryAccount> accts)
         //{
         //    Func<QryAccount, int> QryAccount_Index = (record) =>

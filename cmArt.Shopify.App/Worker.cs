@@ -65,6 +65,7 @@ namespace cmArt.Shopify.App
             _logger = logger;
             Configuration = config;
         }
+
         static string smtpAddress = string.Empty;
         static int portNumber = 0;
         static bool enableSSL = false;
@@ -76,8 +77,37 @@ namespace cmArt.Shopify.App
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                StaticSettings settings = new StaticSettings(Configuration);
-
+                //StaticSettings settings = new StaticSettings(Configuration);
+                try
+                {
+                    ShopifyConsoleApp.Main_Console(new string[] { });
+                }
+                catch (Exception_WhileGettingData e)
+                {
+                    string Error_JSON = string.Empty;
+                    try
+                    {
+                        Error_JSON = System.Text.Json.JsonSerializer.Serialize(e, typeof(Exception_WhileGettingData));
+                    }
+                    catch
+                    {
+                        Error_JSON = "Failed to convert error to JSON. e.Message = " + e.Message + " - Inner Exception Message: " + e.InnerException.Message;
+                    }
+                    SendEmail(Error_JSON);
+                }
+                catch (Exception e)
+                {
+                    string Error_JSON = string.Empty;
+                    try
+                    {
+                        Error_JSON = System.Text.Json.JsonSerializer.Serialize(e, typeof(Exception));
+                    }
+                    catch
+                    {
+                        Error_JSON = "Failed to convert error to JSON. e.Message = " + e.Message;
+                    }
+                    SendEmail(Error_JSON);
+                }
                 //ConsoleExportPSQLQuery.Program.WriteLogFile($"Worker running at: {DateTimeOffset.Now}");
 
                 //_logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
