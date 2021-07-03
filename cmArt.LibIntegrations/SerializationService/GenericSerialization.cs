@@ -68,6 +68,24 @@ namespace cmArt.LibIntegrations.SerializationService
 
         }
 
+        public static bool Exists(string CachedFilesdDirectory, string TableName)
+        {
+            bool directoryExists = false;
+
+            directoryExists = Directory.Exists(CachedFilesdDirectory);
+            IEnumerable<string> ListOfFiles = Directory.GetFiles(CachedFilesdDirectory);
+
+            bool FilesExist = false;
+            try
+            {
+                FilesExist = ListOfFiles.Where(f => f.Contains($"tbl{TableName}_page")).Count() > 0;
+            }
+            catch
+            {
+                FilesExist = false;
+            }
+            return FilesExist;
+        }
         public static void SerializeToJSON(List<T> ToSerialize, string TableName, string CachedFilesDirectory
             , int RecordsPerPage)
         {
@@ -123,6 +141,18 @@ namespace cmArt.LibIntegrations.SerializationService
                         files.Add(file);
                     }
                 }
+            }
+            return files;
+        }
+        public static IEnumerable<string> RemoveCachedFileNamesFromDirectory(string directory, string TableName) // returns files removed
+        {
+            Console.WriteLine("RemoveCachedFilesInDirectory (Begin), checking for files in " +
+                TableName);
+            IEnumerable<string> files = GetCachedFileNamesFromDirectory(directory, TableName); ;
+
+            foreach (var file in files)
+            {
+                File.Delete(file);
             }
             return files;
         }

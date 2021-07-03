@@ -10,7 +10,7 @@ namespace cmArt.System5.Inventory
     public static class IS5InventoryExtensions
     {
 
-        public static IEnumerable<IS5InvAssembled> ToAssembled(this IS5Inventory InvToAssemble)
+        public static IEnumerable<IS5InvAssembled> ToAssembled(this IS5Inventory_ReadOnly InvToAssemble)
         {
             IEnumerable<IEnumerable<IStok>> StokLinesPerInventry = new List<List<IStok>>();
             StokLinesPerInventry = GenericAggregateToLists<IStok, int>.ToLists
@@ -37,7 +37,7 @@ namespace cmArt.System5.Inventory
             IEnumerable<IEnumerable<IAltSuply>> AltSupliesPerInventry;
             AltSupliesPerInventry = GenericAggregateToLists<IAltSuply, int>.ToLists
             (
-                InvToAssemble.AltSupplies.Select(altSuply => new AltSuply_Clean(altSuply))
+                InvToAssemble.AltSuplyLines.Select(altSuply => new AltSuply_Clean(altSuply))
                 , AltSuply_Indexes.InventoryUnique
             );
 

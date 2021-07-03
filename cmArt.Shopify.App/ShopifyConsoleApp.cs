@@ -18,6 +18,7 @@ using Microsoft.Extensions.Configuration.Json;
 using System.Threading.Tasks;
 using cmArt.Shopify.App.Data;
 using System.Text.Json;
+using cmArt.LibIntegrations.SerializationService;
 
 namespace cmArt.Shopify.App
 {
@@ -137,10 +138,18 @@ namespace cmArt.Shopify.App
 
             Console.WriteLine("Loading Inventory From Real Windward");
 
-            IEnumerable<IS5InvAssembled> InvAss;
+            IEnumerable<IS5InvAssembled> InvAss = new List<IS5InvAssembled>();
             try
             {
-                InvAss = GetDataFromSystemFive(config);
+                if (settings.Cachinginfo == "UseCaching" && DoWeHaveCachedFiles(config))
+                {
+                    InvAss = GetDataFromJson(config);
+                }
+                if(settings.Cachinginfo != "UseCaching" || InvAss.Count() == 0)
+                {
+                    InvAss = GetDataFromSystemFive(config);
+                }
+
             }
             catch (Exception e)
             {
@@ -313,17 +322,18 @@ namespace cmArt.Shopify.App
         //    IEnumerable<QryAccount> records = context._Records.Select(r => clean(r));
         //    return records;
         //}
+
         private static IEnumerable<IS5InvAssembled> GetDataFromJson(IConfiguration config)
         {
-            string CachedFilesDirectory = config["Shopifyinfo:SourceDirectory"];
+            string CachedFilesDirectory = config["Shopifyinfo:CachedFiles"];
 
             Options opt = PagedJsonOptions_S5Inventory.GetOptions(CachedFilesDirectory, new List<string>());
-            OdbcContext_S5Inventory context = new OdbcContext_S5Inventory(opt);
+            PagedJsonContext context = new PagedJsonContext(opt);
 
             // Assemble Inventory
             S5Inventory InvRaw = new S5Inventory
             (
-                AltSuply_Records: context.AltSuplies
+                AltSuply_Records: context.AltSuplyLines
                 , Comments_Records: context.CommentsLines
                 , Inventry_27_Records: context.Inventry_27s
                 , InvPrice_Records: context.InvPrices
@@ -332,6 +342,19 @@ namespace cmArt.Shopify.App
             IEnumerable<IS5InvAssembled> InvAss = InvRaw.ToAssembled();
             return InvAss;
         }
+        private static bool DoWeHaveCachedFiles(IConfiguration config)
+        {
+            string CachedField = config["Shopifyinfo:CachedFiles"];
+            int foundCount = 0;
+            if (GenericSerialization<AltSuply>.Exists(CachedField, "AltSuply")) { foundCount++; }
+            if (GenericSerialization<Comments>.Exists(CachedField, "Comments")) { foundCount++; }
+            if (GenericSerialization<Inventry_27>.Exists(CachedField, "Inventry")) { foundCount++; }
+            if (GenericSerialization<InvPrice>.Exists(CachedField, "InvPrice")) { foundCount++; }
+            if (GenericSerialization<Stok>.Exists(CachedField, "Stok")) { foundCount++; }
+
+            bool foundAll = foundCount == 5;
+            return foundAll;
+        }
         private static IEnumerable<IS5InvAssembled> GetDataFromSystemFive(IConfiguration config)
         {
             string DSN = config["Shopifyinfo:DSNinfo"];
@@ -339,10 +362,18 @@ namespace cmArt.Shopify.App
             Options opt = OdbcOptions.GetOptions(DSN);
             OdbcContext_S5Inventory context = new OdbcContext_S5Inventory(opt);
 
+            // Cache data here
+            string CachedFilesDirectory = config["Shopifyinfo:CachedFiles"];
+
+            Options opt2 = PagedJsonOptions_S5Inventory.GetOptions(CachedFilesDirectory, new List<string>());
+            PagedJsonContext JSONContext = new PagedJsonContext();
+            JSONContext.CopyFrom(context);
+            JSONContext.SaveToPagedFiles(opt2);
+
             // Assemble Inventory
             S5Inventory InvRaw = new S5Inventory
             (
-                AltSuply_Records: context.AltSuplies
+                AltSuply_Records: context.AltSuplyLines
                 , Comments_Records: context.CommentsLines
                 , Inventry_27_Records: context.Inventry_27s
                 , InvPrice_Records: context.InvPrices

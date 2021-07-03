@@ -5,7 +5,7 @@ using System.Text;
 
 namespace cmArt.System5.Inventory
 {
-    public class S5Inventory : IS5Inventory
+    public class S5Inventory : IS5Inventory_ReadOnly
     {
         public short Schedule_0 { get; set; }
         public short Schedule_List { get; set; }
@@ -14,7 +14,7 @@ namespace cmArt.System5.Inventory
 
         public S5Inventory()
         {
-            AltSupplies = new List<IAltSuply>();
+            AltSuplyLines = new List<IAltSuply>();
             CommentsLines = new List<IComments>();
             Inventry_27s = new List<IInventry_27>();
             InvPrices = new List<IInvPrice>();
@@ -61,7 +61,7 @@ namespace cmArt.System5.Inventory
 
         private IEnumerable<IAltSuply> _AltSuplies;
 
-        public IEnumerable<IAltSuply> AltSupplies
+        public IEnumerable<IAltSuply> AltSuplyLines
         {
             get { return new List<IAltSuply>(_AltSuplies); }
             set { _AltSuplies = new List<IAltSuply>(value); }

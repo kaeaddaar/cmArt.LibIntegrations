@@ -75,6 +75,7 @@ namespace cmArt.Shopify.App
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            DateTime LastRun = new DateTime();
             while (!stoppingToken.IsCancellationRequested)
             {
                 //StaticSettings settings = new StaticSettings(Configuration);

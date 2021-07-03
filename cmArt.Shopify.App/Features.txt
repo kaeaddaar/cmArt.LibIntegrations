@@ -1,0 +1,9 @@
+﻿* Shopify QTY update problem
+* Implementing the generic filter for only records with changes functionality.
+* Implement Caching Functionality
+ - Add ability to read from directory to see if files are there
+ - Consider checking for continuity
+ - Do the files de-serialize
+
+
+

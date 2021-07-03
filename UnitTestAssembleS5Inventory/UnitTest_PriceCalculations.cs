@@ -87,7 +87,7 @@ namespace UnitTestAssembleS5Inventory
             );
 
             Assert.AreEqual(12018, InvRaw.Inventry_27s.First().InvUnique);
-            Assert.AreEqual(12018, InvRaw.AltSupplies.First().Part);
+            Assert.AreEqual(12018, InvRaw.AltSuplyLines.First().Part);
             Assert.AreEqual(12018, InvRaw.CommentsLines.First().RecordNo);
             Assert.AreEqual(12018, InvRaw.InvPrices.First().PartUnique);
             Assert.AreEqual(12018, InvRaw.StokLines.First().PartPtr);
@@ -97,7 +97,7 @@ namespace UnitTestAssembleS5Inventory
             Assert.AreEqual("ff2".PadRight(60, ' '), InvRaw.CommentsLines.Last().Comment);
 
             Assert.AreEqual(new DateTime(2020, 10, 15), InvRaw.InvPrices.Where(p => p.InvUnique == 435900).First().StartDate);
-            Assert.AreEqual("211545".PadRight(50, ' '), InvRaw.AltSupplies.Where(a => a.AUnique == 2).First().PartNumber);
+            Assert.AreEqual("211545".PadRight(50, ' '), InvRaw.AltSuplyLines.Where(a => a.AUnique == 2).First().PartNumber);
 
             // additional assertions based on future scenarios go here
 

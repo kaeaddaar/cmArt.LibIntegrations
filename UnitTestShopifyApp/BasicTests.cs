@@ -59,7 +59,7 @@ namespace UnitTestShopifyApp
         [TestMethod]
         public void Load_sample_S5Inventory_to_ShopifyDataLoadFormat_and_check_values()
         {
-            IS5Inventory _s5Inv = Get_Sample_S5Inventory_for_one_Inventory_Item();
+            IS5Inventory_ReadOnly _s5Inv = Get_Sample_S5Inventory_for_one_Inventory_Item();
             IEnumerable<IS5InvAssembled> InvAss = _s5Inv.ToAssembled();
             var First = InvAss.First();
 
@@ -156,7 +156,7 @@ namespace UnitTestShopifyApp
             );
 
             Assert.AreEqual(12018, InvRaw.Inventry_27s.First().InvUnique);
-            Assert.AreEqual(12018, InvRaw.AltSupplies.First().Part);
+            Assert.AreEqual(12018, InvRaw.AltSuplyLines.First().Part);
             Assert.AreEqual(12018, InvRaw.CommentsLines.First().RecordNo);
             Assert.AreEqual(12018, InvRaw.InvPrices.First().PartUnique);
             Assert.AreEqual(12018, InvRaw.StokLines.First().PartPtr);
@@ -166,7 +166,7 @@ namespace UnitTestShopifyApp
             Assert.AreEqual("ff2".PadRight(60, ' '), InvRaw.CommentsLines.Last().Comment);
 
             Assert.AreEqual(new DateTime(2020, 10, 15), InvRaw.InvPrices.Where(p => p.InvUnique == 435900).First().StartDate);
-            Assert.AreEqual("211545".PadRight(50, ' '), InvRaw.AltSupplies.Where(a => a.AUnique == 2).First().PartNumber);
+            Assert.AreEqual("211545".PadRight(50, ' '), InvRaw.AltSuplyLines.Where(a => a.AUnique == 2).First().PartNumber);
 
             // additional assertions based on future scenarios go here
 

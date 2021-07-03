@@ -79,7 +79,7 @@ namespace cmArt.BevNet.App
             //  - Assemble pairs of matching records that need to be updated from each other. 
             //      - DataLoadFormat is ICommonFields
             //      - BevNetRecords is IPriceFile
-            //      - Join them together into pairs and perorm the update
+            //      - Join them together into pairs and perform the update
             Func<ICommonFields, (string SupplierCode, string SupplierPart)> keyDataLoad = (common) =>
             {
                 return new ValueTuple<string, string>(common.SupplierCode.ToUpper(), common.SupplierPartNumber);
@@ -160,7 +160,7 @@ namespace cmArt.BevNet.App
             // Assemble Inventory
             S5Inventory InvRaw = new S5Inventory
             (
-                AltSuply_Records: context.AltSuplies
+                AltSuply_Records: context.AltSuplyLines
                 , Comments_Records: context.CommentsLines
                 , Inventry_27_Records: context.Inventry_27s
                 , InvPrice_Records: context.InvPrices
@@ -179,7 +179,7 @@ namespace cmArt.BevNet.App
             // Assemble Inventory
             S5Inventory InvRaw = new S5Inventory
             (
-                AltSuply_Records: context.AltSuplies
+                AltSuply_Records: context.AltSuplyLines
                 , Comments_Records: context.CommentsLines
                 , Inventry_27_Records: context.Inventry_27s
                 , InvPrice_Records: context.InvPrices
