@@ -8,10 +8,12 @@ namespace cmArt.Shopify.App.Data
         int InvUnique { get; set; }
         string PartNumber { get; set; }
         string Description { get; set; }
-        IEnumerable<pair> Prices { get; set; }
+        IEnumerable<S5PricePair> Prices { get; set; }
         decimal WholesaleCost { get; set; }
         decimal InStock { get; set; }
 
         IShopifyDataLoadFormat CopyFrom(IShopifyDataLoadFormat IFrom);
+        bool Equals(IShopifyDataLoadFormat compareTo);
+        
     }
 }

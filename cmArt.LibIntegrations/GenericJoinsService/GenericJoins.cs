@@ -45,6 +45,26 @@ namespace cmArt.LibIntegrations.GenericJoinsService
 
             return results;
         }
+        public static IEnumerable<Tuple<TLeft, TRight>> FullOuterJoin
+        (
+            IEnumerable<TLeft> LeftRecords
+            , IEnumerable<TRight> RightRecords
+            , Func<TLeft, iKey> LeftKey
+            , Func<TRight, iKey> RightKey
+        )
+        {
+            IEnumerable<Tuple<TLeft, TRight>> results = new List<Tuple<TLeft, TRight>>();
+
+            results =
+                from LeftNullRecord in LeftRecords.DefaultIfEmpty()
+                join RightRecord in RightRecords
+                on LeftKey(LeftNullRecord) equals RightKey(RightRecord)
+                into RightNullRecords
+                from RightNullRecord in RightNullRecords.DefaultIfEmpty()
+                select new Tuple<TLeft, TRight>(item1: LeftNullRecord, item2: RightNullRecord);
+
+            return results;
+        }
         public static IEnumerable<Tuple<TLeft, TRight>> RightJoin
         (
             IEnumerable<TLeft> LeftRecords

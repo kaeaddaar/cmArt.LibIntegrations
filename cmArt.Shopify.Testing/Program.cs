@@ -14,15 +14,15 @@ namespace cmArt.Shopify.Testing
 
             List<ShopifyDataLoadFormat> Records = new List<ShopifyDataLoadFormat>();
 
-            List<pair> first = new List<pair>();
-            first.Add(new pair(0, 200));
-            first.Add(new pair(1, 180));
-            first.Add(new pair(2, 160));
+            List<S5PricePair> first = new List<S5PricePair>();
+            first.Add(new S5PricePair(0, 200));
+            first.Add(new S5PricePair(1, 180));
+            first.Add(new S5PricePair(2, 160));
 
-            List<pair> second = new List<pair>();
-            second.Add(new pair(0, 2000));
-            second.Add(new pair(1, 1800));
-            second.Add(new pair(2, 1600));
+            List<S5PricePair> second = new List<S5PricePair>();
+            second.Add(new S5PricePair(0, 2000));
+            second.Add(new S5PricePair(1, 1800));
+            second.Add(new S5PricePair(2, 1600));
 
             Records.Add
             (

@@ -124,24 +124,32 @@ namespace cmArt.LibIntegrations
             return UpdatedDestRecords;
         }
 
-        public IEnumerable<Tuple<TCommon, TCommon>> GetUpdatesByCommonFields()
+        public IEnumerable<Tuple<TCommon, TCommon>> GetUpdatesByCommonFields(Func<TCommon,TCommon,bool> fEquals)
         {
-            return GetUpdatesByCommonFields(SourceRecords: _SourceRecords, DestRecords: _DestRecords);
+            return GetUpdatesByCommonFields(SourceRecords: _SourceRecords, DestRecords: _DestRecords, fEquals: fEquals);
         }
         private IEnumerable<Tuple<TCommon, TCommon>> GetUpdatesByCommonFields
         (
             IEnumerable<TCommon> SourceRecords
-            , IEnumerable<TCommon> DestRecords)
+            , IEnumerable<TCommon> DestRecords
+            , Func<TCommon, TCommon, bool> fEquals)
         {
             IEnumerable<TCommon> srcRs = SourceRecords;
             IEnumerable<TCommon> destRs = DestRecords;
 
             var Common =
-                from src in srcRs
-                join dest in destRs
-                on _fGetKey(src) equals _fGetKey(dest)
-                where !src.Equals(dest)
-                select new Tuple<TCommon, TCommon>(src, dest);
+            from src in srcRs
+            join dest in destRs
+            on _fGetKey(src) equals _fGetKey(dest)
+            where !fEquals(src, dest)
+            select new Tuple<TCommon, TCommon>(src, dest);
+
+            int CountCommon = Common.Count();
+            bool result;
+            foreach (Tuple<TCommon, TCommon> CommonPair in Common)
+            {
+                result = fEquals(CommonPair.Item1, CommonPair.Item2);
+            }
 
             return Common;
         }

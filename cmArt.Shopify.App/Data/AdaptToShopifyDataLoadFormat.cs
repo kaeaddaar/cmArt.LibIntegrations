@@ -27,16 +27,16 @@ namespace cmArt.Shopify.App.Data
         public string Description { get => _InvAss.Inv.Description; set => _InvAss.Inv.Description = value ?? string.Empty; }
 
         public decimal WholesaleCost { get => (decimal)_InvAss.Inv.Wholesale_1; set => _InvAss.Inv.Wholesale_1 = (double)value; }
-        public IEnumerable<pair> Prices 
+        public IEnumerable<S5PricePair> Prices 
         { 
             get
             {
-                List<pair> prices = new List<pair>();
+                List<S5PricePair> prices = new List<S5PricePair>();
                 var FirstRecord = _InvAss;
                 foreach (var sched in FirstRecord.InvPrices_PerInventry_27)
                 {
                     PriceScheduleView tmpPriceSchedule = GetPriceSchedule(sched.ScheduleLevel);
-                    pair tmpPrice = new pair(tmpPriceSchedule.Level, tmpPriceSchedule.Price);
+                    S5PricePair tmpPrice = new S5PricePair(tmpPriceSchedule.Level, tmpPriceSchedule.Price);
                     prices.Add(tmpPrice);
                 }
                 return prices;
@@ -97,7 +97,19 @@ namespace cmArt.Shopify.App.Data
 
         public IShopifyDataLoadFormat CopyFrom(IShopifyDataLoadFormat IFrom)
         {
-            throw new NotImplementedException();
+            this.Cat = IFrom.Cat;
+            this.Description = IFrom.Description;
+            this.InStock = IFrom.InStock;
+            this.InvUnique = IFrom.InvUnique;
+            this.PartNumber = IFrom.PartNumber;
+            this.Prices = IFrom.Prices;
+            this.WholesaleCost = IFrom.WholesaleCost;
+            return this;
+        }
+
+        public bool Equals(IShopifyDataLoadFormat compareTo)
+        {
+            return IShopifyDataLoadFormatExtensions.Equals(this, compareTo);
         }
     }
 

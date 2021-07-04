@@ -9,7 +9,7 @@ namespace cmArt.LibIntegrations
         Func<TCommon, TKey> fGetKey { get; set; }
         IEnumerable<TCommon> SourceRecords { get; set; }
 
-        IEnumerable<Tuple<TCommon, TCommon>> GetUpdatesByCommonFields();
+        IEnumerable<Tuple<TCommon, TCommon>> GetUpdatesByCommonFields(Func<TCommon,TCommon,bool> fEquals);
         IEnumerable<TCommon> GetUpdatesByKeys();
     }
 }

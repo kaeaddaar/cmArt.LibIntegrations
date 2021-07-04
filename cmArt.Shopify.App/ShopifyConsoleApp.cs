@@ -110,15 +110,6 @@ namespace cmArt.Shopify.App
 
             #endregion Get WebData
             
-            //if (false)
-            //{
-            //    int MaxRecordsToDisplay = 10;
-            //    for (int i = 0; i < MaxRecordsToDisplay; i++)
-            //    {
-            //        Console.WriteLine((BevNetRecords.Skip(i).FirstOrDefault() ?? new PriceFile()).PROD_ITEM);
-            //    }
-            //}
-
             Console.WriteLine($"CachedFiles: {settings.CachedFiles}");
             Console.WriteLine($"CSVFiles: {settings.CSVFiles}");
             Console.WriteLine($"OutputDirectory: {settings.OutputDirectory}");
@@ -166,55 +157,25 @@ namespace cmArt.Shopify.App
             }
             );
 
-            string result = string.Empty;
-            try
-            {
-                result = JsonSerializer.Serialize(adapters, typeof(IEnumerable<AdaptToShopifyDataLoadFormat>));
-            }
-            catch (Exception e)
-            {
-                List<IShopifyDataLoadFormat> FromAdapters = new List<IShopifyDataLoadFormat>();
-                List<IShopifyDataLoadFormat> AdapterRecordsNotSerializable = new List<IShopifyDataLoadFormat>();
+            // We have the results from the POS, now grab the results from Shopify
+            List<ShopifyDataLoadFormat> shopifyData = FromShopify();
 
-                // only copy serializable records and try again
-                string tmp = string.Empty;
-                int i = 0;
+            // get changed records
+            UpdateProcess<IShopifyDataLoadFormat, int> updater = new UpdateProcess<IShopifyDataLoadFormat, int>();
+            updater.fGetKey = IShopifyDataLoadFormat_Indexes.UniqueId;
+            updater.SourceRecords = adapters;
+            updater.DestRecords = shopifyData;
+            Func<IShopifyDataLoadFormat, IShopifyDataLoadFormat, bool> fEquals = (from, to) =>
+                {
+                    return from.Equals(to);
+                };
+            IEnumerable<Tuple<IShopifyDataLoadFormat, IShopifyDataLoadFormat>> ChangedRecordPairs = updater.GetUpdatesByCommonFields(fEquals);
+            IEnumerable<IShopifyDataLoadFormat> ChangedRecords = ChangedRecordPairs.Select(p => p.Item1);
 
-                foreach (var adapter in adapters)
-                {
-                    try
-                    {
-                        tmp = JsonSerializer.Serialize(adapter, typeof(AdaptToShopifyDataLoadFormat));
-                        FromAdapters.Add(adapter);
-                    }
-                    catch (Exception Ex)
-                    {
-                        // Count bad records
-                        i++;
-                        IShopifyDataLoadFormat dataLoadFormat = new ShopifyDataLoadFormat();
-                        try
-                        {
-                            dataLoadFormat.CopyFrom(adapter);
-                            AdapterRecordsNotSerializable.Add(dataLoadFormat);
-                        }
-                        catch
-                        {
-                            throw new Exception("Failed to .CopyFrom the adapter record into a data load format object for a single record "
-                                + "that also failed to serialize. See Inner Exception.", e);
-                        }
-                    }
-                }
+            // serialize the results to prep them for sending
+            string result = SerializeForExport(adapters);
+            result = SerializeForExport(ChangedRecords);
 
-                try
-                {
-                    result = JsonSerializer.Serialize(FromAdapters, typeof(IEnumerable<AdaptToShopifyDataLoadFormat>));
-                }
-                catch
-                {
-                    throw new Exception($"Failed to serialize sanitized records from the Shopify Data Load File. See Inner Exception.", e);
-                }
-            }
-            
             //Console.WriteLine(result);
             File.WriteAllText("c:\\temp\\results.txt", result);
 
@@ -293,7 +254,127 @@ namespace cmArt.Shopify.App
             Console.WriteLine("Done");
             Console.ReadKey();
         }
-        
+        private static string SerializeForExport(IEnumerable<IShopifyDataLoadFormat> ChangedRecords)
+        {
+            // serialize the results to prep them for sending
+            string result = string.Empty;
+            try
+            {
+                result = JsonSerializer.Serialize(ChangedRecords, typeof(IEnumerable<IShopifyDataLoadFormat>));
+            }
+            catch (Exception e)
+            {
+                List<IShopifyDataLoadFormat> FromAdapters = new List<IShopifyDataLoadFormat>();
+                List<IShopifyDataLoadFormat> AdapterRecordsNotSerializable = new List<IShopifyDataLoadFormat>();
+
+                // only copy serializable records and try again
+                string tmp = string.Empty;
+                int i = 0;
+
+                foreach (var ChangedRecord in ChangedRecords)
+                {
+                    try
+                    {
+                        tmp = JsonSerializer.Serialize(ChangedRecord, typeof(IShopifyDataLoadFormat));
+                        FromAdapters.Add(ChangedRecord);
+                    }
+                    catch (Exception Ex)
+                    {
+                        // Count bad records
+                        i++;
+                        IShopifyDataLoadFormat dataLoadFormat = new ShopifyDataLoadFormat();
+                        try
+                        {
+                            dataLoadFormat.CopyFrom(ChangedRecord);
+                            AdapterRecordsNotSerializable.Add(dataLoadFormat);
+                        }
+                        catch
+                        {
+                            throw new Exception("Failed to .CopyFrom the adapter record into a data load format object for a single record "
+                                + "that also failed to serialize. See Inner Exception.", e);
+                        }
+                    }
+                }
+
+                try
+                {
+                    result = JsonSerializer.Serialize(FromAdapters, typeof(IEnumerable<IShopifyDataLoadFormat>));
+                }
+                catch
+                {
+                    throw new Exception($"Failed to serialize sanitized records from the Shopify Data Load File. See Inner Exception.", e);
+                }
+            }
+            return result;
+        }
+
+        private static string SerializeForExport(IEnumerable<AdaptToShopifyDataLoadFormat> adapters)
+        {
+            // serialize the results to prep them for sending
+            string result = string.Empty;
+            try
+            {
+                result = JsonSerializer.Serialize(adapters, typeof(IEnumerable<AdaptToShopifyDataLoadFormat>));
+            }
+            catch (Exception e)
+            {
+                List<IShopifyDataLoadFormat> FromAdapters = new List<IShopifyDataLoadFormat>();
+                List<IShopifyDataLoadFormat> AdapterRecordsNotSerializable = new List<IShopifyDataLoadFormat>();
+
+                // only copy serializable records and try again
+                string tmp = string.Empty;
+                int i = 0;
+
+                foreach (var adapter in adapters)
+                {
+                    try
+                    {
+                        tmp = JsonSerializer.Serialize(adapter, typeof(AdaptToShopifyDataLoadFormat));
+                        FromAdapters.Add(adapter);
+                    }
+                    catch (Exception Ex)
+                    {
+                        // Count bad records
+                        i++;
+                        IShopifyDataLoadFormat dataLoadFormat = new ShopifyDataLoadFormat();
+                        try
+                        {
+                            dataLoadFormat.CopyFrom(adapter);
+                            AdapterRecordsNotSerializable.Add(dataLoadFormat);
+                        }
+                        catch
+                        {
+                            throw new Exception("Failed to .CopyFrom the adapter record into a data load format object for a single record "
+                                + "that also failed to serialize. See Inner Exception.", e);
+                        }
+                    }
+                }
+
+                try
+                {
+                    result = JsonSerializer.Serialize(FromAdapters, typeof(IEnumerable<AdaptToShopifyDataLoadFormat>));
+                }
+                catch
+                {
+                    throw new Exception($"Failed to serialize sanitized records from the Shopify Data Load File. See Inner Exception.", e);
+                }
+            }
+            return result;
+        }
+        private static List<ShopifyDataLoadFormat> FromShopify()
+        {
+            string FilePathAndName = "C:\\Temp\\results-Shopify.txt";
+            List<ShopifyDataLoadFormat> ShopifyRecords = new List<ShopifyDataLoadFormat>();
+            if (!File.Exists(FilePathAndName))
+            {
+                return ShopifyRecords;
+            }
+
+            string contents = File.ReadAllText(FilePathAndName);
+            List<ShopifyDataLoadFormat> data = (List<ShopifyDataLoadFormat>)JsonSerializer.Deserialize(contents, typeof(List<ShopifyDataLoadFormat>));
+            return data;
+        }
+
         //private static IEnumerable<Tuple<IS5InvAssembled, QryAccount>> MakePairs(IEnumerable<IS5InvAssembled> InvAss, IEnumerable<QryAccount> accts)
         //{
         //    Func<QryAccount, int> QryAccount_Index = (record) =>

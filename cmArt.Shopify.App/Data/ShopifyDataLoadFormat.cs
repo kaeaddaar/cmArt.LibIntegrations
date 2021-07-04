@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using cmArt.LibIntegrations;
+using cmArt.LibIntegrations.GenericJoinsService;
 using FileHelpers;
 
 
 namespace cmArt.Shopify.App.Data
 {
     [DelimitedRecord(",")]
-    public class ShopifyDataLoadFormat : IShopifyCommonFields, ICopyable<IShopifyDataLoadFormat>, IShopifyDataLoadFormat
+    public class ShopifyDataLoadFormat : ICopyable<IShopifyDataLoadFormat>, IShopifyDataLoadFormat
     {
-        private List<pair> prices;
+        private List<S5PricePair> prices;
         public ShopifyDataLoadFormat()
         {
-            prices = new List<pair>();
+            prices = new List<S5PricePair>();
         }
         public IShopifyDataLoadFormat CopyFrom(IShopifyDataLoadFormat IFrom)
         {
@@ -31,6 +32,11 @@ namespace cmArt.Shopify.App.Data
             return this;
         }
 
+        public bool Equals(IShopifyDataLoadFormat compareTo)
+        {
+            return IShopifyDataLoadFormatExtensions.Equals(this, compareTo);
+        }
+
         public int InvUnique { get; set; }
         [FieldQuoted]
         [FieldNullValue(typeof(string), "")]
@@ -45,7 +51,7 @@ namespace cmArt.Shopify.App.Data
         [FieldQuoted]
         [FieldNullValue(typeof(string), "")]
         public decimal InStock { get; set; }
-        public IEnumerable<pair> Prices 
+        public IEnumerable<S5PricePair> Prices 
         {
             get
             {
@@ -56,7 +62,7 @@ namespace cmArt.Shopify.App.Data
                 prices.RemoveAll((x) => { return true; });
                 foreach(var price in value)
                 {
-                    prices.Add(new pair(price.Level, price.Price));
+                    prices.Add(new S5PricePair(price.Level, price.Price));
                 }
             }
         }
