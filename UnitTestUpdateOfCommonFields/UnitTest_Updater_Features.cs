@@ -24,8 +24,13 @@ namespace UnitTestUpdateOfCommonFields
 
             updater.SourceRecords = GetSourceRecords(guid1, guid2);
             updater.DestRecords = GetDifferentSourceRecords(guid1, guid2);
+            
+            Func<Data, Data, bool> fEquals = (from, to) =>
+            {
+                return from.Equals(to);
+            };
 
-            IEnumerable<Tuple<Data, Data>> ChangedRecords = updater.GetUpdatesByCommonFields();
+            IEnumerable<Tuple<Data, Data>> ChangedRecords = updater.GetUpdatesByCommonFields(fEquals);
             Tuple<Data, Data> UpdatedRecordPair = ChangedRecords.FirstOrDefault();
 
             Assert.AreEqual(guid2, UpdatedRecordPair.Item1.ID);
