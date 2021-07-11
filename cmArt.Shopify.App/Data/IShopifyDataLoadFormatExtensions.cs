@@ -14,7 +14,6 @@ namespace cmArt.Shopify.App.Data
                 if (
                     compareTo.Cat == compareFrom.Cat
                     && compareTo.Description == compareFrom.Description
-                    && compareTo.InStock == compareFrom.InStock
                     && compareTo.InvUnique == compareFrom.InvUnique
                     && compareTo.PartNumber == compareFrom.PartNumber
                     && compareTo.WholesaleCost == compareFrom.WholesaleCost

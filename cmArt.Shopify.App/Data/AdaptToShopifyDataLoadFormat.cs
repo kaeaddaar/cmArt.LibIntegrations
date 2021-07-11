@@ -99,7 +99,6 @@ namespace cmArt.Shopify.App.Data
         {
             this.Cat = IFrom.Cat;
             this.Description = IFrom.Description;
-            this.InStock = IFrom.InStock;
             this.InvUnique = IFrom.InvUnique;
             this.PartNumber = IFrom.PartNumber;
             this.Prices = IFrom.Prices;

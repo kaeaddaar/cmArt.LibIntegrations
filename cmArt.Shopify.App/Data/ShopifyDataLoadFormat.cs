@@ -23,7 +23,6 @@ namespace cmArt.Shopify.App.Data
             this.InvUnique = IFrom.InvUnique;
             this.PartNumber = IFrom.PartNumber;
             this.Description = IFrom.Description;
-            this.InStock = IFrom.InStock;
             this.WholesaleCost = IFrom.WholesaleCost;
             foreach (var p in IFrom.Prices)
             {

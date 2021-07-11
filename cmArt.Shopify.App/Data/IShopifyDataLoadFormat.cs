@@ -2,16 +2,8 @@
 
 namespace cmArt.Shopify.App.Data
 {
-    public interface IShopifyDataLoadFormat
+    public interface IShopifyDataLoadFormat : IShopify_Identity, IShopify_Product, IShopify_Prices
     {
-        string Cat { get; set; }
-        int InvUnique { get; set; }
-        string PartNumber { get; set; }
-        string Description { get; set; }
-        IEnumerable<S5PricePair> Prices { get; set; }
-        decimal WholesaleCost { get; set; }
-        decimal InStock { get; set; }
-
         IShopifyDataLoadFormat CopyFrom(IShopifyDataLoadFormat IFrom);
         bool Equals(IShopifyDataLoadFormat compareTo);
         
