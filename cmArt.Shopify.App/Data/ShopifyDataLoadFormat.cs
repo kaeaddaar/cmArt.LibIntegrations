@@ -13,6 +13,8 @@ namespace cmArt.Shopify.App.Data
     public class ShopifyDataLoadFormat : ICopyable<IShopifyDataLoadFormat>, IShopifyDataLoadFormat
     {
         private List<S5PricePair> prices;
+        private List<S5QtyPair> quantities;
+
         public ShopifyDataLoadFormat()
         {
             prices = new List<S5PricePair>();
@@ -36,6 +38,21 @@ namespace cmArt.Shopify.App.Data
             return IShopifyDataLoadFormatExtensions.Equals(this, compareTo);
         }
 
+        public bool Equals(IShopify_Product compareTo)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Equals(IShopify_Prices compareTo)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Equals(IShopify_Quantities compareTo)
+        {
+            throw new NotImplementedException();
+        }
+
         public int InvUnique { get; set; }
         [FieldQuoted]
         [FieldNullValue(typeof(string), "")]
@@ -49,7 +66,6 @@ namespace cmArt.Shopify.App.Data
         public decimal WholesaleCost { get; set; }
         [FieldQuoted]
         [FieldNullValue(typeof(string), "")]
-        public decimal InStock { get; set; }
         public IEnumerable<S5PricePair> Prices 
         {
             get
@@ -66,6 +82,21 @@ namespace cmArt.Shopify.App.Data
             }
         }
 
+        public IEnumerable<S5QtyPair> Quantities
+        {
+            get
+            {
+                return quantities.AsEnumerable();
+            }
+            set
+            {
+                quantities.RemoveAll((x) => { return true; });
+                foreach (var qtyPair in value)
+                {
+                    prices.Add(new S5PricePair(qtyPair.Department, qtyPair.Qty));
+                }
+            }
+        }
     }
 
 }

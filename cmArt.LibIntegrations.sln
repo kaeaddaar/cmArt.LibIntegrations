@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Shopify.Testing", "cm
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTestShopifyApp", "UnitTestShopifyApp\UnitTestShopifyApp.csproj", "{CE7C4E73-BCC3-4CC7-9241-EA386EF5302C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmArt.Shopify.Connector", "cmArt.Shopify.Connector\cmArt.Shopify.Connector.csproj", "{860309FC-B2B4-43D9-BEB6-5E52A2DDA0F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Shopify.Connector", "cmArt.Shopify.Connector\cmArt.Shopify.Connector.csproj", "{860309FC-B2B4-43D9-BEB6-5E52A2DDA0F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

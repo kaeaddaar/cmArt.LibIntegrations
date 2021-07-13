@@ -6,12 +6,12 @@ namespace cmArt.Shopify.App.Data
 {
     public class S5QtyPair
     {
-        public S5QtyPair(short level, decimal qty)
+        public S5QtyPair(short department, decimal qty)
         {
-            Level = level;
+            Department = department;
             Qty = qty;
         }
-        public short Level { get; set; }
+        public short Department { get; set; }
         public decimal Qty { get; set; }
 
     }

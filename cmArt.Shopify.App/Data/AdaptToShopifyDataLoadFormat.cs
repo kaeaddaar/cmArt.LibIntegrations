@@ -83,6 +83,56 @@ namespace cmArt.Shopify.App.Data
             set => throw new NotImplementedException("You can't really load a qty into the records that make the quantity up. Possible, but does it really make sense?"); 
         }
 
+        public IEnumerable<S5QtyPair> Quantities 
+        {
+            get 
+            {
+                // build quantities for each department. Consider an All Department Quantities as well
+                IEnumerable<short> StokDepts = _InvAss.StokLines_PerInventry_27.Select(inv => inv.Department).GroupBy(x => x).Select(y => y.Key);
+                List<S5QtyPair> pairs = new List<S5QtyPair>();
+                foreach(var dept in StokDepts)
+                {
+                    S5QtyPair tmp = GetInStock(dept);
+                    pairs.Add(tmp);
+                }
+                return pairs;
+            }
+            set => throw new NotImplementedException("You can't really load a qty into the records that make the quantity up. Possible, but does it really make sense?");
+        }
+        private S5QtyPair GetInStock(short Dept)
+        {
+            _InvAss = _InvAss ?? new S5InvAssembled();
+            decimal tmpQty = (decimal)0;
+            double dblQty = 0;
+            IEnumerable<IStok> StokForDept = _InvAss.StokLines_PerInventry_27.Where(stk => stk.Department == Dept);
+            try
+            {
+                dblQty =
+                (
+                    StokForDept.Select(stok => stok.CostQuantity).Sum()
+                    - StokForDept.Where(stok => stok.StockStatus == 39 || stok.StockStatus == 40 || stok.StockStatus == 16 || stok.StockStatus == 17)
+                        .Select(stok => stok.PriceQty)
+                        .Sum()
+                );
+
+            }
+            catch
+            {
+                dblQty = 0;
+            }
+
+            try
+            {
+                tmpQty = (decimal)dblQty;
+            }
+            catch
+            {
+                tmpQty = 0;
+            }
+
+            S5QtyPair pair = new S5QtyPair(Dept, tmpQty);
+            return pair;
+        }
         protected PriceScheduleView GetPriceSchedule(short ScheduleNum)
         {
             var FirstRecord = _InvAss;
@@ -109,6 +159,21 @@ namespace cmArt.Shopify.App.Data
         public bool Equals(IShopifyDataLoadFormat compareTo)
         {
             return IShopifyDataLoadFormatExtensions.Equals(this, compareTo);
+        }
+
+        public bool Equals(IShopify_Product compareTo)
+        {
+            return IShopify_ProductExtensions.Equals(this, compareTo);
+        }
+
+        public bool Equals(IShopify_Prices compareTo)
+        {
+            return IShopify_PricesExtensions.Equals(this, compareTo);
+        }
+
+        public bool Equals(IShopify_Quantities compareTo)
+        {
+            throw new NotImplementedException();
         }
     }
 

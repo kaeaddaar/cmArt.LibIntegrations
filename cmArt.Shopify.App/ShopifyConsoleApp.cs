@@ -148,6 +148,9 @@ namespace cmArt.Shopify.App
             }
             Console.WriteLine("Finished - Loading Inventory From Real Windward");
 
+            // Get E-Commerce parts
+            IEnumerable<IS5InvAssembled> ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y");
+
             // Use facade to create data load format from Assembled Inventory Data
             IEnumerable<AdaptToShopifyDataLoadFormat> adapters = InvAss.Select(Inv =>
             {
@@ -156,6 +159,9 @@ namespace cmArt.Shopify.App
                 return tmp;
             }
             );
+            IEnumerable<IShopify_Product> prod = adapters.Select(x => (IShopify_Product)x);
+            IEnumerable<IShopify_Prices> prices = adapters.Select(x => (IShopify_Prices)x);
+            IEnumerable<IShopify_Quantities> quantities = adapters.Select(x => (IShopify_Quantities)x);
 
             // We have the results from the POS, now grab the results from Shopify
             List<ShopifyDataLoadFormat> shopifyData = FromShopify();

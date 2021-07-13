@@ -37,7 +37,6 @@ namespace UnitTestShopifyApp
                     , PartNumber = "12345"
                     , WholesaleCost = (decimal)100
                     , Prices = first
-                    , InStock = 1
                 }
             );
             Records.Add
@@ -50,7 +49,6 @@ namespace UnitTestShopifyApp
                     , PartNumber = "ABCDE"
                     , WholesaleCost = (decimal)1000
                     , Prices = second
-                    , InStock = 2
                 }
             );
 
@@ -90,7 +88,6 @@ namespace UnitTestShopifyApp
 
             decimal StandardCost = 29;
             Assert.AreEqual("211545", ShopifyData.PartNumber);
-            Assert.AreEqual((Decimal)4, ShopifyData.InStock);
             Assert.AreEqual("100", ShopifyData.Cat.Trim());
             Assert.AreEqual("211545 from Dakis for testing", ShopifyData.Description.Trim());
             Assert.AreEqual(12018, ShopifyData.InvUnique);
