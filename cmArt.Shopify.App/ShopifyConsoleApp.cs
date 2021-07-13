@@ -166,17 +166,53 @@ namespace cmArt.Shopify.App
             // We have the results from the POS, now grab the results from Shopify
             List<ShopifyDataLoadFormat> shopifyData = FromShopify();
 
-            // get changed records
+            // get changed records (full comparison)
             UpdateProcess<IShopifyDataLoadFormat, int> updater = new UpdateProcess<IShopifyDataLoadFormat, int>();
             updater.fGetKey = IShopifyDataLoadFormat_Indexes.UniqueId;
             updater.SourceRecords = adapters;
             updater.DestRecords = shopifyData;
             Func<IShopifyDataLoadFormat, IShopifyDataLoadFormat, bool> fEquals = (from, to) =>
-                {
-                    return from.Equals(to);
-                };
+            {
+                return from.Equals(to);
+            };
             IEnumerable<Tuple<IShopifyDataLoadFormat, IShopifyDataLoadFormat>> ChangedRecordPairs = updater.GetUpdatesByCommonFields(fEquals);
             IEnumerable<IShopifyDataLoadFormat> ChangedRecords = ChangedRecordPairs.Select(p => p.Item1);
+
+            // get changed records (prices comparison)
+            UpdateProcess<IShopify_Prices, int> updater_Prices = new UpdateProcess<IShopify_Prices, int>();
+            updater_Prices.fGetKey = IShopifyDataLoadFormat_Indexes.UniqueId;
+            updater_Prices.SourceRecords = adapters;
+            updater_Prices.DestRecords = shopifyData;
+            Func<IShopify_Prices, IShopify_Prices, bool> fEquals_Prices = (from, to) =>
+            {
+                return from.Equals(to);
+            };
+            IEnumerable<Tuple<IShopify_Prices, IShopify_Prices>> ChangedRecordPairs_Prices = updater_Prices.GetUpdatesByCommonFields(fEquals_Prices);
+            IEnumerable<IShopify_Prices> ChangedRecords_Prices = ChangedRecordPairs.Select(p => p.Item1);
+
+            // get changed records (quantities comparison)
+            UpdateProcess<IShopify_Quantities, int> updater_Quantities = new UpdateProcess<IShopify_Quantities, int>();
+            updater_Quantities.fGetKey = IShopifyDataLoadFormat_Indexes.UniqueId;
+            updater_Quantities.SourceRecords = adapters;
+            updater_Quantities.DestRecords = shopifyData;
+            Func<IShopify_Quantities, IShopify_Quantities, bool> fEquals_Quantities = (from, to) =>
+            {
+                return from.Equals(to);
+            };
+            IEnumerable<Tuple<IShopify_Quantities, IShopify_Quantities>> ChangedRecordPairs_Quantities = updater_Quantities.GetUpdatesByCommonFields(fEquals_Quantities);
+            IEnumerable<IShopify_Quantities> ChangedRecords_Quantities = ChangedRecordPairs.Select(p => p.Item1);
+
+            // get changed records (product comparison)
+            UpdateProcess<IShopify_Product, int> updater_Product = new UpdateProcess<IShopify_Product, int>();
+            updater_Product.fGetKey = IShopifyDataLoadFormat_Indexes.UniqueId;
+            updater_Product.SourceRecords = adapters;
+            updater_Product.DestRecords = shopifyData;
+            Func<IShopify_Product, IShopify_Product, bool> fEquals_Product = (from, to) =>
+            {
+                return from.Equals(to);
+            };
+            IEnumerable<Tuple<IShopify_Product, IShopify_Product>> ChangedRecordPairs_Product = updater_Product.GetUpdatesByCommonFields(fEquals_Product);
+            IEnumerable<IShopify_Product> ChangedRecords_Product = ChangedRecordPairs.Select(p => p.Item1);
 
             // serialize the results to prep them for sending
             string result = SerializeForExport(adapters);

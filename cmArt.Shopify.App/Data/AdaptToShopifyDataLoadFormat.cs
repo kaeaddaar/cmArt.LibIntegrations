@@ -173,7 +173,7 @@ namespace cmArt.Shopify.App.Data
 
         public bool Equals(IShopify_Quantities compareTo)
         {
-            throw new NotImplementedException();
+            return IShopify_QuantitiesExtensions.Equals(this, compareTo);
         }
     }
 

@@ -6,7 +6,7 @@ namespace cmArt.Shopify.App.Data
 {
     public static class IShopifyDataLoadFormat_Indexes
     {
-        public static int UniqueId(IShopifyDataLoadFormat data)
+        public static int UniqueId(IShopify_Identity data)
         {
             return data.InvUnique;
         }
