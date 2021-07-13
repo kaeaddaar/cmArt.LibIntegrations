@@ -11,11 +11,7 @@ namespace cmArt.Shopify.App.Data
         {
             try
             {
-                if (
-                    compareTo.Cat == compareFrom.Cat
-                    && compareTo.InvUnique == compareFrom.InvUnique
-                    && compareTo.PartNumber == compareFrom.PartNumber
-                )
+                if (compareTo.InvUnique == compareFrom.InvUnique)
                 {
                     IEnumerable<Tuple<S5QtyPair, S5QtyPair>> QtyPairs = GenericJoins<S5QtyPair, S5QtyPair, short>
                         .FullOuterJoin(LeftRecords: compareTo.Quantities, RightRecords: compareTo.Quantities, LeftKey: S5QtyPairIndexes.Department, RightKey: S5QtyPairIndexes.Department);
