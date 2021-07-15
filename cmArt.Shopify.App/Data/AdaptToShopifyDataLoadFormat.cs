@@ -88,6 +88,7 @@ namespace cmArt.Shopify.App.Data
             get 
             {
                 // build quantities for each department. Consider an All Department Quantities as well
+                if(_InvAss.StokLines_PerInventry_27 is null) { return new List<S5QtyPair>(); }
                 IEnumerable<short> StokDepts = _InvAss.StokLines_PerInventry_27.Select(inv => inv.Department).GroupBy(x => x).Select(y => y.Key);
                 List<S5QtyPair> pairs = new List<S5QtyPair>();
                 foreach(var dept in StokDepts)

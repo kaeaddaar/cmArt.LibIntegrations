@@ -15,11 +15,14 @@ namespace cmArt.LibIntegrations.GenericJoinsService
             , Func<TRight, iKey> RightKey
         )
         {
+            IEnumerable<TLeft> _LeftRecords = LeftRecords ?? new List<TLeft>();
+            IEnumerable<TRight> _RightRecords = RightRecords ?? new List<TRight>();
+
             IEnumerable<Tuple<TLeft, TRight>> results = new List<Tuple<TLeft, TRight>>();
 
             results =
-                from LeftRecord in LeftRecords
-                join RightRecord in RightRecords
+                from LeftRecord in _LeftRecords
+                join RightRecord in _RightRecords
                 on LeftKey(LeftRecord) equals RightKey(RightRecord)
                 select new Tuple<TLeft, TRight>(item1: LeftRecord, item2: RightRecord);
 
@@ -33,11 +36,14 @@ namespace cmArt.LibIntegrations.GenericJoinsService
             , Func<TRight, iKey> RightKey
         )
         {
+            IEnumerable<TLeft> _LeftRecords = LeftRecords ?? new List<TLeft>();
+            IEnumerable<TRight> _RightRecords = RightRecords ?? new List<TRight>();
+
             IEnumerable<Tuple<TLeft, TRight>> results = new List<Tuple<TLeft, TRight>>();
 
             results =
-                from LeftRecord in LeftRecords
-                join RightRecord in RightRecords
+                from LeftRecord in _LeftRecords
+                join RightRecord in _RightRecords
                 on LeftKey(LeftRecord) equals RightKey(RightRecord)
                 into RightNullRecords
                 from RightNullRecord in RightNullRecords.DefaultIfEmpty()
@@ -53,11 +59,14 @@ namespace cmArt.LibIntegrations.GenericJoinsService
             , Func<TRight, iKey> RightKey
         )
         {
+            IEnumerable<TLeft> _LeftRecords = LeftRecords ?? new List<TLeft>();
+            IEnumerable<TRight> _RightRecords = RightRecords ?? new List<TRight>();
+
             IEnumerable<Tuple<TLeft, TRight>> results = new List<Tuple<TLeft, TRight>>();
 
             results =
-                from LeftNullRecord in LeftRecords.DefaultIfEmpty()
-                join RightRecord in RightRecords
+                from LeftNullRecord in _LeftRecords.DefaultIfEmpty()
+                join RightRecord in _RightRecords
                 on LeftKey(LeftNullRecord) equals RightKey(RightRecord)
                 into RightNullRecords
                 from RightNullRecord in RightNullRecords.DefaultIfEmpty()
@@ -73,11 +82,14 @@ namespace cmArt.LibIntegrations.GenericJoinsService
             , Func<TRight, iKey> RightKey
         )
         {
+            IEnumerable<TLeft> _LeftRecords = LeftRecords ?? new List<TLeft>();
+            IEnumerable<TRight> _RightRecords = RightRecords ?? new List<TRight>();
+
             IEnumerable<Tuple<TLeft, TRight>> results = new List<Tuple<TLeft, TRight>>();
 
             results =
-                from RightRecord in RightRecords
-                join LeftRecord in LeftRecords
+                from RightRecord in _RightRecords
+                join LeftRecord in _LeftRecords
                 on RightKey(RightRecord) equals LeftKey(LeftRecord)
                 into LeftNullRecords
                 from LeftNullRecord in LeftNullRecords.DefaultIfEmpty()

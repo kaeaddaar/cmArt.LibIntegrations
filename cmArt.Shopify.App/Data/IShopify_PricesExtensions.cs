@@ -13,6 +13,10 @@ namespace cmArt.Shopify.App.Data
             {
                 if (compareTo.InvUnique == compareFrom.InvUnique)
                 {
+                    if (compareFrom.Prices == null && compareTo.Prices != null) { return false; }
+                    if (compareFrom.Prices != null && compareTo.Prices == null) { return false; }
+                    if (compareFrom.Prices == null && compareTo.Prices == null) { return true; }
+
                     IEnumerable<Tuple<S5PricePair, S5PricePair>> PricePairs = GenericJoins<S5PricePair, S5PricePair, short>
                         .FullOuterJoin(LeftRecords: compareTo.Prices, RightRecords: compareTo.Prices, LeftKey: S5PricePairIndexes.Level, RightKey: S5PricePairIndexes.Level);
                     foreach (var PricePair in PricePairs)

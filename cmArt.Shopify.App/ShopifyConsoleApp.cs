@@ -188,7 +188,7 @@ namespace cmArt.Shopify.App
                 return from.Equals(to);
             };
             IEnumerable<Tuple<IShopify_Prices, IShopify_Prices>> ChangedRecordPairs_Prices = updater_Prices.GetUpdatesByCommonFields(fEquals_Prices);
-            IEnumerable<IShopify_Prices> ChangedRecords_Prices = ChangedRecordPairs.Select(p => p.Item1);
+            IEnumerable<IShopify_Prices> ChangedRecords_Prices = ChangedRecordPairs_Prices.Select(p => p.Item1);
 
             // get changed records (quantities comparison)
             UpdateProcess<IShopify_Quantities, int> updater_Quantities = new UpdateProcess<IShopify_Quantities, int>();
@@ -200,7 +200,7 @@ namespace cmArt.Shopify.App
                 return from.Equals(to);
             };
             IEnumerable<Tuple<IShopify_Quantities, IShopify_Quantities>> ChangedRecordPairs_Quantities = updater_Quantities.GetUpdatesByCommonFields(fEquals_Quantities);
-            IEnumerable<IShopify_Quantities> ChangedRecords_Quantities = ChangedRecordPairs.Select(p => p.Item1);
+            IEnumerable<IShopify_Quantities> ChangedRecords_Quantities = ChangedRecordPairs_Quantities.Select(p => p.Item1);
 
             // get changed records (product comparison)
             UpdateProcess<IShopify_Product, int> updater_Product = new UpdateProcess<IShopify_Product, int>();
@@ -212,7 +212,7 @@ namespace cmArt.Shopify.App
                 return from.Equals(to);
             };
             IEnumerable<Tuple<IShopify_Product, IShopify_Product>> ChangedRecordPairs_Product = updater_Product.GetUpdatesByCommonFields(fEquals_Product);
-            IEnumerable<IShopify_Product> ChangedRecords_Product = ChangedRecordPairs.Select(p => p.Item1);
+            IEnumerable<IShopify_Product> ChangedRecords_Product = ChangedRecordPairs_Product.Select(p => p.Item1);
 
             // serialize the results to prep them for sending
             string result = SerializeForExport(adapters);
@@ -302,7 +302,8 @@ namespace cmArt.Shopify.App
             string result = string.Empty;
             try
             {
-                result = JsonSerializer.Serialize(ChangedRecords, typeof(IEnumerable<IShopifyDataLoadFormat>));
+                IEnumerable<ShopifyDataLoadFormat> _ChangedRecords = ChangedRecords.Select(rec => (ShopifyDataLoadFormat)(new ShopifyDataLoadFormat().CopyFrom(rec)));
+                result = JsonSerializer.Serialize(_ChangedRecords, typeof(IEnumerable<ShopifyDataLoadFormat>));
             }
             catch (Exception e)
             {
