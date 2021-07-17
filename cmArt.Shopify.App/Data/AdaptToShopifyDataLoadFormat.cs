@@ -176,6 +176,11 @@ namespace cmArt.Shopify.App.Data
         {
             return IShopify_QuantitiesExtensions.Equals(this, compareTo);
         }
+
+        public IShopify_Product CopyFrom(IShopify_Product IFrom)
+        {
+            return IShopify_ProductExtensions.CopyFrom(this, IFrom);
+        }
     }
 
 }

@@ -218,6 +218,17 @@ namespace cmArt.Shopify.App
             string result = SerializeForExport(adapters);
             result = SerializeForExport(ChangedRecords);
 
+            try
+            {
+                IEnumerable<Shopify_Product> _ChangedRecords_Product = ChangedRecords_Product.Select(rec => (Shopify_Product)(new Shopify_Product().CopyFrom(rec)));
+                result = JsonSerializer.Serialize(_ChangedRecords_Product, typeof(IEnumerable<Shopify_Product>));
+            }
+            catch
+            {
+                Console.WriteLine("Serialize of ChangedRecordPairs_Product falied");
+            }
+            IEnumerable<Shopify_Product> _AllRecords_Product = adapters.Select(rec => (Shopify_Product)(new Shopify_Product().CopyFrom(rec)));
+            result = JsonSerializer.Serialize(_AllRecords_Product, typeof(IEnumerable<Shopify_Product>));
             //Console.WriteLine(result);
             File.WriteAllText("c:\\temp\\results.txt", result);
 

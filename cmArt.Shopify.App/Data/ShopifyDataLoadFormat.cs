@@ -53,6 +53,11 @@ namespace cmArt.Shopify.App.Data
             throw new NotImplementedException();
         }
 
+        public IShopify_Product CopyFrom(IShopify_Product IFrom)
+        {
+            return IShopify_ProductExtensions.CopyFrom(this, IFrom);
+        }
+
         public int InvUnique { get; set; }
         [FieldQuoted]
         [FieldNullValue(typeof(string), "")]

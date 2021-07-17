@@ -1,4 +1,5 @@
-﻿using System;
+﻿using cmArt.LibIntegrations;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -27,5 +28,15 @@ namespace cmArt.Shopify.App.Data
                 return false;
             }
         }
+        public static IShopify_Product CopyFrom(this IShopify_Product to, IShopify_Product from)
+        {
+            to.Cat = from.Cat;
+            to.Description = from.Description;
+            to.InvUnique = from.InvUnique;
+            to.PartNumber = from.PartNumber;
+            to.WholesaleCost = from.WholesaleCost;
+            return to;
+        }
+
     }
 }
