@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\cmArt.Shopify.App\cmArt.Shopify.App.csproj" />
+    <ProjectReference Include="..\cmArt.Shopify.Connector\cmArt.Shopify.Connector.csproj" />
   </ItemGroup>
 
 </Project>

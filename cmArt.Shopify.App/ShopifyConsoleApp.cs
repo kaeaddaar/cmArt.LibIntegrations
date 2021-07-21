@@ -19,6 +19,8 @@ using System.Threading.Tasks;
 using cmArt.Shopify.App.Data;
 using System.Text.Json;
 using cmArt.LibIntegrations.SerializationService;
+using cmArt.Shopify.Connector.Data;
+using cmArt.Shopify.Connector;
 
 namespace cmArt.Shopify.App
 {
@@ -203,10 +205,13 @@ namespace cmArt.Shopify.App
             IEnumerable<IShopify_Quantities> ChangedRecords_Quantities = ChangedRecordPairs_Quantities.Select(p => p.Item1);
 
             // get changed records (product comparison)
+            List<Product_Product> all = cmShopify.GetAllShopifyRecords().ToList();
+            string strProducts = System.Text.Json.JsonSerializer.Serialize(all, typeof(List<Product_Product>));
+            IEnumerable<ProductAdapter> AllProduct = all.Select(prod => { ProductAdapter pa = new ProductAdapter(); pa.Init(prod); return pa; });
             UpdateProcess<IShopify_Product, int> updater_Product = new UpdateProcess<IShopify_Product, int>();
             updater_Product.fGetKey = IShopifyDataLoadFormat_Indexes.UniqueId;
             updater_Product.SourceRecords = adapters;
-            updater_Product.DestRecords = shopifyData;
+            updater_Product.DestRecords = AllProduct;
             Func<IShopify_Product, IShopify_Product, bool> fEquals_Product = (from, to) =>
             {
                 return from.Equals(to);
@@ -229,6 +234,8 @@ namespace cmArt.Shopify.App
             }
             IEnumerable<Shopify_Product> _AllRecords_Product = adapters.Select(rec => (Shopify_Product)(new Shopify_Product().CopyFrom(rec)));
             result = JsonSerializer.Serialize(_AllRecords_Product, typeof(IEnumerable<Shopify_Product>));
+
+
             //Console.WriteLine(result);
             File.WriteAllText("c:\\temp\\results.txt", result);
 
