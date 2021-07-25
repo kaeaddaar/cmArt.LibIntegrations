@@ -54,7 +54,7 @@ namespace cmArt.Shopify.Connector
 
             int pageSize = 100; // max 250
             int pages = count / pageSize;
-            bool IsPartialPage = (count % 3) > 0;
+            bool IsPartialPage = (count % pageSize) > 0;
             if(IsPartialPage)
             {
                 pages = pages + 1;
