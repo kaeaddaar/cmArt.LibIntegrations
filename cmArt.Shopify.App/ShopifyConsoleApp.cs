@@ -220,8 +220,9 @@ namespace cmArt.Shopify.App
             IEnumerable<IShopify_Product> ChangedRecords_Product = ChangedRecordPairs_Product.Select(p => p.Item1);
 
             // serialize the results to prep them for sending
-            string result = SerializeForExport(adapters);
-            result = SerializeForExport(ChangedRecords);
+            string result2 = SerializeForExport(adapters);
+            //result2 = SerializeForExport(ChangedRecords);
+            string result = string.Empty;
 
             try
             {
@@ -233,7 +234,7 @@ namespace cmArt.Shopify.App
                 Console.WriteLine("Serialize of ChangedRecordPairs_Product falied");
             }
             IEnumerable<Shopify_Product> _AllRecords_Product = adapters.Select(rec => (Shopify_Product)(new Shopify_Product().CopyFrom(rec)));
-            result = JsonSerializer.Serialize(_AllRecords_Product, typeof(IEnumerable<Shopify_Product>));
+            string result3 = JsonSerializer.Serialize(_AllRecords_Product, typeof(IEnumerable<Shopify_Product>));
 
 
             //Console.WriteLine(result);

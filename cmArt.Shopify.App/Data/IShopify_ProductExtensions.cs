@@ -16,7 +16,6 @@ namespace cmArt.Shopify.App.Data
                     && compareTo.Description == compareFrom.Description
                     && compareTo.InvUnique == compareFrom.InvUnique
                     && compareTo.PartNumber == compareFrom.PartNumber
-                    && compareTo.WholesaleCost == compareFrom.WholesaleCost
                 )
                 {
                     return true;
@@ -34,7 +33,6 @@ namespace cmArt.Shopify.App.Data
             to.Description = from.Description;
             to.InvUnique = from.InvUnique;
             to.PartNumber = from.PartNumber;
-            to.WholesaleCost = from.WholesaleCost;
             return to;
         }
 

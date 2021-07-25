@@ -29,7 +29,6 @@ namespace cmArt.Shopify.App.Data
                 _data.body_html = value;
             }
         }
-        public decimal WholesaleCost { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public string Cat
         {
             get

@@ -13,6 +13,8 @@ namespace cmArt.Shopify.App.Data
             {
                 if (compareTo.InvUnique == compareFrom.InvUnique)
                 {
+                    if (compareTo.WholesaleCost != compareFrom.WholesaleCost) { return false; }
+
                     if (compareFrom.Prices == null && compareTo.Prices != null) { return false; }
                     if (compareFrom.Prices != null && compareTo.Prices == null) { return false; }
                     if (compareFrom.Prices == null && compareTo.Prices == null) { return true; }

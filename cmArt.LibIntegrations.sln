@@ -31,6 +31,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTestShopifyApp", "UnitT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Shopify.Connector", "cmArt.Shopify.Connector\cmArt.Shopify.Connector.csproj", "{860309FC-B2B4-43D9-BEB6-5E52A2DDA0F2}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.WebJaguar.App", "cmArt.WebJaguar.App\cmArt.WebJaguar.App.csproj", "{0F345647-14E6-43F2-B056-59237A27AA2B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.WebJaguar.Connector", "cmArt.WebJaguar.Connector\cmArt.WebJaguar.Connector.csproj", "{FEDA293D-BCE0-4BC2-BA5F-372BB5378BB6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +97,14 @@ Global
 		{860309FC-B2B4-43D9-BEB6-5E52A2DDA0F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{860309FC-B2B4-43D9-BEB6-5E52A2DDA0F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{860309FC-B2B4-43D9-BEB6-5E52A2DDA0F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F345647-14E6-43F2-B056-59237A27AA2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F345647-14E6-43F2-B056-59237A27AA2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F345647-14E6-43F2-B056-59237A27AA2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F345647-14E6-43F2-B056-59237A27AA2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEDA293D-BCE0-4BC2-BA5F-372BB5378BB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEDA293D-BCE0-4BC2-BA5F-372BB5378BB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEDA293D-BCE0-4BC2-BA5F-372BB5378BB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEDA293D-BCE0-4BC2-BA5F-372BB5378BB6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
