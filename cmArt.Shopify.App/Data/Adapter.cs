@@ -41,9 +41,9 @@ namespace cmArt.Shopify.App.Data
                 _data.product_type = value;
             }
         }
-        public int InvUnique
+        private int InvUnique_OLD
         {
-            get 
+            get
             {
                 int tmp = 0;
                 int.TryParse(_data.handle, out tmp);
@@ -52,6 +52,24 @@ namespace cmArt.Shopify.App.Data
             set
             {
                 _data.handle = value.ToString();
+            }
+        }
+        public int InvUnique
+        {
+            get
+            {
+                int tmp = 0;
+                int.TryParse((_data.variants.FirstOrDefault() ?? new Product_Variant()).sku, out tmp);
+                return tmp;
+            }
+            set
+            {
+                _data.variants = _data.variants ?? new List<Product_Variant>();
+                if (_data.variants.FirstOrDefault() == null)
+                {
+                    _data.variants.Add(new Product_Variant());
+                }
+                _data.variants.First().sku = value.ToString();
             }
         }
         public string PartNumber
