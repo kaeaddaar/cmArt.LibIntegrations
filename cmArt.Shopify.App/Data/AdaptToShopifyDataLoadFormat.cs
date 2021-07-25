@@ -21,10 +21,10 @@ namespace cmArt.Shopify.App.Data
         {
             _InvAss = inv;
         }
-        public string Cat { get => _InvAss.Inv.Cat; set => _InvAss.Inv.Cat = value ?? string.Empty; }
+        public string Cat { get => _InvAss.Inv.Cat.TrimEnd(); set => _InvAss.Inv.Cat = value.TrimEnd() ?? string.Empty; }
         public int InvUnique { get => _InvAss.Inv.InvUnique; set => _InvAss.Inv.InvUnique = value; }
-        public string PartNumber { get => _InvAss.Inv.Part; set => _InvAss.Inv.Part = value ?? string.Empty; }
-        public string Description { get => _InvAss.Inv.Description; set => _InvAss.Inv.Description = value ?? string.Empty; }
+        public string PartNumber { get => _InvAss.Inv.Part.TrimEnd(); set => _InvAss.Inv.Part = value.TrimEnd() ?? string.Empty; }
+        public string Description { get => _InvAss.Inv.Description.TrimEnd(); set => _InvAss.Inv.Description = value.TrimEnd() ?? string.Empty; }
 
         public decimal WholesaleCost { get => (decimal)_InvAss.Inv.Wholesale_1; set => _InvAss.Inv.Wholesale_1 = (double)value; }
         public IEnumerable<S5PricePair> Prices 
