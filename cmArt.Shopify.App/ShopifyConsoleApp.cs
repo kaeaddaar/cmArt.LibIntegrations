@@ -166,28 +166,28 @@ namespace cmArt.Shopify.App
             IEnumerable<IShopify_Prices> prices = adapters.Select(x => (IShopify_Prices)x);
             IEnumerable<IShopify_Quantities> quantities = adapters.Select(x => (IShopify_Quantities)x);
 
-            // We have the results from the POS, now grab the results from Shopify
-            List<ShopifyDataLoadFormat> shopifyData = FromShopify();
 
             Func<IShopifyDataLoadFormat, IShopifyDataLoadFormat, bool> fEquals = (from, to) => { return from.Equals(to); };
             Func<IShopify_Prices, IShopify_Prices, bool> fEquals_Prices = (from, to) => { return from.Equals(to); };
             Func<IShopify_Quantities, IShopify_Quantities, bool> fEquals_Quantities = (from, to) => { return from.Equals(to); };
             Func<IShopify_Product, IShopify_Product, bool> fEquals_Product = (from, to) => { return from.Equals(to); };
 
-            IEnumerable<IShopifyDataLoadFormat> ChangedRecords = UpdateProcessPattern<IShopifyDataLoadFormat, ShopifyDataLoadFormat, int>
-                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals, adapters, shopifyData);
-
+            // Get Price Records from Reece's Shopify API
+            IEnumerable<IShopify_Prices> API_Prices = ReeceShopify.GetAllShopify_Prices();
             IEnumerable<IShopify_Prices> ChangedRecords_Prices = UpdateProcessPattern<IShopify_Prices, Shopify_Prices, int>
-                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Prices, adapters, shopifyData);
+                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Prices, adapters, API_Prices);
 
-            IEnumerable<IShopify_Quantities> ChangedRecords_Quantities = UpdateProcessPattern<IShopify_Quantities, Shopify_Prices, int>
-                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Quantities, adapters, shopifyData);
+            IEnumerable<IShopify_Quantities> API_Quantities = ReeceShopify.GetAllShopify_Quantities();
+            IEnumerable<IShopify_Quantities> ChangedRecords_Quantities = UpdateProcessPattern<IShopify_Quantities, Shopify_Quantities, int>
+                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Quantities, adapters, API_Quantities);
 
+            // Direct from Shopify
             List<Product_Product> all = cmShopify.GetAllShopifyRecords().ToList();
             string strProducts = System.Text.Json.JsonSerializer.Serialize(all, typeof(List<Product_Product>));
             IEnumerable<ProductAdapter> AllProduct = all.Select(prod => { ProductAdapter pa = new ProductAdapter(); pa.Init(prod); return pa; });
 
-            IEnumerable<IShopify_Product> ChangedRecords_Product = UpdateProcessPattern<IShopify_Product, Shopify_Prices, int>
+            IEnumerable<IShopify_Product> API_Products = ReeceShopify.GetAllShopify_Products();
+            IEnumerable<IShopify_Product> ChangedRecords_Product = UpdateProcessPattern<IShopify_Product, Shopify_Product, int>
                 .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Product, adapters, AllProduct);
 
 
@@ -212,6 +212,7 @@ namespace cmArt.Shopify.App
             //Console.WriteLine(result);
             File.WriteAllText("c:\\temp\\results.txt", result);
 
+            #region logic and reporting from Colonial version
             //// A: Get XRef from Account for AUnique,BankInfo pairs
             //IEnumerable<QryAccount> accts = GetXRefFromSupplierRecords(config);
 
@@ -283,6 +284,7 @@ namespace cmArt.Shopify.App
             //        engine.WriteNext(record);
             //    }
             //}
+            #endregion logic and reporting from Colonial version
 
             Console.WriteLine("Done");
             Console.ReadKey();
@@ -395,7 +397,7 @@ namespace cmArt.Shopify.App
             }
             return result;
         }
-        private static List<ShopifyDataLoadFormat> FromShopify()
+        private static List<ShopifyDataLoadFormat> FromShopify_LocalTestData()
         {
             string FilePathAndName = "C:\\Temp\\results-Shopify.txt";
             List<ShopifyDataLoadFormat> ShopifyRecords = new List<ShopifyDataLoadFormat>();
