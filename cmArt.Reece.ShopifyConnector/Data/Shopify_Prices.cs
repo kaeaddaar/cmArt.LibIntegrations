@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace cmArt.Shopify.App.Data
+namespace cmArt.Reece.ShopifyConnector
 {
     public class Shopify_Prices : IShopify_Prices
     {

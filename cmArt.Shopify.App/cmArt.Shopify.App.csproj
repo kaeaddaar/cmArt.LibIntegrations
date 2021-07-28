@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BevNet\cmArt.BevNet.csproj" />
     <ProjectReference Include="..\cmArt.LibIntegrations\cmArt.LibIntegrations.csproj" />
+    <ProjectReference Include="..\cmArt.Reece.ShopifyConnector\cmArt.Reece.ShopifyConnector.csproj" />
     <ProjectReference Include="..\cmArt.Shopify.Connector\cmArt.Shopify.Connector.csproj" />
     <ProjectReference Include="..\cmArt.System5.Data\cmArt.System5.Data.csproj" />
     <ProjectReference Include="..\cmArt.System5.Inventory\cmArt.System5.Inventory.csproj" />

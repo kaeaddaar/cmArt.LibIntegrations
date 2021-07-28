@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using cmArt.LibIntegrations.PriceCalculations;
+using cmArt.Reece.ShopifyConnector;
 #nullable enable
 
 namespace cmArt.Shopify.App.Data

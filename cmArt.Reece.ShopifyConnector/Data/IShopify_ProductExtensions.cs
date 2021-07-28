@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace cmArt.Shopify.App.Data
+namespace cmArt.Reece.ShopifyConnector
 {
     public static class IShopify_ProductExtensions
     {

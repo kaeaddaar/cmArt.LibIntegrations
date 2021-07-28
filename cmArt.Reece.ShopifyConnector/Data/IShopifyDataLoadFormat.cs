@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace cmArt.Shopify.App.Data
+namespace cmArt.Reece.ShopifyConnector
 {
     public interface IShopifyDataLoadFormat : IShopify_Identity, IShopify_Product, IShopify_Prices, IShopify_Quantities, IEquality<IShopifyDataLoadFormat>
     {

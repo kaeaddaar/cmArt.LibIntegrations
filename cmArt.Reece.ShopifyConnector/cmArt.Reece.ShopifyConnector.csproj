@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FileHelpers" Version="3.4.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\cmArt.LibIntegrations\cmArt.LibIntegrations.csproj" />
+    <ProjectReference Include="..\cmArt.Shopify.Connector\cmArt.Shopify.Connector.csproj" />
+  </ItemGroup>
+
+</Project>

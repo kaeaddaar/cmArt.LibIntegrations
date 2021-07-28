@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-
+using cmArt.Reece.ShopifyConnector;
 
 namespace cmArt.Shopify.App.Data
 {

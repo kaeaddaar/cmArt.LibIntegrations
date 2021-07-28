@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace cmArt.Shopify.App.Data
+namespace cmArt.Reece.ShopifyConnector
 {
     public interface IShopify_Quantities : IShopify_Identity, IEquality<IShopify_Quantities>
     {

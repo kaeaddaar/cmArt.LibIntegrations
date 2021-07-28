@@ -7,7 +7,7 @@ using cmArt.LibIntegrations.GenericJoinsService;
 using FileHelpers;
 
 
-namespace cmArt.Shopify.App.Data
+namespace cmArt.Reece.ShopifyConnector
 {
     [DelimitedRecord(",")]
     public class ShopifyDataLoadFormat : ICopyable<IShopifyDataLoadFormat>, IShopifyDataLoadFormat
@@ -18,6 +18,7 @@ namespace cmArt.Shopify.App.Data
         public ShopifyDataLoadFormat()
         {
             prices = new List<S5PricePair>();
+            quantities = new List<S5QtyPair>();
         }
         public IShopifyDataLoadFormat CopyFrom(IShopifyDataLoadFormat IFrom)
         {
@@ -91,14 +92,15 @@ namespace cmArt.Shopify.App.Data
         {
             get
             {
-                return quantities.AsEnumerable();
+                return (quantities ?? new List<S5QtyPair>()).AsEnumerable();
             }
             set
             {
+                quantities = quantities ?? new List<S5QtyPair>();
                 quantities.RemoveAll((x) => { return true; });
                 foreach (var qtyPair in value)
                 {
-                    prices.Add(new S5PricePair(qtyPair.Department, qtyPair.Qty));
+                    quantities.Add(new S5QtyPair(qtyPair.Location, qtyPair.Qty));
                 }
             }
         }

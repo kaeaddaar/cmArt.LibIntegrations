@@ -21,6 +21,7 @@ using System.Text.Json;
 using cmArt.LibIntegrations.SerializationService;
 using cmArt.Shopify.Connector.Data;
 using cmArt.Shopify.Connector;
+using cmArt.Reece.ShopifyConnector;
 
 namespace cmArt.Shopify.App
 {
