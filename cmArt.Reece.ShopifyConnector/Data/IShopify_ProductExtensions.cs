@@ -7,6 +7,12 @@ namespace cmArt.Reece.ShopifyConnector
 {
     public static class IShopify_ProductExtensions
     {
+        public static Shopify_Product AsShopify_Product(this IShopify_Product data)
+        {
+            Shopify_Product _prod = new Shopify_Product();
+            _prod.CopyFrom(data);
+            return _prod;
+        }
         public static bool Equals(this IShopify_Product compareFrom, IShopify_Product compareTo)
         {
             try

@@ -172,15 +172,6 @@ namespace cmArt.Shopify.App
             Func<IShopify_Quantities, IShopify_Quantities, bool> fEquals_Quantities = (from, to) => { return from.Equals(to); };
             Func<IShopify_Product, IShopify_Product, bool> fEquals_Product = (from, to) => { return from.Equals(to); };
 
-            // Get Price Records from Reece's Shopify API
-            IEnumerable<IShopify_Prices> API_Prices = ReeceShopify.GetAllShopify_Prices();
-            IEnumerable<IShopify_Prices> ChangedRecords_Prices = UpdateProcessPattern<IShopify_Prices, Shopify_Prices, int>
-                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Prices, adapters, API_Prices);
-
-            IEnumerable<IShopify_Quantities> API_Quantities = ReeceShopify.GetAllShopify_Quantities();
-            IEnumerable<IShopify_Quantities> ChangedRecords_Quantities = UpdateProcessPattern<IShopify_Quantities, Shopify_Quantities, int>
-                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Quantities, adapters, API_Quantities);
-
             // Direct from Shopify
             List<Product_Product> all = cmShopify.GetAllShopifyRecords().ToList();
             string strProducts = System.Text.Json.JsonSerializer.Serialize(all, typeof(List<Product_Product>));
@@ -188,8 +179,45 @@ namespace cmArt.Shopify.App
 
             IEnumerable<IShopify_Product> API_Products = ReeceShopify.GetAllShopify_Products();
             IEnumerable<IShopify_Product> ChangedRecords_Product = UpdateProcessPattern<IShopify_Product, Shopify_Product, int>
-                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Product, adapters, AllProduct);
+                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Product, adapters, API_Products);
+            
+            //IEnumerable<IShopify_Prices> API_Prices = ReeceShopify.GetAllShopify_Prices();
+            IEnumerable<tmpShopify_Prices> tmpPrices = ReeceShopify.GetAlltmpShopify_Prices();
+            IEnumerable<IShopify_Prices> MissingInfoPrices = tmpPrices.Select(p => p.AsShopify_Prices());
+            Func<IShopify_Product, string> fGetProductPartNumber = (sp) => { return sp.PartNumber; };
+            Func<IShopify_Prices, string> fGetPricesPartNumber = (sp) => { return sp.PartNumber; };
+            
+            IEnumerable<Tuple<IShopify_Product, IShopify_Prices>> joined_prices = 
+                GenericJoins<IShopify_Product, IShopify_Prices, string>.LeftJoin(API_Products, MissingInfoPrices, fGetProductPartNumber, fGetPricesPartNumber);
+            
+            IEnumerable<IShopify_Prices> jp = joined_prices.Where(p => p.Item2 != null).Select(p => 
+            { 
+                p.Item2.InvUnique = p.Item1.InvUnique;
+                p.Item2.Cat = p.Item1.Cat;
+                p.Item2.WholesaleCost = (decimal)100000;
+                return p.Item2;
+            });
+            IEnumerable<IShopify_Prices> ChangedRecords_Prices = UpdateProcessPattern<IShopify_Prices, Shopify_Prices, int>
+                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Prices, adapters, jp);
 
+            //IEnumerable<IShopify_Quantities> API_Quantities = ReeceShopify.GetAllShopify_Quantities();
+            IEnumerable<tmpShopify_Quantities> tmpApi_Quantities = ReeceShopify.GetAlltmpShopify_Quantities();
+            IEnumerable<IShopify_Quantities> MissingInfoQuantities = tmpApi_Quantities.Select(p => p.AsShopify_Quantities());
+            Func<IShopify_Quantities, string> fGetQuantitiesPartNumber = (sp) => { return sp.PartNumber; };
+
+            IEnumerable<Tuple<IShopify_Product, IShopify_Quantities>> joined_quantities =
+                GenericJoins<IShopify_Product, IShopify_Quantities, string>.LeftJoin(API_Products, MissingInfoQuantities, fGetProductPartNumber, fGetQuantitiesPartNumber);
+            IEnumerable<IShopify_Quantities> jq = joined_quantities.Where(p => p.Item2 != null).Select(p =>
+            {
+                p.Item2.InvUnique = p.Item1.InvUnique;
+                p.Item2.Cat = p.Item1.Cat;
+                return p.Item2;
+            });
+            IEnumerable<IShopify_Quantities> ChangedRecords_Quantities = UpdateProcessPattern<IShopify_Quantities, Shopify_Quantities, int>
+                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Quantities, adapters, jq);
+
+            IEnumerable<Shopify_Product> changedProducts = ChangedRecords_Product.Select(p => p.AsShopify_Product());
+            string Product_Edit_Results = ReeceShopify.Products_Edit(changedProducts);
 
             // serialize the results to prep them for sending
             string result2 = SerializeForExport(adapters);
