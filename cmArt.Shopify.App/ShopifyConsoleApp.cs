@@ -132,6 +132,11 @@ namespace cmArt.Shopify.App
 
             Console.WriteLine("Loading Inventory From Real Windward");
 
+            bool PreventApiAddsNEdits = false;
+            bool PreventProduct = false;
+            bool PreventPrices = false;
+            bool PreventQuantities = false;
+
             IEnumerable<IS5InvAssembled> InvAss = new List<IS5InvAssembled>();
             try
             {
@@ -152,10 +157,10 @@ namespace cmArt.Shopify.App
             Console.WriteLine("Finished - Loading Inventory From Real Windward");
 
             // Get E-Commerce parts
-            IEnumerable<IS5InvAssembled> ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y");
+            IEnumerable<IS5InvAssembled> ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y").Take(5);
 
             // Use facade to create data load format from Assembled Inventory Data
-            IEnumerable<AdaptToShopifyDataLoadFormat> adapters = InvAss.Select(Inv =>
+            IEnumerable<AdaptToShopifyDataLoadFormat> adapters = ECommInvAss.Select(Inv =>
             {
                 AdaptToShopifyDataLoadFormat tmp = new AdaptToShopifyDataLoadFormat();
                 tmp.Init(Inv);
@@ -177,16 +182,19 @@ namespace cmArt.Shopify.App
             string strProducts = System.Text.Json.JsonSerializer.Serialize(all, typeof(List<Product_Product>));
             IEnumerable<ProductAdapter> AllProduct = all.Select(prod => { ProductAdapter pa = new ProductAdapter(); pa.Init(prod); return pa; });
 
+            #region Reece Products
             IEnumerable<IShopify_Product> API_Products = ReeceShopify.GetAllShopify_Products();
             IEnumerable<IShopify_Product> ChangedRecords_Product = UpdateProcessPattern<IShopify_Product, Shopify_Product, int>
                 .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Product, adapters, API_Products);
-            
+            #endregion Reece Products
+
+            #region Reece Prices
             //IEnumerable<IShopify_Prices> API_Prices = ReeceShopify.GetAllShopify_Prices();
             IEnumerable<tmpShopify_Prices> tmpPrices = ReeceShopify.GetAlltmpShopify_Prices();
             IEnumerable<IShopify_Prices> MissingInfoPrices = tmpPrices.Select(p => p.AsShopify_Prices());
             Func<IShopify_Product, string> fGetProductPartNumber = (sp) => { return sp.PartNumber; };
             Func<IShopify_Prices, string> fGetPricesPartNumber = (sp) => { return sp.PartNumber; };
-            
+
             IEnumerable<Tuple<IShopify_Product, IShopify_Prices>> joined_prices = 
                 GenericJoins<IShopify_Product, IShopify_Prices, string>.LeftJoin(API_Products, MissingInfoPrices, fGetProductPartNumber, fGetPricesPartNumber);
             
@@ -199,7 +207,9 @@ namespace cmArt.Shopify.App
             });
             IEnumerable<IShopify_Prices> ChangedRecords_Prices = UpdateProcessPattern<IShopify_Prices, Shopify_Prices, int>
                 .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Prices, adapters, jp);
+            #endregion Reece Prices
 
+            #region Reece Quantities
             //IEnumerable<IShopify_Quantities> API_Quantities = ReeceShopify.GetAllShopify_Quantities();
             IEnumerable<tmpShopify_Quantities> tmpApi_Quantities = ReeceShopify.GetAlltmpShopify_Quantities();
             IEnumerable<IShopify_Quantities> MissingInfoQuantities = tmpApi_Quantities.Select(p => p.AsShopify_Quantities());
@@ -215,9 +225,95 @@ namespace cmArt.Shopify.App
             });
             IEnumerable<IShopify_Quantities> ChangedRecords_Quantities = UpdateProcessPattern<IShopify_Quantities, Shopify_Quantities, int>
                 .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Quantities, adapters, jq);
+            #endregion Reece Quantities
 
-            IEnumerable<Shopify_Product> changedProducts = ChangedRecords_Product.Select(p => p.AsShopify_Product());
-            string Product_Edit_Results = ReeceShopify.Products_Edit(changedProducts);
+            #region Perform Edits
+            IEnumerable<Shopify_Product> changedProducts = new List<Shopify_Product>();
+            IEnumerable<Shopify_Prices> changedPrices = new List<Shopify_Prices>();
+            IEnumerable<Shopify_Quantities> changedQuantities = new List<Shopify_Quantities>();
+            if (!PreventApiAddsNEdits)
+            {
+                changedProducts = ChangedRecords_Product.Select(p => p.AsShopify_Product());
+                string Product_Edit_Results = string.Empty;
+                if (!PreventProduct)
+                { Product_Edit_Results = ReeceShopify.Products_Edit(changedProducts); }
+
+                changedPrices = ChangedRecords_Prices.Select(p => p.AsShopify_Prices());
+                string Prices_Edit_Results = string.Empty;
+                if (!PreventPrices && false)
+                { Prices_Edit_Results = ReeceShopify.Prices_Edit(changedPrices); }
+
+                changedQuantities = ChangedRecords_Quantities.Select(p => p.AsShopify_Quantities());
+                string Quantities_Edit_Results = string.Empty;
+                if (!PreventQuantities)
+                { Quantities_Edit_Results = ReeceShopify.Quantities_Edit(changedQuantities); }
+            }
+            else
+            {
+                Console.WriteLine("Perform Edits Supressed due to Settings");
+            }
+            #endregion Perform Edits
+
+            #region Perform Adds
+            IEnumerable<Tuple<IShopify_Product, IShopify_Product>> NewProductsPairs = new List<Tuple<IShopify_Product, IShopify_Product>>();
+            IEnumerable<Tuple<IShopify_Prices, IShopify_Prices>> NewPricesPairs = new List<Tuple<IShopify_Prices, IShopify_Prices>>();
+            IEnumerable<Tuple<IShopify_Quantities, IShopify_Quantities>> NewQuantitiesPairs = new List<Tuple<IShopify_Quantities, IShopify_Quantities>>();
+            
+            //API_Products, jp, jq
+            NewProductsPairs = GenericJoins<IShopify_Product, IShopify_Product, int>
+            .LeftJoin(adapters, API_Products, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
+            IEnumerable<Shopify_Product> NewProducts = NewProductsPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsShopify_Product());
+            if (!PreventApiAddsNEdits)
+            {
+                if (!PreventProduct)
+                { string Product_Add_Results = ReeceShopify.Products_Add(NewProducts); }
+            }
+            try
+            {
+                string content = System.Text.Json.JsonSerializer.Serialize(NewProducts.ToList(), typeof(List<Shopify_Product>));
+                System.IO.File.WriteAllText("C:\\Temp\\NewProducts.txt", content);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error serializing and saving new products to file. Message: " + e.Message);
+            }
+
+            NewPricesPairs = GenericJoins<IShopify_Prices, IShopify_Prices, int>
+                .LeftJoin(adapters, jp, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
+            IEnumerable<Shopify_Prices> NewPrices = NewPricesPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsShopify_Prices());
+            if (!PreventApiAddsNEdits)
+            {
+                if (!PreventPrices)
+                { string Prices_Add_Results = ReeceShopify.Prices_Add(NewPrices); }
+            }
+            try
+            {
+                string content = System.Text.Json.JsonSerializer.Serialize(NewPrices.ToList(), typeof(List<Shopify_Prices>));
+                System.IO.File.WriteAllText("C:\\Temp\\NewPrices.txt", content);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error serializing and saving new prices to file. Message: " + e.Message);
+            }
+
+            NewQuantitiesPairs = GenericJoins<IShopify_Quantities, IShopify_Quantities, int>
+                .LeftJoin(adapters, jq, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
+            IEnumerable<Shopify_Quantities> NewQuantities = NewQuantitiesPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsShopify_Quantities());
+            if (!PreventApiAddsNEdits)
+            {
+                if (!PreventQuantities)
+                { string Quantities_Add_Results = ReeceShopify.Quantities_Add(NewQuantities); }
+            }
+            try
+            {
+                string content = System.Text.Json.JsonSerializer.Serialize(NewQuantities.ToList(), typeof(List<Shopify_Quantities>));
+                System.IO.File.WriteAllText("C:\\Temp\\NewQuantities.txt", content);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error serializing and saving new quantities to file. Message: " + e.Message);
+            }
+            #endregion Perform Adds
 
             // serialize the results to prep them for sending
             string result2 = SerializeForExport(adapters);

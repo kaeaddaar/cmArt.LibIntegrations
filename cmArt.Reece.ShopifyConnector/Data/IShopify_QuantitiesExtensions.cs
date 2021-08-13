@@ -7,6 +7,15 @@ namespace cmArt.Reece.ShopifyConnector
 {
     public static class IShopify_QuantitiesExtensions
     {
+        public static Shopify_Quantities AsShopify_Quantities(this IShopify_Quantities data)
+        {
+            Shopify_Quantities _quantities = new Shopify_Quantities();
+            _quantities.Cat = data.Cat;
+            _quantities.InvUnique = data.InvUnique;
+            _quantities.PartNumber = data.PartNumber;
+            _quantities.Quantities = data.Quantities;
+            return _quantities;
+        }
         public static bool Equals(this IShopify_Quantities compareFrom, IShopify_Quantities compareTo)
         {
             try

@@ -7,6 +7,16 @@ namespace cmArt.Reece.ShopifyConnector
 {
     public static class IShopify_PricesExtensions
     {
+        public static Shopify_Prices AsShopify_Prices(this IShopify_Prices data)
+        {
+            Shopify_Prices _prices = new Shopify_Prices();
+            _prices.Cat = data.Cat;
+            _prices.InvUnique = data.InvUnique;
+            _prices.PartNumber = data.PartNumber;
+            _prices.Prices = data.Prices;
+            _prices.WholesaleCost = data.WholesaleCost;
+            return _prices;
+        }
         public static bool Equals(this IShopify_Prices compareFrom, IShopify_Prices compareTo)
         {
             try

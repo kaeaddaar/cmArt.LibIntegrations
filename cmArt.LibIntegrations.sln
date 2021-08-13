@@ -35,7 +35,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.WebJaguar.App", "cmAr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.WebJaguar.Connector", "cmArt.WebJaguar.Connector\cmArt.WebJaguar.Connector.csproj", "{FEDA293D-BCE0-4BC2-BA5F-372BB5378BB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmArt.Reece.ShopifyConnector", "cmArt.Reece.ShopifyConnector\cmArt.Reece.ShopifyConnector.csproj", "{4986534E-7134-4BB1-9FB6-1C0F529B1027}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Reece.ShopifyConnector", "cmArt.Reece.ShopifyConnector\cmArt.Reece.ShopifyConnector.csproj", "{4986534E-7134-4BB1-9FB6-1C0F529B1027}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestReeceShopifyApi", "UnitTestReeceShopifyApi\UnitTestReeceShopifyApi.csproj", "{5C98E91F-8C5F-4B4B-9462-691765621396}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -111,6 +113,10 @@ Global
 		{4986534E-7134-4BB1-9FB6-1C0F529B1027}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4986534E-7134-4BB1-9FB6-1C0F529B1027}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4986534E-7134-4BB1-9FB6-1C0F529B1027}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C98E91F-8C5F-4B4B-9462-691765621396}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C98E91F-8C5F-4B4B-9462-691765621396}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C98E91F-8C5F-4B4B-9462-691765621396}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C98E91F-8C5F-4B4B-9462-691765621396}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

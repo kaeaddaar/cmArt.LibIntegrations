@@ -46,6 +46,10 @@ namespace cmArt.Shopify.Connector
                 products = (Product_Root)JsonSerializer.Deserialize(tmp, typeof(Product_Root));
                 lastProduct = products.products.LastOrDefault();
                 PagesOfProduct.Add(products.products);
+                if (lastProduct == null)
+                {
+                    break;
+                }
             }
             IEnumerable<Product_Product> AllProducts = PagesOfProduct.SelectMany(prod => prod);
             return AllProducts;
