@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "cmArt.Shopify.ConsoleTools": {
+      "commandName": "Project",
+      "commandLineArgs": "Products"
+    }
+  }
+}

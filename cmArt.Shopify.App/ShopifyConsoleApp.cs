@@ -82,6 +82,8 @@ namespace cmArt.Shopify.App
         {
             Console.WriteLine("Begin");
 
+            string[] _args = args ?? new string[] { };
+            _args = args.Select(c => c.ToUpper()).ToArray();
 
             IConfiguration config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -132,10 +134,10 @@ namespace cmArt.Shopify.App
 
             Console.WriteLine("Loading Inventory From Real Windward");
 
-            bool PreventApiAddsNEdits = false;
-            bool PreventProduct = false;
-            bool PreventPrices = false;
-            bool PreventQuantities = false;
+            bool PreventApiAddsNEdits = _args.Contains("PREVENTADDSANDEDITS") || _args.Contains("PREVENTADDSNEDITS");
+            bool PreventProduct = !(_args.Contains("PRODUCTS") || _args.Contains("PRODUCT")) && _args.Count() > 0;
+            bool PreventPrices = !(_args.Contains("DISCOUNTS") || _args.Contains("DISCOUNT")) && _args.Count() > 0;
+            bool PreventQuantities = !(_args.Contains("INVENTORY") || _args.Contains("INVENTORYITEMS") || _args.Contains("INVENTORYITEM")) && _args.Count() > 0;
 
             IEnumerable<IS5InvAssembled> InvAss = new List<IS5InvAssembled>();
             try
@@ -157,7 +159,7 @@ namespace cmArt.Shopify.App
             Console.WriteLine("Finished - Loading Inventory From Real Windward");
 
             // Get E-Commerce parts
-            IEnumerable<IS5InvAssembled> ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y").Take(5);
+            IEnumerable<IS5InvAssembled> ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y");
 
             // Use facade to create data load format from Assembled Inventory Data
             IEnumerable<AdaptToShopifyDataLoadFormat> adapters = ECommInvAss.Select(Inv =>
@@ -192,8 +194,8 @@ namespace cmArt.Shopify.App
             //IEnumerable<IShopify_Prices> API_Prices = ReeceShopify.GetAllShopify_Prices();
             IEnumerable<tmpShopify_Prices> tmpPrices = ReeceShopify.GetAlltmpShopify_Prices();
             IEnumerable<IShopify_Prices> MissingInfoPrices = tmpPrices.Select(p => p.AsShopify_Prices());
-            Func<IShopify_Product, string> fGetProductPartNumber = (sp) => { return sp.PartNumber; };
-            Func<IShopify_Prices, string> fGetPricesPartNumber = (sp) => { return sp.PartNumber; };
+            Func<IShopify_Product, string> fGetProductPartNumber = (sp) => { return sp.PartNumber.TrimEnd(); };
+            Func<IShopify_Prices, string> fGetPricesPartNumber = (sp) => { return sp.PartNumber.TrimEnd(); };
 
             IEnumerable<Tuple<IShopify_Product, IShopify_Prices>> joined_prices = 
                 GenericJoins<IShopify_Product, IShopify_Prices, string>.LeftJoin(API_Products, MissingInfoPrices, fGetProductPartNumber, fGetPricesPartNumber);
@@ -240,7 +242,7 @@ namespace cmArt.Shopify.App
 
                 changedPrices = ChangedRecords_Prices.Select(p => p.AsShopify_Prices());
                 string Prices_Edit_Results = string.Empty;
-                if (!PreventPrices && false)
+                if (!PreventPrices)
                 { Prices_Edit_Results = ReeceShopify.Prices_Edit(changedPrices); }
 
                 changedQuantities = ChangedRecords_Quantities.Select(p => p.AsShopify_Quantities());

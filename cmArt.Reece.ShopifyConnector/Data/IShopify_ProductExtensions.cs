@@ -19,9 +19,9 @@ namespace cmArt.Reece.ShopifyConnector
             {
                 if (
                     compareTo.Cat == compareFrom.Cat
-                    && compareTo.Description == compareFrom.Description
+                    && compareTo.Description.TrimEnd() == compareFrom.Description.TrimEnd()
                     && compareTo.InvUnique == compareFrom.InvUnique
-                    && compareTo.PartNumber == compareFrom.PartNumber
+                    && compareTo.PartNumber.TrimEnd() == compareFrom.PartNumber.TrimEnd()
                 )
                 {
                     return true;
@@ -36,9 +36,9 @@ namespace cmArt.Reece.ShopifyConnector
         public static IShopify_Product CopyFrom(this IShopify_Product to, IShopify_Product from)
         {
             to.Cat = from.Cat;
-            to.Description = from.Description;
+            to.Description = from.Description.TrimEnd();
             to.InvUnique = from.InvUnique;
-            to.PartNumber = from.PartNumber;
+            to.PartNumber = from.PartNumber.TrimEnd();
             return to;
         }
 

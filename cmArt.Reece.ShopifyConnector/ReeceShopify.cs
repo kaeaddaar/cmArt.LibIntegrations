@@ -198,6 +198,16 @@ namespace cmArt.Reece.ShopifyConnector
             string results = MakeApiGetCall_Unsecured("/product/shopify") ?? string.Empty;
             return results;
         }
+        public static string Discounts_Sync()
+        {
+            string results = MakeApiGetCall_Unsecured("/discount/shopify") ?? string.Empty;
+            return results;
+        }
+        public static string Inventory_Sync()
+        {
+            string results = MakeApiGetCall_Unsecured("/inventory/shopify") ?? string.Empty;
+            return results;
+        }
         public static string Products_DeleteAll()
         {
             try
@@ -291,6 +301,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public static IEnumerable<Shopify_Prices> GetAllShopify_Prices()
         {
+            Discounts_Sync();
             try
             {
                 string results = MakeApiGetCall_Unsecured("/discount/list");
@@ -308,6 +319,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public static IEnumerable<tmpShopify_Prices> GetAlltmpShopify_Prices()
         {
+            Discounts_Sync();
             try
             {
                 string results = MakeApiGetCall_Unsecured("/discount/list");
@@ -325,6 +337,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public static IEnumerable<Shopify_Quantities> GetAllShopify_Quantities()
         {
+            Inventory_Sync();
             string results = MakeApiGetCall_Unsecured("/inventory/list");
             List<Shopify_Quantities> Data = new List<Shopify_Quantities>();
             try
@@ -340,6 +353,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public static IEnumerable<tmpShopify_Quantities> GetAlltmpShopify_Quantities()
         {
+            Inventory_Sync();
             string results = MakeApiGetCall_Unsecured("/inventory/list");
             results = results.Replace("\"id\":null,", string.Empty);
             List<tmpShopify_Quantities> Data = new List<tmpShopify_Quantities>();
