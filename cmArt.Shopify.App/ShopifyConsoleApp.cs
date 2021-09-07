@@ -132,36 +132,47 @@ namespace cmArt.Shopify.App
             Console.WriteLine($"fromemailaddress: {settings.fromemailaddress}");
             Console.WriteLine($"fromemailpassword: {settings.fromemailpassword}");
 
-            Console.WriteLine("Loading Inventory From Real Windward");
-
             bool PreventApiAddsNEdits = _args.Contains("PREVENTADDSANDEDITS") || _args.Contains("PREVENTADDSNEDITS");
             bool PreventProduct = !(_args.Contains("PRODUCTS") || _args.Contains("PRODUCT")) && _args.Count() > 0;
             bool PreventPrices = !(_args.Contains("DISCOUNTS") || _args.Contains("DISCOUNT")) && _args.Count() > 0;
             bool PreventQuantities = !(_args.Contains("INVENTORY") || _args.Contains("INVENTORYITEMS") || _args.Contains("INVENTORYITEM")) && _args.Count() > 0;
+            
+            if (PreventApiAddsNEdits) { Console.WriteLine("PREVENTADDSANDEDITS or PREVENTADDSNEDITS found in arguments, adds and edits will be prevented"); }
+            if (PreventProduct) { Console.WriteLine("PRODUCTS or PRODUCT not found in arguments so we will prevent them from being sent to Shopify"); }
+            if (PreventPrices) { Console.WriteLine("DISCOUNTS or DISCOUNT not found in arguments so we will prevent them from being sent to Shopify"); }
+            if (PreventQuantities) { Console.WriteLine("INVENTORY or INVENTORYITEMS or INVENTORYITEM not found in arguments so we will prevent them from "
+                 + "being sent to Shopify"); }
+
+            Console.WriteLine("Loading Inventory From System Five");
 
             IEnumerable<IS5InvAssembled> InvAss = new List<IS5InvAssembled>();
             try
             {
                 if (settings.Cachinginfo == "UseCaching" && DoWeHaveCachedFiles(config))
                 {
+                    Console.WriteLine("Loading Cached System Five Data");
                     InvAss = GetDataFromJson(config);
                 }
                 if(settings.Cachinginfo != "UseCaching" || InvAss.Count() == 0)
                 {
+                    Console.WriteLine("Loading System Five Data via ODBC");
                     InvAss = GetDataFromSystemFive(config);
                 }
 
             }
             catch (Exception e)
             {
+                Console.WriteLine("Error occurred while trying to Load Data From System Five (Cache or ODBC)");
                 throw new Exception_WhileGettingData("An error occured Getting Data From System Five.", e);
             }
             Console.WriteLine("Finished - Loading Inventory From Real Windward");
 
             // Get E-Commerce parts
+            Console.WriteLine("Filtering for Ecommerce equals Y");
             IEnumerable<IS5InvAssembled> ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y");
 
             // Use facade to create data load format from Assembled Inventory Data
+            Console.WriteLine("Begin converting Assembled Inventory Records to the Shopify Data Load Format via an adapter.");
             IEnumerable<AdaptToShopifyDataLoadFormat> adapters = ECommInvAss.Select(Inv =>
             {
                 AdaptToShopifyDataLoadFormat tmp = new AdaptToShopifyDataLoadFormat();
@@ -169,10 +180,12 @@ namespace cmArt.Shopify.App
                 return tmp;
             }
             );
+            Console.WriteLine(" -- Get products from adapter");
             IEnumerable<IShopify_Product> prod = adapters.Select(x => (IShopify_Product)x);
+            Console.WriteLine(" -- Get prices from adapter");
             IEnumerable<IShopify_Prices> prices = adapters.Select(x => (IShopify_Prices)x);
+            Console.WriteLine(" -- Get quantities from adapter");
             IEnumerable<IShopify_Quantities> quantities = adapters.Select(x => (IShopify_Quantities)x);
-
 
             Func<IShopifyDataLoadFormat, IShopifyDataLoadFormat, bool> fEquals = (from, to) => { return from.Equals(to); };
             Func<IShopify_Prices, IShopify_Prices, bool> fEquals_Prices = (from, to) => { return from.Equals(to); };
@@ -180,18 +193,20 @@ namespace cmArt.Shopify.App
             Func<IShopify_Product, IShopify_Product, bool> fEquals_Product = (from, to) => { return from.Equals(to); };
 
             // Direct from Shopify
+            Console.WriteLine("Get Products directly from Shopify");
             List<Product_Product> all = cmShopify.GetAllShopifyRecords().ToList();
             string strProducts = System.Text.Json.JsonSerializer.Serialize(all, typeof(List<Product_Product>));
             IEnumerable<ProductAdapter> AllProduct = all.Select(prod => { ProductAdapter pa = new ProductAdapter(); pa.Init(prod); return pa; });
 
             #region Reece Products
+            Console.WriteLine("Get Products using Reece's API");
             IEnumerable<IShopify_Product> API_Products = ReeceShopify.GetAllShopify_Products();
             IEnumerable<IShopify_Product> ChangedRecords_Product = UpdateProcessPattern<IShopify_Product, Shopify_Product, int>
                 .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Product, adapters, API_Products);
             #endregion Reece Products
 
             #region Reece Prices
-            //IEnumerable<IShopify_Prices> API_Prices = ReeceShopify.GetAllShopify_Prices();
+            Console.WriteLine("Get Prices using Reece's API");
             IEnumerable<tmpShopify_Prices> tmpPrices = ReeceShopify.GetAlltmpShopify_Prices();
             IEnumerable<IShopify_Prices> MissingInfoPrices = tmpPrices.Select(p => p.AsShopify_Prices());
             Func<IShopify_Product, string> fGetProductPartNumber = (sp) => { return sp.PartNumber.TrimEnd(); };
@@ -204,7 +219,7 @@ namespace cmArt.Shopify.App
             { 
                 p.Item2.InvUnique = p.Item1.InvUnique;
                 p.Item2.Cat = p.Item1.Cat;
-                p.Item2.WholesaleCost = (decimal)100000;
+                p.Item2.WholesaleCost = (decimal)100000; // likely makes all records different. 
                 return p.Item2;
             });
             IEnumerable<IShopify_Prices> ChangedRecords_Prices = UpdateProcessPattern<IShopify_Prices, Shopify_Prices, int>
@@ -212,6 +227,7 @@ namespace cmArt.Shopify.App
             #endregion Reece Prices
 
             #region Reece Quantities
+            Console.WriteLine("Get Quantities form Reece's API");
             //IEnumerable<IShopify_Quantities> API_Quantities = ReeceShopify.GetAllShopify_Quantities();
             IEnumerable<tmpShopify_Quantities> tmpApi_Quantities = ReeceShopify.GetAlltmpShopify_Quantities();
             IEnumerable<IShopify_Quantities> MissingInfoQuantities = tmpApi_Quantities.Select(p => p.AsShopify_Quantities());
@@ -230,6 +246,7 @@ namespace cmArt.Shopify.App
             #endregion Reece Quantities
 
             #region Perform Edits
+            Console.WriteLine("Begin Performing Edits");
             IEnumerable<Shopify_Product> changedProducts = new List<Shopify_Product>();
             IEnumerable<Shopify_Prices> changedPrices = new List<Shopify_Prices>();
             IEnumerable<Shopify_Quantities> changedQuantities = new List<Shopify_Quantities>();
@@ -238,25 +255,42 @@ namespace cmArt.Shopify.App
                 changedProducts = ChangedRecords_Product.Select(p => p.AsShopify_Product());
                 string Product_Edit_Results = string.Empty;
                 if (!PreventProduct)
-                { Product_Edit_Results = ReeceShopify.Products_Edit(changedProducts); }
+                {
+                    Console.WriteLine("Performing Edits on Changed Products");
+                    Console.WriteLine($"Number of Changed Products: {changedProducts.Count()}");
+                    Product_Edit_Results = ReeceShopify.Products_Edit(changedProducts); 
+                }
+                else { Console.WriteLine("Preventing edits on changed products"); }
 
                 changedPrices = ChangedRecords_Prices.Select(p => p.AsShopify_Prices());
                 string Prices_Edit_Results = string.Empty;
                 if (!PreventPrices)
-                { Prices_Edit_Results = ReeceShopify.Prices_Edit(changedPrices); }
+                {
+                    Console.WriteLine("Performing Edits on Changed Prices");
+                    Console.WriteLine($"Number of Changed Prices {changedPrices.Count()}");
+                    Prices_Edit_Results = ReeceShopify.Prices_Edit(changedPrices); 
+                }
+                else { Console.WriteLine("Preventing edits on changed prices"); }
 
                 changedQuantities = ChangedRecords_Quantities.Select(p => p.AsShopify_Quantities());
                 string Quantities_Edit_Results = string.Empty;
                 if (!PreventQuantities)
-                { Quantities_Edit_Results = ReeceShopify.Quantities_Edit(changedQuantities); }
+                {
+                    Console.WriteLine("Performing Edits on Changed Quantities");
+                    Console.WriteLine($"Number of Changed Quantities: {changedQuantities.Count()}");
+                    Quantities_Edit_Results = ReeceShopify.Quantities_Edit(changedQuantities); 
+                }
+                else { Console.WriteLine("Preventing edits on changed quantities"); }
+
             }
             else
             {
-                Console.WriteLine("Perform Edits Supressed due to Settings");
+                Console.WriteLine("All Perform Edits Supressed due to Settings");
             }
             #endregion Perform Edits
 
             #region Perform Adds
+            Console.WriteLine("Begin Perform Adds");
             IEnumerable<Tuple<IShopify_Product, IShopify_Product>> NewProductsPairs = new List<Tuple<IShopify_Product, IShopify_Product>>();
             IEnumerable<Tuple<IShopify_Prices, IShopify_Prices>> NewPricesPairs = new List<Tuple<IShopify_Prices, IShopify_Prices>>();
             IEnumerable<Tuple<IShopify_Quantities, IShopify_Quantities>> NewQuantitiesPairs = new List<Tuple<IShopify_Quantities, IShopify_Quantities>>();
@@ -268,12 +302,18 @@ namespace cmArt.Shopify.App
             if (!PreventApiAddsNEdits)
             {
                 if (!PreventProduct)
-                { string Product_Add_Results = ReeceShopify.Products_Add(NewProducts); }
-            }
+                {
+                    Console.WriteLine("Performing Products_Add on NewProducts");
+                    Console.WriteLine($"Number of records in NewProducts: {NewProducts.Count()}");
+                    string Product_Add_Results = ReeceShopify.Products_Add(NewProducts); 
+                } else { Console.WriteLine("Prevented adding of NewProducts");}
+            } 
             try
             {
+                string FileNameNewProducts = "C:\\Temp\\NewProducts.txt";
+                Console.WriteLine($"Saving NewProducts to file: {FileNameNewProducts}");
                 string content = System.Text.Json.JsonSerializer.Serialize(NewProducts.ToList(), typeof(List<Shopify_Product>));
-                System.IO.File.WriteAllText("C:\\Temp\\NewProducts.txt", content);
+                System.IO.File.WriteAllText(FileNameNewProducts, content);
             }
             catch (Exception e)
             {
@@ -286,12 +326,18 @@ namespace cmArt.Shopify.App
             if (!PreventApiAddsNEdits)
             {
                 if (!PreventPrices)
-                { string Prices_Add_Results = ReeceShopify.Prices_Add(NewPrices); }
+                {
+                    Console.WriteLine("Performing Prices_Add on NewPrices");
+                    Console.WriteLine($"Number of records in NewPrices: {NewPrices.Count()}");
+                    string Prices_Add_Results = ReeceShopify.Prices_Add(NewPrices);
+                } else { Console.WriteLine("Prevented adding of NewPrices"); }
             }
             try
             {
+                string FileNameNewPrices = "C:\\Temp\\NewPrices.txt";
+                Console.WriteLine($"Saving NewPrices to file: {FileNameNewPrices}");
                 string content = System.Text.Json.JsonSerializer.Serialize(NewPrices.ToList(), typeof(List<Shopify_Prices>));
-                System.IO.File.WriteAllText("C:\\Temp\\NewPrices.txt", content);
+                System.IO.File.WriteAllText(FileNameNewPrices, content);
             }
             catch (Exception e)
             {
@@ -304,12 +350,18 @@ namespace cmArt.Shopify.App
             if (!PreventApiAddsNEdits)
             {
                 if (!PreventQuantities)
-                { string Quantities_Add_Results = ReeceShopify.Quantities_Add(NewQuantities); }
+                {
+                    Console.WriteLine("Performing Quantities_Add on NewQuantities");
+                    Console.WriteLine($"Number of records in NewQuantities: {NewQuantities.Count()}");
+                    string Quantities_Add_Results = ReeceShopify.Quantities_Add(NewQuantities); 
+                } else { Console.WriteLine("Prevented addinf of NewQuantities"); }
             }
             try
             {
+                string FileNameNewQuantities = "C:\\Temp\\NewQuantities.txt";
+                Console.WriteLine($"Saving NewQuantities to file: {FileNameNewQuantities}");
                 string content = System.Text.Json.JsonSerializer.Serialize(NewQuantities.ToList(), typeof(List<Shopify_Quantities>));
-                System.IO.File.WriteAllText("C:\\Temp\\NewQuantities.txt", content);
+                System.IO.File.WriteAllText(FileNameNewQuantities, content);
             }
             catch (Exception e)
             {
@@ -317,13 +369,14 @@ namespace cmArt.Shopify.App
             }
             #endregion Perform Adds
 
-            // serialize the results to prep them for sending
+            // ----- Reporting goes here -----
+
             string result2 = SerializeForExport(adapters);
-            //result2 = SerializeForExport(ChangedRecords);
             string result = string.Empty;
 
             try
             {
+                Console.WriteLine("Attempting to serialize ChangedRecords_Product");
                 IEnumerable<Shopify_Product> _ChangedRecords_Product = ChangedRecords_Product.Select(rec => (Shopify_Product)(new Shopify_Product().CopyFrom(rec)));
                 result = JsonSerializer.Serialize(_ChangedRecords_Product, typeof(IEnumerable<Shopify_Product>));
             }
@@ -334,9 +387,9 @@ namespace cmArt.Shopify.App
             IEnumerable<Shopify_Product> _AllRecords_Product = adapters.Select(rec => (Shopify_Product)(new Shopify_Product().CopyFrom(rec)));
             string result3 = JsonSerializer.Serialize(_AllRecords_Product, typeof(IEnumerable<Shopify_Product>));
 
-
-            //Console.WriteLine(result);
-            File.WriteAllText("c:\\temp\\results.txt", result);
+            string FileName = "c:\\temp\\results.txt";
+            Console.WriteLine($"Saving ChangedRecords_Product to file: {FileName}");
+            File.WriteAllText(FileName, result);
 
             #region logic and reporting from Colonial version
             //// A: Get XRef from Account for AUnique,BankInfo pairs
