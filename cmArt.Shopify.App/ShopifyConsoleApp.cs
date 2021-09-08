@@ -200,7 +200,7 @@ namespace cmArt.Shopify.App
 
             #region Reece Products
             Console.WriteLine("Get Products using Reece's API");
-            IEnumerable<IShopify_Product> API_Products = ReeceShopify.GetAllShopify_Products();
+            IEnumerable<Shopify_Product> API_Products = ReeceShopify.GetAllShopify_Products();
             IEnumerable<IShopify_Product> ChangedRecords_Product = UpdateProcessPattern<IShopify_Product, Shopify_Product, int>
                 .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Product, adapters, API_Products);
             #endregion Reece Products
@@ -212,14 +212,14 @@ namespace cmArt.Shopify.App
             Func<IShopify_Product, string> fGetProductPartNumber = (sp) => { return sp.PartNumber.TrimEnd(); };
             Func<IShopify_Prices, string> fGetPricesPartNumber = (sp) => { return sp.PartNumber.TrimEnd(); };
 
-            IEnumerable<Tuple<IShopify_Product, IShopify_Prices>> joined_prices = 
-                GenericJoins<IShopify_Product, IShopify_Prices, string>.LeftJoin(API_Products, MissingInfoPrices, fGetProductPartNumber, fGetPricesPartNumber);
+            IEnumerable<Tuple<Shopify_Product, IShopify_Prices>> joined_prices = 
+                GenericJoins<Shopify_Product, IShopify_Prices, string>.LeftJoin(API_Products, MissingInfoPrices, fGetProductPartNumber, fGetPricesPartNumber);
             
             IEnumerable<IShopify_Prices> jp = joined_prices.Where(p => p.Item2 != null).Select(p => 
             { 
                 p.Item2.InvUnique = p.Item1.InvUnique;
                 p.Item2.Cat = p.Item1.Cat;
-                p.Item2.WholesaleCost = (decimal)100000; // likely makes all records different. 
+                p.Item2.WholesaleCost = Math.Round(p.Item1.WholesaleCost,6);
                 return p.Item2;
             });
             IEnumerable<IShopify_Prices> ChangedRecords_Prices = UpdateProcessPattern<IShopify_Prices, Shopify_Prices, int>
