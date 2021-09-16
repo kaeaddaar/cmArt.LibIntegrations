@@ -5,6 +5,8 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Linq;
 using System.Collections.Generic;
+using System.Web;
+
 
 namespace cmArt.Shopify.Connector
 {
@@ -12,7 +14,15 @@ namespace cmArt.Shopify.Connector
     {
         // Get all records from shopify
         // Store records from shopify
-
+        public static bool ProductExists(string PartNumber)
+        {
+            // Part Number from S5 should be found as Title from Shopify Product
+            string strProducts = ApiCalls.MakeApiGetCall("/admin/api/2021-07/products.json?title=" + HttpUtility.UrlEncode(PartNumber));
+            Product_Root ProductsRoot = (Product_Root)JsonSerializer.Deserialize(strProducts, typeof(Product_Root));
+            bool FoundOneOrMore = (ProductsRoot.products ?? new List<Product_Product>()).Count() > 0;
+            return FoundOneOrMore;
+        }
+        
         public static IEnumerable<Product_Product>GetAllShopifyRecords()
         {
             // count of records
