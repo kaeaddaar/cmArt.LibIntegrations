@@ -1,0 +1,25 @@
+﻿@page "/"
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+<h1>cmArt.Shopify.UI Settings Page</h1>
+These are the top level settings that we use to save things like:
+<ul>
+    <li>Path and Name of Settings file for the Shopify Integration</li>
+    <li>Preferences ex: dark mode</li>
+</ul>
+These top level settings are store in the local storage of the browser using Blazored.LocalStorage.
+
+<h2>Demo of localStorage</h2>
+@CustomerName
+@code {
+    string CustomerName = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await localStorage.SetItemAsync("name", "John Smith");
+        var name = await localStorage.GetItemAsync<string>("name");
+        CustomerName = name;
+    }
+
+}
+

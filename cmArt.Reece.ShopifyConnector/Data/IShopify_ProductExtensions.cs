@@ -7,6 +7,20 @@ namespace cmArt.Reece.ShopifyConnector
 {
     public static class IShopify_ProductExtensions
     {
+
+        public static Shopify_Product AsShopify_Product(this Shopify_Product data)
+        {
+            Shopify_Product _prod = new Shopify_Product();
+
+            _prod.Cat = data.Cat;
+            _prod.Description = data.Description;
+            _prod.InvUnique = data.InvUnique;
+            _prod.PartNumber = data.PartNumber;
+            _prod.WholesaleCost = data.WholesaleCost;
+
+            return _prod;
+        }
+
         public static Shopify_Product AsShopify_Product(this IShopify_Product data)
         {
             Shopify_Product _prod = new Shopify_Product();

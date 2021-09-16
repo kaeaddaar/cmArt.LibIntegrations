@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+
 namespace cmArt.System5.Inventory
 {
     public interface IS5InvAssembled

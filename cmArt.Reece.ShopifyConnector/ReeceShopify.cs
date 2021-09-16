@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using System.Diagnostics;
 
 
 namespace cmArt.Reece.ShopifyConnector
@@ -14,9 +15,25 @@ namespace cmArt.Reece.ShopifyConnector
         // Get all records from shopify
         // Store records from shopify
         const string BaseUrl = "https://aquadragonservices.com/pcr/apitest/index.php";
-
+        private static string MapApiPostCall_Unsecured(string urlCommand, string content, Func<string,int> MakeLogEntry)
+        {
+            try
+            {
+                MakeLogEntry("urlCommand: " + urlCommand);
+                MakeLogEntry("content: " + content);
+            }
+            catch (Exception e)
+            {
+                return "Error in MapApiPostCall_Unsecured. Message: " + e.Message;
+            }
+            string results = MakeApiPostCall_Unsecured(urlCommand, content);
+            MakeLogEntry("results: " + results);
+            return results;
+        }
         private static string MakeApiPostCall_Unsecured(string urlCommand, string content)
         {
+            Console.WriteLine("urlCommand: " + urlCommand);
+            Console.WriteLine("content: " + content);
             HttpClient client = new HttpClient();
 
             Uri baseUri = new Uri(BaseUrl + urlCommand);
@@ -40,12 +57,14 @@ namespace cmArt.Reece.ShopifyConnector
             response.EnsureSuccessStatusCode();
             string responseBody = response.Content.ReadAsStringAsync().Result;
 
+            Console.WriteLine("responseBody: " + responseBody);
             return responseBody;
         }
 
         private static string MakeApiGetCall_Unsecured(string urlCommand)
         {
             HttpClient client = new HttpClient();
+            client.Timeout = TimeSpan.FromMinutes(10); // 1000 tics per second * 60 Seconds is a minute * 10 is 10 minutes
 
             Uri baseUri = new Uri(BaseUrl + urlCommand);
             client.BaseAddress = baseUri;

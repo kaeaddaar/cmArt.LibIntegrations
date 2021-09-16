@@ -198,19 +198,26 @@ namespace cmArt.Shopify.App
 
         public static void SendEmail(string body)
         {
-            using (MailMessage mail = new MailMessage())
+            try
             {
-                mail.From = new MailAddress(emailFromAddress);
-                mail.To.Add(emailToAddress);
-                mail.Subject = "Workers Error";
-                mail.Body = body;
-                mail.IsBodyHtml = false;
-                using (SmtpClient smtp = new SmtpClient(smtpAddress, portNumber))
+                using (MailMessage mail = new MailMessage())
                 {
-                    smtp.Credentials = new NetworkCredential(emailFromAddress, password);
-                    smtp.EnableSsl = enableSSL;
-                    smtp.Send(mail);
+                    mail.From = new MailAddress(emailFromAddress);
+                    mail.To.Add(emailToAddress);
+                    mail.Subject = "Workers Error";
+                    mail.Body = body;
+                    mail.IsBodyHtml = false;
+                    using (SmtpClient smtp = new SmtpClient(smtpAddress, portNumber))
+                    {
+                        smtp.Credentials = new NetworkCredential(emailFromAddress, password);
+                        smtp.EnableSsl = enableSSL;
+                        smtp.Send(mail);
+                    }
                 }
+            }
+            catch
+            {
+                Console.WriteLine("Error emailing error message. Ignoring.");
             }
         }
     }

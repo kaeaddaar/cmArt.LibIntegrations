@@ -169,7 +169,9 @@ namespace cmArt.Shopify.App
 
             // Get E-Commerce parts
             Console.WriteLine("Filtering for Ecommerce equals Y");
-            IEnumerable<IS5InvAssembled> ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y");
+            IEnumerable<IS5InvAssembled> ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y").Take(1);
+            string strECommInvAss = SerializeForExport(ECommInvAss);
+            File.WriteAllText(settings.OutputDirectory + "\\strEcommInvAss.txt", strECommInvAss);
 
             // Use facade to create data load format from Assembled Inventory Data
             Console.WriteLine("Begin converting Assembled Inventory Records to the Shopify Data Load Format via an adapter.");
@@ -193,21 +195,63 @@ namespace cmArt.Shopify.App
             Func<IShopify_Product, IShopify_Product, bool> fEquals_Product = (from, to) => { return from.Equals(to); };
 
             // Direct from Shopify
-            Console.WriteLine("Get Products directly from Shopify");
-            List<Product_Product> all = cmShopify.GetAllShopifyRecords().ToList();
-            string strProducts = System.Text.Json.JsonSerializer.Serialize(all, typeof(List<Product_Product>));
-            IEnumerable<ProductAdapter> AllProduct = all.Select(prod => { ProductAdapter pa = new ProductAdapter(); pa.Init(prod); return pa; });
+            if(false)
+            {
+                Console.WriteLine("Get Products directly from Shopify");
+                List<Product_Product> all = cmShopify.GetAllShopifyRecords().ToList();
+                string strProducts = System.Text.Json.JsonSerializer.Serialize(all, typeof(List<Product_Product>));
+                IEnumerable<ProductAdapter> AllProduct = all.Select(prod => { ProductAdapter pa = new ProductAdapter(); pa.Init(prod); return pa; });
+            }
 
             #region Reece Products
             Console.WriteLine("Get Products using Reece's API");
-            IEnumerable<Shopify_Product> API_Products = ReeceShopify.GetAllShopify_Products();
+            IEnumerable<Shopify_Product> API_Products = new List<Shopify_Product>();
+            try
+            {
+                API_Products = ReeceShopify.GetAllShopify_Products();
+                Console.WriteLine($"Saving Shopify Products for API_Products");
+                try
+                {
+                    GenericSerialization<Shopify_Product>.RemoveCachedFileNamesFromDirectory(settings.OutputDirectory, "API_Products");
+                    GenericSerialization<Shopify_Product>.SerializeToJSON(API_Products.ToList(), "API_Products", settings.OutputDirectory, 50000);
+                }
+                catch
+                {
+                    Console.WriteLine($"Failed to serialize API_Products. API_Products file(s) will not be written.");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Failed to get All shopify products from Custom API. Message = \"{e.Message}\"");
+                Console.ReadKey();
+            }
             IEnumerable<IShopify_Product> ChangedRecords_Product = UpdateProcessPattern<IShopify_Product, Shopify_Product, int>
                 .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Product, adapters, API_Products);
             #endregion Reece Products
 
             #region Reece Prices
             Console.WriteLine("Get Prices using Reece's API");
-            IEnumerable<tmpShopify_Prices> tmpPrices = ReeceShopify.GetAlltmpShopify_Prices();
+            IEnumerable<tmpShopify_Prices> tmpPrices = new List<tmpShopify_Prices>();
+            try
+            {
+                tmpPrices = ReeceShopify.GetAlltmpShopify_Prices();
+                string FileOrTableName = "tmpPrices";
+                Console.WriteLine($"Saving Shopify Prices to file: {FileOrTableName}");
+                try
+                {
+                    GenericSerialization<tmpShopify_Prices>.RemoveCachedFileNamesFromDirectory(settings.OutputDirectory, FileOrTableName);
+                    GenericSerialization<tmpShopify_Prices>.SerializeToJSON(tmpPrices.ToList(), FileOrTableName, settings.OutputDirectory, 50000);
+                }
+                catch
+                {
+                    Console.WriteLine($"Failed to serialize {FileOrTableName}. {FileOrTableName} file(s) will be missing");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Failed to get All shopify prices from Custom API. Message = \"{e.Message}\"");
+                Console.ReadKey();
+            }
             IEnumerable<IShopify_Prices> MissingInfoPrices = tmpPrices.Select(p => p.AsShopify_Prices());
             Func<IShopify_Product, string> fGetProductPartNumber = (sp) => { return sp.PartNumber.TrimEnd(); };
             Func<IShopify_Prices, string> fGetPricesPartNumber = (sp) => { return sp.PartNumber.TrimEnd(); };
@@ -227,9 +271,29 @@ namespace cmArt.Shopify.App
             #endregion Reece Prices
 
             #region Reece Quantities
-            Console.WriteLine("Get Quantities form Reece's API");
+            Console.WriteLine("Get Quantities from Reece's API");
             //IEnumerable<IShopify_Quantities> API_Quantities = ReeceShopify.GetAllShopify_Quantities();
-            IEnumerable<tmpShopify_Quantities> tmpApi_Quantities = ReeceShopify.GetAlltmpShopify_Quantities();
+            IEnumerable<tmpShopify_Quantities> tmpApi_Quantities = new List<tmpShopify_Quantities>();
+            try
+            {
+                tmpApi_Quantities = ReeceShopify.GetAlltmpShopify_Quantities();
+                string FileOrTableName = "tmpQuantities";
+                Console.WriteLine($"Saving Shopify Quantities to file: {FileOrTableName}");
+                try
+                {
+                    GenericSerialization<tmpShopify_Quantities>.RemoveCachedFileNamesFromDirectory(settings.OutputDirectory, FileOrTableName);
+                    GenericSerialization<tmpShopify_Quantities>.SerializeToJSON(tmpApi_Quantities.ToList(), FileOrTableName, settings.OutputDirectory, 50000);
+                }
+                catch
+                {
+                    Console.WriteLine($"Failed to serialize {FileOrTableName}. {FileOrTableName} file(s) will be missing");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Failed to get All shopify quantities from Custom API. Message = \"{e.Message}\"");
+                Console.ReadKey();
+            }
             IEnumerable<IShopify_Quantities> MissingInfoQuantities = tmpApi_Quantities.Select(p => p.AsShopify_Quantities());
             Func<IShopify_Quantities, string> fGetQuantitiesPartNumber = (sp) => { return sp.PartNumber; };
 
@@ -258,7 +322,10 @@ namespace cmArt.Shopify.App
                 {
                     Console.WriteLine("Performing Edits on Changed Products");
                     Console.WriteLine($"Number of Changed Products: {changedProducts.Count()}");
-                    Product_Edit_Results = ReeceShopify.Products_Edit(changedProducts); 
+                    Product_Edit_Results = ReeceShopify.Products_Edit(changedProducts);
+                    string FileNameChangedProducts = settings.OutputDirectory + "\\changedProducts.json.txt";
+                    string content = System.Text.Json.JsonSerializer.Serialize(changedProducts.ToList(), typeof(List<Shopify_Product>));
+                    System.IO.File.WriteAllText(FileNameChangedProducts, content);
                 }
                 else { Console.WriteLine("Preventing edits on changed products"); }
 
@@ -268,7 +335,10 @@ namespace cmArt.Shopify.App
                 {
                     Console.WriteLine("Performing Edits on Changed Prices");
                     Console.WriteLine($"Number of Changed Prices {changedPrices.Count()}");
-                    Prices_Edit_Results = ReeceShopify.Prices_Edit(changedPrices); 
+                    Prices_Edit_Results = ReeceShopify.Prices_Edit(changedPrices);
+                    string FileNameChangedPrices = settings.OutputDirectory + "\\changedPrices.json.txt";
+                    string content = System.Text.Json.JsonSerializer.Serialize(changedPrices.ToList(), typeof(List<Shopify_Prices>));
+                    System.IO.File.WriteAllText(FileNameChangedPrices, content);
                 }
                 else { Console.WriteLine("Preventing edits on changed prices"); }
 
@@ -278,7 +348,10 @@ namespace cmArt.Shopify.App
                 {
                     Console.WriteLine("Performing Edits on Changed Quantities");
                     Console.WriteLine($"Number of Changed Quantities: {changedQuantities.Count()}");
-                    Quantities_Edit_Results = ReeceShopify.Quantities_Edit(changedQuantities); 
+                    Quantities_Edit_Results = ReeceShopify.Quantities_Edit(changedQuantities);
+                    string FileNameChangedQuantities = settings.OutputDirectory + "\\changedQuantities.json.txt";
+                    string content = System.Text.Json.JsonSerializer.Serialize(changedQuantities.ToList(), typeof(List<Shopify_Quantities>));
+                    System.IO.File.WriteAllText(FileNameChangedQuantities, content);
                 }
                 else { Console.WriteLine("Preventing edits on changed quantities"); }
 
@@ -310,7 +383,7 @@ namespace cmArt.Shopify.App
             } 
             try
             {
-                string FileNameNewProducts = "C:\\Temp\\NewProducts.txt";
+                string FileNameNewProducts = settings.OutputDirectory + "\\NewProducts.json.txt";
                 Console.WriteLine($"Saving NewProducts to file: {FileNameNewProducts}");
                 string content = System.Text.Json.JsonSerializer.Serialize(NewProducts.ToList(), typeof(List<Shopify_Product>));
                 System.IO.File.WriteAllText(FileNameNewProducts, content);
@@ -334,7 +407,7 @@ namespace cmArt.Shopify.App
             }
             try
             {
-                string FileNameNewPrices = "C:\\Temp\\NewPrices.txt";
+                string FileNameNewPrices = settings.OutputDirectory + "\\NewPrices.json.txt";
                 Console.WriteLine($"Saving NewPrices to file: {FileNameNewPrices}");
                 string content = System.Text.Json.JsonSerializer.Serialize(NewPrices.ToList(), typeof(List<Shopify_Prices>));
                 System.IO.File.WriteAllText(FileNameNewPrices, content);
@@ -358,7 +431,7 @@ namespace cmArt.Shopify.App
             }
             try
             {
-                string FileNameNewQuantities = "C:\\Temp\\NewQuantities.txt";
+                string FileNameNewQuantities = settings.OutputDirectory + "\\NewQuantities.json.txt";
                 Console.WriteLine($"Saving NewQuantities to file: {FileNameNewQuantities}");
                 string content = System.Text.Json.JsonSerializer.Serialize(NewQuantities.ToList(), typeof(List<Shopify_Quantities>));
                 System.IO.File.WriteAllText(FileNameNewQuantities, content);
@@ -387,7 +460,7 @@ namespace cmArt.Shopify.App
             IEnumerable<Shopify_Product> _AllRecords_Product = adapters.Select(rec => (Shopify_Product)(new Shopify_Product().CopyFrom(rec)));
             string result3 = JsonSerializer.Serialize(_AllRecords_Product, typeof(IEnumerable<Shopify_Product>));
 
-            string FileName = "c:\\temp\\results.txt";
+            string FileName = settings.OutputDirectory + "\\_ChangedRecords_Product.json.txt";
             Console.WriteLine($"Saving ChangedRecords_Product to file: {FileName}");
             File.WriteAllText(FileName, result);
 
@@ -468,6 +541,60 @@ namespace cmArt.Shopify.App
             Console.WriteLine("Done");
             Console.ReadKey();
         }
+
+        private static string SerializeForExport(IEnumerable<IS5InvAssembled> ListToSerialize)
+        {
+            // serialize the results to prep them for sending
+            string result = string.Empty;
+            try
+            {
+                result = JsonSerializer.Serialize(ListToSerialize, typeof(IEnumerable<IS5InvAssembled>));
+            }
+            catch (Exception e)
+            {
+                List<IS5InvAssembled> FromAdapters = new List<IS5InvAssembled>();
+                List<IS5InvAssembled> AdapterRecordsNotSerializable = new List<IS5InvAssembled>();
+
+                // only copy serializable records and try again
+                string tmp = string.Empty;
+                int i = 0;
+
+                foreach (var adapter in ListToSerialize)
+                {
+                    try
+                    {
+                        tmp = JsonSerializer.Serialize(adapter, typeof(S5InvAssembled));
+                        FromAdapters.Add(adapter);
+                    }
+                    catch (Exception Ex)
+                    {
+                        // Count bad records
+                        i++;
+                        IS5InvAssembled dataLoadFormat = new S5InvAssembled();
+                        try
+                        {
+                            AdapterRecordsNotSerializable.Add(adapter);
+                        }
+                        catch
+                        {
+                            throw new Exception("Failed to .CopyFrom the adapter record into a data load format object for a single record "
+                                + "that also failed to serialize. See Inner Exception.", e);
+                        }
+                    }
+                }
+
+                try
+                {
+                    result = JsonSerializer.Serialize(FromAdapters, typeof(IEnumerable<AdaptToShopifyDataLoadFormat>));
+                }
+                catch
+                {
+                    throw new Exception($"Failed to serialize sanitized records from the Shopify Data Load File. See Inner Exception.", e);
+                }
+            }
+            return result;
+        }
+
         private static string SerializeForExport(IEnumerable<IShopifyDataLoadFormat> ChangedRecords)
         {
             // serialize the results to prep them for sending
