@@ -169,7 +169,7 @@ namespace cmArt.Shopify.App
 
             // Get E-Commerce parts
             Console.WriteLine("Filtering for Ecommerce equals Y");
-            IEnumerable<IS5InvAssembled> ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y").Take(1);
+            IEnumerable<IS5InvAssembled> ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y");
             string strECommInvAss = SerializeForExport(ECommInvAss);
             File.WriteAllText(settings.OutputDirectory + "\\strEcommInvAss.txt", strECommInvAss);
 
