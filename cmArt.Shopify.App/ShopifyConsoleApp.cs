@@ -40,7 +40,7 @@ namespace cmArt.Shopify.App
 
     public class ShopifyConsoleApp
     {
-        private readonly ILogger _logger;
+        //private readonly ILogger _logger;
         class StaticSettings
         {
             public StaticSettings(IConfiguration config)
@@ -83,23 +83,23 @@ namespace cmArt.Shopify.App
 
         }
 
-        public ShopifyConsoleApp(ILogger<ShopifyConsoleApp> logger)
-        {
-            _logger = logger;
-        }
+        //public ShopifyConsoleApp(ILogger<ShopifyConsoleApp> logger)
+        //{
+        //    _logger = logger;
+        //}
         private static void ConfigureServices(IServiceCollection services)
         {
-            //we will configure logging here
             services.AddLogging(configure => configure.AddConsole())
                     .AddTransient<ShopifyConsoleApp>();
         }
         public static void Main_Console(string[] args)
         {
-            var serviceCollection = new ServiceCollection();
+            ServiceCollection serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
-            var serviceProvider = serviceCollection.BuildServiceProvider();
-            var logger = serviceProvider.GetService<ILogger<ShopifyConsoleApp>>();
-            logger.LogInformation("Hello World");
+            ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
+            ILogger<ShopifyConsoleApp> logger;
+            logger = serviceProvider.GetService<ILogger<ShopifyConsoleApp>>();
+
             logger.LogInformation("Begin");
 
             string[] _args = args ?? new string[] { };
