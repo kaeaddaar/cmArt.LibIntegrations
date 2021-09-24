@@ -41,7 +41,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTestReeceShopifyApi", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Shopify.ConsoleTools", "cmArt.Shopify.ConsoleTools\cmArt.Shopify.ConsoleTools.csproj", "{C0580241-42A5-485A-98B7-BBF6C21EB89A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmArt.Shopify.Ui", "cmArt.Shopify.Ui\cmArt.Shopify.Ui.csproj", "{A7AC155F-145F-4728-BD23-EFD8941D44A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Shopify.Ui", "cmArt.Shopify.Ui\cmArt.Shopify.Ui.csproj", "{A7AC155F-145F-4728-BD23-EFD8941D44A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmArt.System5.App.CacheS5Data", "cmArt.System5.App.CacheS5Data\cmArt.System5.App.CacheS5Data.csproj", "{83B665BF-6D0B-4B46-B6E3-CD7727D5D103}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +131,10 @@ Global
 		{A7AC155F-145F-4728-BD23-EFD8941D44A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7AC155F-145F-4728-BD23-EFD8941D44A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7AC155F-145F-4728-BD23-EFD8941D44A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83B665BF-6D0B-4B46-B6E3-CD7727D5D103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83B665BF-6D0B-4B46-B6E3-CD7727D5D103}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83B665BF-6D0B-4B46-B6E3-CD7727D5D103}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83B665BF-6D0B-4B46-B6E3-CD7727D5D103}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
