@@ -1,3 +1,4 @@
+using cmArt.Reece.ShopifyConnector;
 using cmArt.Shopify.App.Data;
 using cmArt.System5.Data;
 using cmArt.System5.Inventory;

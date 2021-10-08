@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using cmArt.Shopify.App.Data;
 using System.Text.Json;
-
+using cmArt.Reece.ShopifyConnector;
 
 namespace cmArt.Shopify.Testing
 {

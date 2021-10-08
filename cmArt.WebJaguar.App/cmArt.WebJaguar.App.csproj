@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\cmArt.LibIntegrations\cmArt.LibIntegrations.csproj" />
     <ProjectReference Include="..\cmArt.System5.Inventory\cmArt.System5.Inventory.csproj" />
   </ItemGroup>
 </Project>
