@@ -7,6 +7,9 @@ using cmArt.Reece.ShopifyConnector;
 
 namespace cmArt.Shopify.App.Data
 {
+    /// <summary>
+    /// For converting data provided by Shopify directly
+    /// </summary>
     public class ProductAdapter : IShopify_Product
     {
         Product_Product _data;

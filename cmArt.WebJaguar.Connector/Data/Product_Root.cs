@@ -4,11 +4,11 @@ using System.Text;
 
 namespace cmArt.WebJaguar.Connector
 {
-    public class Product_Root
+    public class Product_Root : IProduct_Root
     {
         public List<int> supplierIds { get; set; }
         public string name { get; set; }
-        public int sku { get; set; }
+        public string sku { get; set; }
         public string note { get; set; }
         public string masterSku { get; set; }
         public int slaveCount { get; set; }
@@ -18,8 +18,8 @@ namespace cmArt.WebJaguar.Connector
         public bool feedFreeze { get; set; }
         public string shortDesc { get; set; }
         public string longDesc { get; set; }
-        public int weight { get; set; }
-        public int msrp { get; set; }
+        public float weight { get; set; }
+        public float msrp { get; set; }
         public bool hideMsrp { get; set; }
         public int unitPrice { get; set; }
         public bool priceByCustomer { get; set; }

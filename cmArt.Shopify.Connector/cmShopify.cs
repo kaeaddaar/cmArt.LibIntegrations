@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Linq;
 using System.Collections.Generic;
 using System.Web;
-
+using System.Threading;
 
 namespace cmArt.Shopify.Connector
 {
@@ -60,6 +60,7 @@ namespace cmArt.Shopify.Connector
                 {
                     break;
                 }
+                Thread.Sleep(2000);
             }
             IEnumerable<Product_Product> AllProducts = PagesOfProduct.SelectMany(prod => prod);
             return AllProducts;

@@ -24,7 +24,7 @@ using cmArt.Shopify.Connector;
 using cmArt.Reece.ShopifyConnector;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
-
+using cmArt.Shopify.App.Services;
 
 namespace cmArt.Shopify.App
 {
@@ -40,76 +40,77 @@ namespace cmArt.Shopify.App
 
     public class ShopifyConsoleApp
     {
-        //private readonly ILogger _logger;
-        class StaticSettings
-        {
-            public StaticSettings(IConfiguration config)
-            {
-                // Feature idea: Add ability validate existense of the keys used below
-                string prefix = "Shopifyinfo:";
-                CachedFiles = config[$"{prefix}CachedFiles"] ?? string.Empty;
-                CSVFiles = config[$"{prefix}CSVFiles"] ?? string.Empty;
-                OutputDirectory = config[$"{prefix}OutputDirectory"] ?? string.Empty;
-                DSNinfo = config[$"{prefix}DSNinfo"] ?? string.Empty;
-                Cachinginfo = config[$"{prefix}Cachinginfo"] ?? string.Empty;
-                SupressUpload = config[$"{prefix}SupressUpload"] ?? string.Empty;
-                LogfilePath = config[$"{prefix}LogfilePath"] ?? string.Empty;
-                Hours = config[$"{prefix}Hours"] ?? string.Empty;
-                Minutes = config[$"{prefix}Minutes"] ?? string.Empty;
-                Seconds = config[$"{prefix}Seconds"] ?? string.Empty;
-                errormail = config[$"{prefix}errormail"] ?? string.Empty;
-                smtpaddress = config[$"{prefix}smtpaddress"] ?? string.Empty;
-                smtpport = config[$"{prefix}smtpport"] ?? string.Empty;
-                enableSSL = config[$"{prefix}enableSSL"] ?? string.Empty;
-                fromemailaddress = config[$"{prefix}fromemailaddress"] ?? string.Empty;
-                fromemailpassword = config[$"{prefix}fromemailpassword"] ?? string.Empty;
-            }
-            public string CachedFiles { get; }
-            public string CSVFiles { get; }
-            public string OutputDirectory { get; }
-            public string DSNinfo { get; }
-            public string Cachinginfo { get; }
-            public string SupressUpload { get; }
-            public string LogfilePath { get; }
-            public string Hours { get; }
-            public string Minutes { get; }
-            public string Seconds { get; }
-            public string errormail { get; }
-            public string smtpaddress { get; }
-            public string smtpport { get; }
-            public string enableSSL { get; }
-            public string fromemailaddress { get; }
-            public string fromemailpassword { get; }
-
-        }
-
-        //public ShopifyConsoleApp(ILogger<ShopifyConsoleApp> logger)
-        //{
-        //    _logger = logger;
-        //}
         private static void ConfigureServices(IServiceCollection services)
         {
             services.AddLogging(configure => configure.AddConsole())
                     .AddTransient<ShopifyConsoleApp>();
         }
-        public static void Main_Console(string[] args)
+        #region variables
+        // SetupLogging()
+        private static ServiceCollection serviceCollection;
+        private static ServiceProvider serviceProvider;
+        private static ILogger<ShopifyConsoleApp> logger;
+        // SetupArgs()
+        private static bool PreventApiAddsNEdits;
+        private static bool PreventProduct;
+        private static bool PreventPrices;
+        private static bool PreventQuantities;
+        private static string[] _args;
+        //SetupAndDisplaySettings()
+        private static IConfiguration config;
+        private static StaticSettings settings;
+        //GetSystem5Data()
+        private static IEnumerable<IS5InvAssembled> InvAss;
+        //FilterForECommAndSave()
+        private static IEnumerable<IS5InvAssembled> ECommInvAss;
+        //CreateDataLoadLists()
+        private static IEnumerable<AdaptToShopifyDataLoadFormat> adapters;
+        private static IEnumerable<Shopify_Product> PocoProductsAdapted;
+        private static IEnumerable<Shopify_Prices> PocoPricesAdapted;
+        private static IEnumerable<Shopify_Quantities> PocoQuantitiesAdapted;
+        private static IEnumerable<IShopify_Product> prods;
+        private static IEnumerable<IShopify_Prices> prices;
+        private static IEnumerable<IShopify_Quantities> quantities;
+        //GetPrevDataLoadLists()
+        private static IEnumerable<Shopify_Product> PrevDataLoad_Product;
+
+
+        #endregion variables
+
+        private static void SetupLogging()
         {
-            ServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
-            ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
-            ILogger<ShopifyConsoleApp> logger;
+            serviceProvider = serviceCollection.BuildServiceProvider();
             logger = serviceProvider.GetService<ILogger<ShopifyConsoleApp>>();
 
-            logger.LogInformation("Begin");
-
-            string[] _args = args ?? new string[] { };
+        }
+        private static void SetupArgs(string[] args)
+        {
+            _args = args ?? new string[] { };
             _args = args.Select(c => c.ToUpper()).ToArray();
 
-            IConfiguration config = new ConfigurationBuilder()
+            PreventApiAddsNEdits = _args.Contains("PREVENTADDSANDEDITS") || _args.Contains("PREVENTADDSNEDITS");
+            PreventProduct = !(_args.Contains("PRODUCTS") || _args.Contains("PRODUCT")) && _args.Count() > 0;
+            PreventPrices = !(_args.Contains("DISCOUNTS") || _args.Contains("DISCOUNT")) && _args.Count() > 0;
+            PreventQuantities = !(_args.Contains("INVENTORY") || _args.Contains("INVENTORYITEMS") || _args.Contains("INVENTORYITEM")) && _args.Count() > 0;
+
+            if (PreventApiAddsNEdits) { logger.LogInformation("PREVENTADDSANDEDITS or PREVENTADDSNEDITS found in arguments, adds and edits will be prevented"); }
+            if (PreventProduct) { logger.LogInformation("PRODUCTS or PRODUCT not found in arguments so we will prevent them from being sent to Shopify"); }
+            if (PreventPrices) { logger.LogInformation("DISCOUNTS or DISCOUNT not found in arguments so we will prevent them from being sent to Shopify"); }
+            if (PreventQuantities)
+            {
+                logger.LogInformation("INVENTORY or INVENTORYITEMS or INVENTORYITEM not found in arguments so we will prevent them from "
++ "being sent to Shopify");
+            }
+        }
+        private static void SetupAndDisplaySettings()
+        {
+            config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            StaticSettings settings = new StaticSettings(config);
+            settings = new StaticSettings(config);
 
             logger.LogInformation($"CachedFiles: {settings.CachedFiles}");
             logger.LogInformation($"CSVFiles: {settings.CSVFiles}");
@@ -127,24 +128,10 @@ namespace cmArt.Shopify.App
             logger.LogInformation($"enableSSL: {settings.enableSSL}");
             logger.LogInformation($"fromemailaddress: {settings.fromemailaddress}");
             logger.LogInformation($"fromemailpassword: {settings.fromemailpassword}");
-
-            bool PreventApiAddsNEdits = _args.Contains("PREVENTADDSANDEDITS") || _args.Contains("PREVENTADDSNEDITS");
-            bool PreventProduct = !(_args.Contains("PRODUCTS") || _args.Contains("PRODUCT")) && _args.Count() > 0;
-            bool PreventPrices = !(_args.Contains("DISCOUNTS") || _args.Contains("DISCOUNT")) && _args.Count() > 0;
-            bool PreventQuantities = !(_args.Contains("INVENTORY") || _args.Contains("INVENTORYITEMS") || _args.Contains("INVENTORYITEM")) && _args.Count() > 0;
-
-            if (PreventApiAddsNEdits) { logger.LogInformation("PREVENTADDSANDEDITS or PREVENTADDSNEDITS found in arguments, adds and edits will be prevented"); }
-            if (PreventProduct) { logger.LogInformation("PRODUCTS or PRODUCT not found in arguments so we will prevent them from being sent to Shopify"); }
-            if (PreventPrices) { logger.LogInformation("DISCOUNTS or DISCOUNT not found in arguments so we will prevent them from being sent to Shopify"); }
-            if (PreventQuantities)
-            {
-                logger.LogInformation("INVENTORY or INVENTORYITEMS or INVENTORYITEM not found in arguments so we will prevent them from "
-+ "being sent to Shopify");
-            }
-
-            logger.LogInformation("Loading Inventory From System Five");
-
-            IEnumerable<IS5InvAssembled> InvAss = new List<IS5InvAssembled>();
+        }
+        private static void GetSystem5Data()
+        {
+            InvAss = new List<IS5InvAssembled>();
             try
             {
                 if (settings.Cachinginfo == "UseCaching" && DoWeHaveCachedFiles(config))
@@ -165,31 +152,67 @@ namespace cmArt.Shopify.App
                 throw new Exception_WhileGettingData("An error occured Getting Data From System Five.", e);
             }
             logger.LogInformation("Finished - Loading Inventory From Real Windward");
-
-            // Get E-Commerce parts
+        }
+        private static void FilterForECommAndSave()
+        {
             logger.LogInformation("Filtering for Ecommerce equals Y");
-            IEnumerable<IS5InvAssembled> ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y");
+            ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y");
             string strECommInvAss = SerializeForExport(ECommInvAss);
             File.WriteAllText(settings.OutputDirectory + "\\strEcommInvAss.txt", strECommInvAss);
-
+        }
+        private static void CreateDataLoadLists()
+        {
             // Use facade to create data load format from Assembled Inventory Data
             logger.LogInformation("Begin converting Assembled Inventory Records to the Shopify Data Load Format via an adapter.");
-            IEnumerable<AdaptToShopifyDataLoadFormat> adapters = ECommInvAss.Select(Inv =>
+            adapters = ECommInvAss.Select(Inv =>
             {
                 AdaptToShopifyDataLoadFormat tmp = new AdaptToShopifyDataLoadFormat();
                 tmp.Init(Inv);
                 return tmp;
             }
             );
+
             logger.LogInformation(" -- Get products from adapter");
-            IEnumerable<IShopify_Product> prod = adapters.Select(x => (IShopify_Product)x);
+            PocoProductsAdapted = adapters.Select(x => x.AsShopify_Product());
+            prods = PocoProductsAdapted;
+
             logger.LogInformation(" -- Get prices from adapter");
-            IEnumerable<IShopify_Prices> prices = adapters.Select(x => (IShopify_Prices)x);
+            PocoPricesAdapted = adapters.Select(x => x.AsShopify_Prices());
+            prices = PocoPricesAdapted;
+
             logger.LogInformation(" -- Get quantities from adapter");
-            IEnumerable<IShopify_Quantities> quantities = adapters.Select(x => (IShopify_Quantities)x);
+            PocoQuantitiesAdapted = adapters.Select(x => x.AsShopify_Quantities());
+            quantities = PocoQuantitiesAdapted;
 
-            // ----- Above the S5 Pull of Data is complete along with delayed transformations (execute on acceess) -----
+            // The old way - DNU
+            //prods = adapters.Select(x => (IShopify_Product)x);
+            //prices = adapters.Select(x => (IShopify_Prices)x);
+            //quantities = adapters.Select(x => (IShopify_Quantities)x);
+        }
+        private static void GetPrevDataLoadListsAndOverwrite()
+        {
+            CachingPattern cache = new CachingPattern("PocoProductAdapted", settings);
+            PrevDataLoad_Product = cache._01_GetPrev();
+            cache._02_SaveNewestToCache(PocoProductsAdapted);
+        }
+        public static void Main_Console(string[] args)
+        {
+            SetupLogging();
+            logger.LogInformation("Begin");
+            SetupArgs(args);
 
+            SetupAndDisplaySettings();
+
+            logger.LogInformation("Loading Inventory From System Five");
+
+            GetSystem5Data();
+
+            FilterForECommAndSave();
+
+            CreateDataLoadLists();
+
+            GetPrevDataLoadListsAndOverwrite();
+            
             Func<IShopifyDataLoadFormat, IShopifyDataLoadFormat, bool> fEquals = (from, to) => { return from.Equals(to); };
             Func<IShopify_Prices, IShopify_Prices, bool> fEquals_Prices = (from, to) => { return from.Equals(to); };
             Func<IShopify_Quantities, IShopify_Quantities, bool> fEquals_Quantities = (from, to) => { return from.Equals(to); };
@@ -468,80 +491,6 @@ namespace cmArt.Shopify.App
             logger.LogInformation($"Saving ChangedRecords_Product to file: {FileName}");
             File.WriteAllText(FileName, result);
 
-            #region logic and reporting from Colonial version
-            //// A: Get XRef from Account for AUnique,BankInfo pairs
-            //IEnumerable<QryAccount> accts = GetXRefFromSupplierRecords(config);
-
-            //// B: Attach BankInfo / wholesaler to Assembled Inventory to make InvAss, wholesaler pairs
-            ////   GenericJoins service will do this
-            //IEnumerable<Tuple<IS5InvAssembled, QryAccount>> result = MakePairs(InvAss, accts);
-
-            //// C: create a facade to go from InvAss, wholesaler pairs to a data load format
-            //IEnumerable<AdaptToShopifyDataLoadFormat> adapters = result.Select(p =>
-            //{
-            //    AdaptToShopifyDataLoadFormat tmp = new AdaptToShopifyDataLoadFormat();
-            //    tmp.Init(new ValueTuple<IS5InvAssembled, QryAccount>(p.Item1, p.Item2));
-            //    return tmp;
-            //}
-            //);
-
-            //// At this point I believe I can focus on putting into CSV file. So implement ICopyable<T>
-            //IEnumerable<ShopifyDataLoadFormat> DataLoad = adapters.Select(a =>
-            //{
-            //    ShopifyDataLoadFormat tmp = new ShopifyDataLoadFormat();
-            //    tmp.CopyFrom(a); // .CopyFrom is from ICopyable
-            //    tmp.SupplierPartNumber = tmp.SupplierPartNumber.TrimEnd();
-            //    tmp.S5Orig_ListPrice = a.PriceSchedule1_MSRP;
-            //    tmp.S5Orig_MinPrice = a.PriceSchedule2_MinPrice;
-            //    tmp.S5Orig_WholesaleCost = a.WholesaleCost;
-            //    return tmp;
-            //});
-
-            //List<(IPriceFile IFrom, ICommonFields ITo)> pairs = new List<(IPriceFile, ICommonFields)>();
-            ////  - Assemble pairs of matching records that need to be updated from each other. 
-            ////      - DataLoadFormat is ICommonFields
-            ////      - BevNetRecords is IPriceFile
-            ////      - Join them together into pairs and perorm the update
-            //Func<ICommonFields, (string SupplierCode, string SupplierPart)> keyDataLoad = (common) =>
-            //{
-            //    return new ValueTuple<string, string>(common.SupplierCode.ToUpper(), common.SupplierPartNumber);
-            //};
-            //Func<IPriceFile, ValueTuple<string, string>> keyBevNet = (priceRecord) =>
-            //{
-            //    return new ValueTuple<string, string>(priceRecord.WHOLESALER.ToUpper(), priceRecord.PROD_ITEM);
-            //};
-
-            //IEnumerable<Tuple<IPriceFile, ICommonFields>> updatePairs
-            //    = GenericJoins<IPriceFile, ICommonFields, (string SupplierCode, string SupplierPart)>
-            //    .InnerJoin(BevNetRecords, DataLoad, keyBevNet, keyDataLoad);
-            //pairs = updatePairs.Select(p => new ValueTuple<IPriceFile, ICommonFields>(p.Item1, p.Item2)).ToList();
-
-            //foreach (var pair in pairs)
-            //{
-            //    PriceFileAdapter adapter = new PriceFileAdapter();
-            //    adapter.Init(pair.Item1);
-            //    pair.Item2.CopyFrom(adapter);
-            //}
-
-            //DataLoad = pairs.Select(p => (DataLoadFormat)p.Item2);
-
-            //// export the resulting data load object to CSV
-            //var engine = new FileHelperAsyncEngine<DataLoadFormat>();
-            //engine.HeaderText = "InvUnique, Cat, PartNumber, SupplierName, SupplierPartNumber, SupplierCode " +
-            //    ", WholesaleCost, PriceSchedule1_MSRP, PriceSchedule2_MinPrice, S5Orig_WholesaleCost" +
-            //    ", S5Orig_ListPrice, S5Orig_MinPrice, Change_WholesaleCost, Change_ListPrice, Change_MinPrice";
-            //using (engine.BeginWriteFile(config["Shopifyinfo:SourceDirectory"] + "S5InventoryDataLoad.csv"))
-            //{
-            //    foreach (var record in DataLoad)
-            //    {
-            //        record.Change_ListPrice = record.PriceSchedule1_MSRP - record.S5Orig_ListPrice;
-            //        record.Change_MinPrice = record.PriceSchedule2_MinPrice - record.S5Orig_MinPrice;
-            //        record.Change_WholesaleCost = record.WholesaleCost - record.S5Orig_WholesaleCost;
-            //        engine.WriteNext(record);
-            //    }
-            //}
-            #endregion logic and reporting from Colonial version
-
             Console.WriteLine("Done");
             Console.ReadKey();
         }
@@ -720,35 +669,6 @@ namespace cmArt.Shopify.App
             List<ShopifyDataLoadFormat> data = (List<ShopifyDataLoadFormat>)JsonSerializer.Deserialize(contents, typeof(List<ShopifyDataLoadFormat>));
             return data;
         }
-
-        //private static IEnumerable<Tuple<IS5InvAssembled, QryAccount>> MakePairs(IEnumerable<IS5InvAssembled> InvAss, IEnumerable<QryAccount> accts)
-        //{
-        //    Func<QryAccount, int> QryAccount_Index = (record) =>
-        //    {
-        //        return record.AUnique;
-        //    };
-
-        //    IEnumerable<Tuple<IS5InvAssembled, QryAccount>> result = GenericJoins<IS5InvAssembled, QryAccount, int>
-        //        .InnerJoin(InvAss, accts, IS5InvAssembled_Indexes.SupplierUnique_Key, QryAccount_Index);
-        //    return result;
-        //}
-        //private static IEnumerable<QryAccount> GetXRefFromSupplierRecords(IConfiguration config)
-        //{
-        //    // A: Get XRef from Account for AUnique,BankInfo pairs
-        //    QryAccountContext context = new QryAccountContext();
-        //    Options opt = OdbcOptions.GetOptions(config["Shopifyinfo:DSNinfo"]);
-        //    context.init(opt);
-
-        //    Func<QryAccount, QryAccount> clean = (acct) =>
-        //    {
-        //        acct.AName = acct.AName.TrimEnd();
-        //        acct.BankInfo = acct.BankInfo.TrimEnd();
-        //        return acct;
-        //    };
-
-        //    IEnumerable<QryAccount> records = context._Records.Select(r => clean(r));
-        //    return records;
-        //}
 
         private static IEnumerable<IS5InvAssembled> GetDataFromJson(IConfiguration config)
         {

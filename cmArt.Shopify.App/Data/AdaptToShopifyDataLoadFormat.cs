@@ -10,6 +10,10 @@ using cmArt.Reece.ShopifyConnector;
 
 namespace cmArt.Shopify.App.Data
 {
+    /// <summary>
+    /// Adapt to a common IShopifyDataLoadFormat comprised of IShopify_Product, IShopify_Prices, IShopify_Quantities, and more. The listed interfaces
+    /// match up to the 3 separate API data structures sent & received from Reece's Shopify API.
+    /// </summary>
     public class AdaptToShopifyDataLoadFormat : IShopifyDataLoadFormat
     {
         protected IS5InvAssembled _InvAss { get; set; }
