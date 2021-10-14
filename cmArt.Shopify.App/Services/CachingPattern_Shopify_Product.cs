@@ -10,14 +10,14 @@ using System.Text;
 
 namespace cmArt.Shopify.App.Services
 {
-    public class CachingPattern
+    public class CachingPattern_Shopify_Product
     {
         private string _RootName;
         private StaticSettings _Settings;
         private IEnumerable<Shopify_Product> prev;
         private const int _RecordsPerPage = 10000;
 
-        public CachingPattern(string RootName, StaticSettings settings)
+        public CachingPattern_Shopify_Product(string RootName, StaticSettings settings)
         {
             _Settings = settings;
             _RootName = RootName ?? string.Empty;

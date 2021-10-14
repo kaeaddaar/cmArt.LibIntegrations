@@ -56,6 +56,7 @@ namespace cmArt.Shopify.App
         private static bool PreventPrices;
         private static bool PreventQuantities;
         private static string[] _args;
+        private static bool RunAsSelfCompare;
         //SetupAndDisplaySettings()
         private static IConfiguration config;
         private static StaticSettings settings;
@@ -73,6 +74,8 @@ namespace cmArt.Shopify.App
         private static IEnumerable<IShopify_Quantities> quantities;
         //GetPrevDataLoadLists()
         private static IEnumerable<Shopify_Product> PrevDataLoad_Product;
+        private static IEnumerable<Shopify_Quantities> PrevDataLoad_Quantities;
+        private static IEnumerable<Shopify_Prices> PrevDataLoad_Prices;
 
 
         #endregion variables
@@ -84,25 +87,6 @@ namespace cmArt.Shopify.App
             serviceProvider = serviceCollection.BuildServiceProvider();
             logger = serviceProvider.GetService<ILogger<ShopifyConsoleApp>>();
 
-        }
-        private static void SetupArgs(string[] args)
-        {
-            _args = args ?? new string[] { };
-            _args = args.Select(c => c.ToUpper()).ToArray();
-
-            PreventApiAddsNEdits = _args.Contains("PREVENTADDSANDEDITS") || _args.Contains("PREVENTADDSNEDITS");
-            PreventProduct = !(_args.Contains("PRODUCTS") || _args.Contains("PRODUCT")) && _args.Count() > 0;
-            PreventPrices = !(_args.Contains("DISCOUNTS") || _args.Contains("DISCOUNT")) && _args.Count() > 0;
-            PreventQuantities = !(_args.Contains("INVENTORY") || _args.Contains("INVENTORYITEMS") || _args.Contains("INVENTORYITEM")) && _args.Count() > 0;
-
-            if (PreventApiAddsNEdits) { logger.LogInformation("PREVENTADDSANDEDITS or PREVENTADDSNEDITS found in arguments, adds and edits will be prevented"); }
-            if (PreventProduct) { logger.LogInformation("PRODUCTS or PRODUCT not found in arguments so we will prevent them from being sent to Shopify"); }
-            if (PreventPrices) { logger.LogInformation("DISCOUNTS or DISCOUNT not found in arguments so we will prevent them from being sent to Shopify"); }
-            if (PreventQuantities)
-            {
-                logger.LogInformation("INVENTORY or INVENTORYITEMS or INVENTORYITEM not found in arguments so we will prevent them from "
-+ "being sent to Shopify");
-            }
         }
         private static void SetupAndDisplaySettings()
         {
@@ -128,6 +112,26 @@ namespace cmArt.Shopify.App
             logger.LogInformation($"enableSSL: {settings.enableSSL}");
             logger.LogInformation($"fromemailaddress: {settings.fromemailaddress}");
             logger.LogInformation($"fromemailpassword: {settings.fromemailpassword}");
+        }
+        private static void SetupArgs(string[] args)
+        {
+            _args = args ?? new string[] { };
+            _args = args.Select(c => c.ToUpper()).ToArray();
+
+            PreventApiAddsNEdits = _args.Contains("PREVENTADDSANDEDITS") || _args.Contains("PREVENTADDSNEDITS");
+            PreventProduct = !(_args.Contains("PRODUCTS") || _args.Contains("PRODUCT")) && _args.Count() > 0;
+            PreventPrices = !(_args.Contains("DISCOUNTS") || _args.Contains("DISCOUNT")) && _args.Count() > 0;
+            PreventQuantities = !(_args.Contains("INVENTORY") || _args.Contains("INVENTORYITEMS") || _args.Contains("INVENTORYITEM")) && _args.Count() > 0;
+
+            if (PreventApiAddsNEdits) { logger.LogInformation("PREVENTADDSANDEDITS or PREVENTADDSNEDITS found in arguments, adds and edits will be prevented"); }
+            if (PreventProduct) { logger.LogInformation("PRODUCTS or PRODUCT not found in arguments so we will prevent them from being sent to Shopify"); }
+            if (PreventPrices) { logger.LogInformation("DISCOUNTS or DISCOUNT not found in arguments so we will prevent them from being sent to Shopify"); }
+            if (PreventQuantities)
+            {
+                logger.LogInformation("INVENTORY or INVENTORYITEMS or INVENTORYITEM not found in arguments so we will prevent them from "
++ "being sent to Shopify");
+            }
+            RunAsSelfCompare = (settings.RunAs == "SELFCOMPARE");
         }
         private static void GetSystem5Data()
         {
@@ -191,17 +195,26 @@ namespace cmArt.Shopify.App
         }
         private static void GetPrevDataLoadListsAndOverwrite()
         {
-            CachingPattern cache = new CachingPattern("PocoProductAdapted", settings);
-            PrevDataLoad_Product = cache._01_GetPrev();
-            cache._02_SaveNewestToCache(PocoProductsAdapted);
+            CachingPattern_Shopify_Product cacheShopify_Product = new CachingPattern_Shopify_Product("PocoProductsAdapted", settings);
+            PrevDataLoad_Product = cacheShopify_Product._01_GetPrev();
+            cacheShopify_Product._02_SaveNewestToCache(PocoProductsAdapted);
+
+            CachingPattern_Shopify_Quantities cacheShopify_Quantities = new CachingPattern_Shopify_Quantities("PocoQuantitiesAdapted", settings);
+            PrevDataLoad_Quantities = cacheShopify_Quantities._01_GetPrev();
+            cacheShopify_Quantities._02_SaveNewestToCache(PocoQuantitiesAdapted);
+
+            CachingPattern_Shopify_Prices cacheShopify_Prices = new CachingPattern_Shopify_Prices("PocoPricesAdapted", settings);
+            PrevDataLoad_Prices = cacheShopify_Prices._01_GetPrev();
+            cacheShopify_Prices._02_SaveNewestToCache(PocoPricesAdapted);
         }
         public static void Main_Console(string[] args)
         {
             SetupLogging();
             logger.LogInformation("Begin");
-            SetupArgs(args);
 
             SetupAndDisplaySettings();
+
+            SetupArgs(args);
 
             logger.LogInformation("Loading Inventory From System Five");
 
