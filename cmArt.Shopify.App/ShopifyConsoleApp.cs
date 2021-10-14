@@ -76,7 +76,22 @@ namespace cmArt.Shopify.App
         private static IEnumerable<Shopify_Product> PrevDataLoad_Product;
         private static IEnumerable<Shopify_Quantities> PrevDataLoad_Quantities;
         private static IEnumerable<Shopify_Prices> PrevDataLoad_Prices;
-
+        //GetShopifyData()
+        private static Func<IShopifyDataLoadFormat, IShopifyDataLoadFormat, bool> fEquals = (from, to) => { return from.Equals(to); };
+        private static Func<IShopify_Prices, IShopify_Prices, bool> fEquals_Prices = (from, to) => { return from.Equals(to); };
+        private static Func<IShopify_Quantities, IShopify_Quantities, bool> fEquals_Quantities = (from, to) => { return from.Equals(to); };
+        private static Func<IShopify_Product, IShopify_Product, bool> fEquals_Product = (from, to) => { return from.Equals(to); };
+        //GetShopifyData_Reece_Products()
+        private static IEnumerable<Shopify_Product> API_Products;
+        private static IEnumerable<IShopify_Prices> jp;
+        private static IEnumerable<IShopify_Quantities> jq;
+        //GetShopifyData_Reece_Prices()
+        private static Func<IShopify_Product, string> fGetProductPartNumber;
+        private static Func<IShopify_Prices, string> fGetPricesPartNumber;
+        //GetChangedRecords()
+        private static IEnumerable<IShopify_Product> ChangedRecords_Product;
+        private static IEnumerable<IShopify_Prices> ChangedRecords_Prices;
+        private static IEnumerable<IShopify_Quantities> ChangedRecords_Quantities;
 
         #endregion variables
 
@@ -112,6 +127,7 @@ namespace cmArt.Shopify.App
             logger.LogInformation($"enableSSL: {settings.enableSSL}");
             logger.LogInformation($"fromemailaddress: {settings.fromemailaddress}");
             logger.LogInformation($"fromemailpassword: {settings.fromemailpassword}");
+            logger.LogInformation($"RunAs: {settings.RunAs}");
         }
         private static void SetupArgs(string[] args)
         {
@@ -206,43 +222,15 @@ namespace cmArt.Shopify.App
             CachingPattern_Shopify_Prices cacheShopify_Prices = new CachingPattern_Shopify_Prices("PocoPricesAdapted", settings);
             PrevDataLoad_Prices = cacheShopify_Prices._01_GetPrev();
             cacheShopify_Prices._02_SaveNewestToCache(PocoPricesAdapted);
+
+            API_Products = PrevDataLoad_Product;
+            jp = PrevDataLoad_Prices;
+            jq = PrevDataLoad_Quantities;
         }
-        public static void Main_Console(string[] args)
+        private static void GetShopifyData_Reece_Products()
         {
-            SetupLogging();
-            logger.LogInformation("Begin");
-
-            SetupAndDisplaySettings();
-
-            SetupArgs(args);
-
-            logger.LogInformation("Loading Inventory From System Five");
-
-            GetSystem5Data();
-
-            FilterForECommAndSave();
-
-            CreateDataLoadLists();
-
-            GetPrevDataLoadListsAndOverwrite();
-            
-            Func<IShopifyDataLoadFormat, IShopifyDataLoadFormat, bool> fEquals = (from, to) => { return from.Equals(to); };
-            Func<IShopify_Prices, IShopify_Prices, bool> fEquals_Prices = (from, to) => { return from.Equals(to); };
-            Func<IShopify_Quantities, IShopify_Quantities, bool> fEquals_Quantities = (from, to) => { return from.Equals(to); };
-            Func<IShopify_Product, IShopify_Product, bool> fEquals_Product = (from, to) => { return from.Equals(to); };
-
-            // Direct from Shopify
-            if (false)
-            {
-                logger.LogInformation("Get Products directly from Shopify");
-                List<Product_Product> all = cmShopify.GetAllShopifyRecords().ToList();
-                string strProducts = System.Text.Json.JsonSerializer.Serialize(all, typeof(List<Product_Product>));
-                IEnumerable<ProductAdapter> AllProduct = all.Select(prod => { ProductAdapter pa = new ProductAdapter(); pa.Init(prod); return pa; });
-            }
-
-            #region Reece Products
             logger.LogInformation("Get Products using Reece's API");
-            IEnumerable<Shopify_Product> API_Products = new List<Shopify_Product>();
+            API_Products = new List<Shopify_Product>();
             try
             {
                 API_Products = ReeceShopify.GetAllShopify_Products();
@@ -262,11 +250,9 @@ namespace cmArt.Shopify.App
                 logger.LogInformation($"Failed to get All shopify products from Custom API. Message = \"{e.Message}\"");
                 Console.ReadKey();
             }
-            IEnumerable<IShopify_Product> ChangedRecords_Product = UpdateProcessPattern<IShopify_Product, Shopify_Product, int>
-                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Product, adapters, API_Products);
-            #endregion Reece Products
-
-            #region Reece Prices
+        }
+        private static void GetShopifyData_Reece_Prices()
+        {
             logger.LogInformation("Get Prices using Reece's API");
             IEnumerable<tmpShopify_Prices> tmpPrices = new List<tmpShopify_Prices>();
             try
@@ -290,24 +276,23 @@ namespace cmArt.Shopify.App
                 Console.ReadKey();
             }
             IEnumerable<IShopify_Prices> MissingInfoPrices = tmpPrices.Select(p => p.AsShopify_Prices());
-            Func<IShopify_Product, string> fGetProductPartNumber = (sp) => { return sp.PartNumber.TrimEnd(); };
-            Func<IShopify_Prices, string> fGetPricesPartNumber = (sp) => { return sp.PartNumber.TrimEnd(); };
+            fGetProductPartNumber = (sp) => { return sp.PartNumber.TrimEnd(); };
+            fGetPricesPartNumber = (sp) => { return sp.PartNumber.TrimEnd(); };
 
             IEnumerable<Tuple<Shopify_Product, IShopify_Prices>> joined_prices =
                 GenericJoins<Shopify_Product, IShopify_Prices, string>.LeftJoin(API_Products, MissingInfoPrices, fGetProductPartNumber, fGetPricesPartNumber);
 
-            IEnumerable<IShopify_Prices> jp = joined_prices.Where(p => p.Item2 != null).Select(p =>
+            jp = joined_prices.Where(p => p.Item2 != null).Select(p =>
             {
                 p.Item2.InvUnique = p.Item1.InvUnique;
                 p.Item2.Cat = p.Item1.Cat;
                 p.Item2.WholesaleCost = Math.Round(p.Item1.WholesaleCost, 6);
                 return p.Item2;
             });
-            IEnumerable<IShopify_Prices> ChangedRecords_Prices = UpdateProcessPattern<IShopify_Prices, Shopify_Prices, int>
-                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Prices, adapters, jp);
-            #endregion Reece Prices
 
-            #region Reece Quantities
+        }
+        private static void GetShopifyData_Reece_Quantities()
+        {
             logger.LogInformation("Get Quantities from Reece's API");
             //IEnumerable<IShopify_Quantities> API_Quantities = ReeceShopify.GetAllShopify_Quantities();
             IEnumerable<tmpShopify_Quantities> tmpApi_Quantities = new List<tmpShopify_Quantities>();
@@ -336,15 +321,77 @@ namespace cmArt.Shopify.App
 
             IEnumerable<Tuple<IShopify_Product, IShopify_Quantities>> joined_quantities =
                 GenericJoins<IShopify_Product, IShopify_Quantities, string>.LeftJoin(API_Products, MissingInfoQuantities, fGetProductPartNumber, fGetQuantitiesPartNumber);
-            IEnumerable<IShopify_Quantities> jq = joined_quantities.Where(p => p.Item2 != null).Select(p =>
+            jq = joined_quantities.Where(p => p.Item2 != null).Select(p =>
             {
                 p.Item2.InvUnique = p.Item1.InvUnique;
                 p.Item2.Cat = p.Item1.Cat;
                 return p.Item2;
             });
-            IEnumerable<IShopify_Quantities> ChangedRecords_Quantities = UpdateProcessPattern<IShopify_Quantities, Shopify_Quantities, int>
+        }
+        private static void GetShopifyData()
+        {
+            GetShopifyData_Reece_Products();
+            GetShopifyData_Reece_Prices();
+            GetShopifyData_Reece_Quantities();
+        }
+        private static void GetEqualityFunctions()
+        {
+            fEquals = (from, to) => { return from.Equals(to); };
+            fEquals_Prices = (from, to) => { return from.Equals(to); };
+            fEquals_Quantities = (from, to) => { return from.Equals(to); };
+            fEquals_Product = (from, to) => { return from.Equals(to); };
+        }
+        private static void GetChangedRecords()
+        {
+            ChangedRecords_Product = UpdateProcessPattern<IShopify_Product, Shopify_Product, int>
+                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Product, adapters, API_Products);
+
+            ChangedRecords_Prices = UpdateProcessPattern<IShopify_Prices, Shopify_Prices, int>
+                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Prices, adapters, jp);
+
+            ChangedRecords_Quantities = UpdateProcessPattern<IShopify_Quantities, Shopify_Quantities, int>
                 .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Quantities, adapters, jq);
-            #endregion Reece Quantities
+        }
+        public static void Main_Console(string[] args)
+        {
+            SetupLogging();
+            logger.LogInformation("Begin");
+
+            SetupAndDisplaySettings();
+
+            SetupArgs(args);
+
+            logger.LogInformation("Loading Inventory From System Five");
+
+            GetSystem5Data();
+
+            FilterForECommAndSave();
+
+            CreateDataLoadLists();
+
+
+            GetEqualityFunctions();
+
+            if (RunAsSelfCompare)
+            {
+                GetPrevDataLoadListsAndOverwrite();
+            }
+            else
+            {
+                GetShopifyData();
+            }
+
+            GetChangedRecords();
+
+            // Direct from Shopify
+            if (false)
+            {
+                logger.LogInformation("Get Products directly from Shopify");
+                List<Product_Product> all = cmShopify.GetAllShopifyRecords().ToList();
+                string strProducts = System.Text.Json.JsonSerializer.Serialize(all, typeof(List<Product_Product>));
+                IEnumerable<ProductAdapter> AllProduct = all.Select(prod => { ProductAdapter pa = new ProductAdapter(); pa.Init(prod); return pa; });
+            }
+
 
             #region Perform Edits
             logger.LogInformation("Begin Performing Edits");
