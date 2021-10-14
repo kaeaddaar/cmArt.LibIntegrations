@@ -8,7 +8,8 @@ namespace cmArt.Reece.ShopifyConnector
     {
         public static short Department(S5QtyPair pair)
         {
-            return pair.Location;
+            S5QtyPair _pair = pair ?? new S5QtyPair(-1, 0);
+            return _pair.Location;
         }
     }
 }

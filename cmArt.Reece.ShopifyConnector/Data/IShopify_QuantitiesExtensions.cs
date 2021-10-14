@@ -30,6 +30,10 @@ namespace cmArt.Reece.ShopifyConnector
                         .FullOuterJoin(LeftRecords: compareTo.Quantities, RightRecords: compareTo.Quantities, LeftKey: S5QtyPairIndexes.Department, RightKey: S5QtyPairIndexes.Department);
                     foreach (var QtyPair in QtyPairs)
                     {
+                        if (QtyPair.Item1 == null || QtyPair.Item2 == null)
+                        {
+                            return false;
+                        }
                         if (QtyPair.Item1.Qty != QtyPair.Item2.Qty)
                         {
                             return false;
