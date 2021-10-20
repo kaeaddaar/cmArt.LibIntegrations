@@ -1,6 +1,7 @@
 ﻿using cmArt.LibIntegrations.OdbcService;
 using cmArt.LibIntegrations.PagedJsonService;
 using cmArt.LibIntegrations.SerializationService;
+using cmArt.WebJaguar.App.Data;
 using cmArt.WebJaguar.Connector;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -15,7 +16,7 @@ namespace cmArt.WebJaguar.App.Services
     {
         private string _RootName;
         private StaticSettings _Settings;
-        private IEnumerable<Product_Root> prev;
+        private IEnumerable<S5_CommonFields> prev;
         private const int _RecordsPerPage = 10000;
 
         public CachingPattern(string RootName, StaticSettings settings)
@@ -25,16 +26,16 @@ namespace cmArt.WebJaguar.App.Services
             if (_RootName.Count() < 1) { throw new Exception("RootName must have at least 1 character."); }
         }
 
-        public IEnumerable<Product_Root> _01_GetPrev()
+        public IEnumerable<S5_CommonFields> _01_GetPrev()
         {
-            prev = GenericSerialization<Product_Root>.ReadOrDeserializeTable
+            prev = GenericSerialization<S5_CommonFields>.ReadOrDeserializeTable
                 (_RootName, _Settings.CachedFiles, _RecordsPerPage);
-            return prev ?? new List<Product_Root>();
+            return prev ?? new List<S5_CommonFields>();
         }
-        public void _02_SaveNewestToCache(IEnumerable<Product_Root> curr)
+        public void _02_SaveNewestToCache(IEnumerable<S5_CommonFields> curr)
         {
-            curr = curr ?? new List<Product_Root>();
-            GenericSerialization<Product_Root>.SerializeToJSON(curr.ToList(), _RootName, _Settings.CachedFiles, _RecordsPerPage);
+            curr = curr ?? new List<S5_CommonFields>();
+            GenericSerialization<S5_CommonFields>.SerializeToJSON(curr.ToList(), _RootName, _Settings.CachedFiles, _RecordsPerPage);
         }
 
     }

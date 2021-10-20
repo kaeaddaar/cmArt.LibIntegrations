@@ -11,17 +11,19 @@ namespace cmArt.LibIntegrations.ApiCallerService
 {
     public class ApiCallerBase
     {
-        public ApiConnectorData ApiConnectorData { get; set; }
+        public ApiConnectorData _ApiConnectorData { get; set; }
         public ApiCallerBase()
         {
             init(new ApiConnectorData());
         }
         public void init(ApiConnectorData data)
         {
-            ApiConnectorData = data ?? new ApiConnectorData();
+            _ApiConnectorData = data ?? new ApiConnectorData();
         }
-        private string MapApiPostCall_Unsecured(string urlCommand, string content, Func<string, int> MakeLogEntry)
+        protected string MapApiPostCall_Unsecured(ApiCallData data, Func<string, int> MakeLogEntry)
         {
+            string urlCommand = data.UrlCommand;
+            string content = data.Body;
             try
             {
                 MakeLogEntry("urlCommand: " + urlCommand);
@@ -41,7 +43,7 @@ namespace cmArt.LibIntegrations.ApiCallerService
             Console.WriteLine("content: " + content);
             HttpClient client = new HttpClient();
 
-            Uri baseUri = new Uri(ApiConnectorData.Url + urlCommand);
+            Uri baseUri = new Uri(_ApiConnectorData.Url + urlCommand);
             client.BaseAddress = baseUri;
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.ConnectionClose = true;
@@ -71,7 +73,7 @@ namespace cmArt.LibIntegrations.ApiCallerService
             HttpClient client = new HttpClient();
             client.Timeout = TimeSpan.FromMinutes(10); // 1000 tics per second * 60 Seconds is a minute * 10 is 10 minutes
 
-            Uri baseUri = new Uri(ApiConnectorData.Url + urlCommand);
+            Uri baseUri = new Uri(_ApiConnectorData.Url + urlCommand);
             client.BaseAddress = baseUri;
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.ConnectionClose = true;
@@ -98,7 +100,7 @@ namespace cmArt.LibIntegrations.ApiCallerService
         {
             HttpClient client = new HttpClient();
 
-            Uri baseUri = new Uri(ApiConnectorData.Url + urlCommand);
+            Uri baseUri = new Uri(_ApiConnectorData.Url + urlCommand);
             client.BaseAddress = baseUri;
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.ConnectionClose = true;

@@ -17,10 +17,10 @@ namespace cmArt.System5.Inventory
         )
         {
             _Inv = Inv;
-            _Price_PerInventry_27 = Price_PerInventry_27;
-            _Stok_PerInventry_27 = Stok_PerInventry_27;
-            _Comments_PerInventry_27 = Comments_PerInventry_27;
-            _AltSuply_PerInventry_27 = AltSuply_PerInventry_27;
+            _Price_PerInventry_27 = Price_PerInventry_27 ?? new List<IInvPrice>();
+            _Stok_PerInventry_27 = Stok_PerInventry_27 ?? new List<IStok>();
+            _Comments_PerInventry_27 = Comments_PerInventry_27 ?? new List<IComments>();
+            _AltSuply_PerInventry_27 = AltSuply_PerInventry_27 ?? new List<IAltSuply>();
         }
 
         private IEnumerable<IAltSuply> _AltSuply_PerInventry_27;

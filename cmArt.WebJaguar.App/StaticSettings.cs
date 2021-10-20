@@ -27,7 +27,9 @@ namespace cmArt.WebJaguar.App
             enableSSL = config[$"{prefix}enableSSL"] ?? string.Empty;
             fromemailaddress = config[$"{prefix}fromemailaddress"] ?? string.Empty;
             fromemailpassword = config[$"{prefix}fromemailpassword"] ?? string.Empty;
+            RunAs = config[$"{prefix}RunAs"] ?? string.Empty;
         }
+        public string RunAs { get; } // SYNC, or SELFCOMPARE
         public string CachedFiles { get; }
         public string CSVFiles { get; }
         public string OutputDirectory { get; }
