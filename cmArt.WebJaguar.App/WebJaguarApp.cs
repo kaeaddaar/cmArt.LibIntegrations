@@ -81,6 +81,12 @@ namespace cmArt.WebJaguar.App
         private static Func<IProduct_Root, string> fGetProductPartNumber;
         //GetChangedRecords()
         private static IEnumerable<IS5_CommonFields_In_WJ> ChangedRecords_Product;
+        //PerformEdits()
+        private static IEnumerable<S5_CommonFields> changedProducts;
+        private static IEnumerable<Product_Root> WJ_WithChanges;
+        //GetNewRecords()
+        private static IEnumerable<Tuple<IS5_CommonFields_In_WJ, IS5_CommonFields_In_WJ>> NewProductsPairs;
+        private static IEnumerable<S5_CommonFields> NewProducts;
 
         #endregion variables
 
@@ -236,26 +242,82 @@ namespace cmArt.WebJaguar.App
             ChangedRecords_Product = UpdateProcessPattern<IS5_CommonFields_In_WJ, S5_CommonFields, int>
                 .GetChangedRecords(IS5_CommonFields_In_WJ_Indexes.UniqueId, fEquals, adaptersS5, API_Products);
         }
+        private static void PerformEdits()
+        {
+            logger.LogInformation("Begin Performing Edits");
+            changedProducts = new List<S5_CommonFields>();
+            // Get original Product Records from Shopify with Changes
+            WJ_WithChanges = ChangedRecords_Product.Select(p => (Product_Root)p);
+            WebJaguarConnector apiWJ = new WebJaguarConnector();
+            if (!PreventApiAddsNEdits)
+            {
+                changedProducts = ChangedRecords_Product.Select(p => p.AsS5_CommonFields());
+                string Product_Edit_Results = string.Empty;
+                if (!PreventProduct)
+                {
+                    logger.LogInformation("Performing Edits on Changed Products");
+                    logger.LogInformation($"Number of Changed Products: {changedProducts.Count()}");
+                    //Product_Edit_Results = apiWJ.Products_Edit(changedProducts);
+                    Product_Edit_Results = apiWJ.Products_Edit(WJ_WithChanges); // uses changes converted back to Product_Root (if it works)
+                    string FileNameChangedProducts = settings.OutputDirectory + "\\changedProducts.json.txt";
+                    string content = System.Text.Json.JsonSerializer.Serialize(changedProducts.ToList(), typeof(List<Product_Root>));
+                    System.IO.File.WriteAllText(FileNameChangedProducts, content);
+                }
+                else { logger.LogInformation("Preventing edits on changed products"); }
+            }
+            else
+            {
+                logger.LogInformation("All Perform Edits Supressed due to Settings");
+            }
+        }
+        private static void GetNewRecords()
+        {
+            NewProductsPairs = new List<Tuple<IS5_CommonFields_In_WJ, IS5_CommonFields_In_WJ>>();
+
+            NewProductsPairs = GenericJoins<IS5_CommonFields_In_WJ, IS5_CommonFields_In_WJ, int>
+            .LeftJoin(adaptersS5, API_Products, IS5_CommonFields_In_WJ_Indexes.UniqueId, IS5_CommonFields_In_WJ_Indexes.UniqueId);
+            NewProducts = NewProductsPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsS5_CommonFields());
+            // convert CommonFields to Product_Root filling using default content
+
+        }
+        private static void PerformAdds()
+        {
+            logger.LogInformation("Begin Perform Adds");
+            if (!PreventApiAddsNEdits)
+            {
+                if (!PreventProduct)
+                {
+                    logger.LogInformation("Performing Products_Add on NewProducts");
+                    logger.LogInformation($"Number of records in NewProducts: {NewProducts.Count()}");
+                    WebJaguarConnector apiWJ = new WebJaguarConnector();
+                    
+                    string Product_Add_Results = apiWJ.Products_Add(NewProducts);
+                }
+                else { logger.LogInformation("Prevented adding of NewProducts"); }
+            }
+            try
+            {
+                string FileNameNewProducts = settings.OutputDirectory + "\\NewProducts.json.txt";
+                logger.LogInformation($"Saving NewProducts to file: {FileNameNewProducts}");
+                string content = System.Text.Json.JsonSerializer.Serialize(NewProducts.ToList(), typeof(List<S5_CommonFields>));
+                System.IO.File.WriteAllText(FileNameNewProducts, content);
+            }
+            catch (Exception e)
+            {
+                logger.LogInformation("Error serializing and saving new products to file. Message: " + e.Message);
+            }
+        }
         public static void Main_Console(string[] args)
         {
             SetupLogging();
             logger.LogInformation("Begin");
-
             SetupAndDisplaySettings();
-
             SetupArgs(args);
-
             logger.LogInformation("Loading Inventory From System Five");
-
             GetSystem5Data();
-
             FilterForECommAndSave();
-
             CreateDataLoadLists();
-
-
             GetEqualityFunctions();
-
             if (RunAsSelfCompare)
             {
                 GetPrevDataLoadListsAndOverwrite();
@@ -264,144 +326,11 @@ namespace cmArt.WebJaguar.App
             {
                 GetWebJaguarData_Product_Root();
             }
-
             GetChangedRecords();
+            PerformEdits();
+            GetNewRecords();
+            PerformAdds();
 
-            #region Perform Edits
-            logger.LogInformation("Begin Performing Edits");
-            IEnumerable<Shopify_Product> changedProducts = new List<Shopify_Product>();
-            IEnumerable<Shopify_Prices> changedPrices = new List<Shopify_Prices>();
-            IEnumerable<Shopify_Quantities> changedQuantities = new List<Shopify_Quantities>();
-            if (!PreventApiAddsNEdits)
-            {
-                changedProducts = ChangedRecords_Product.Select(p => p.AsShopify_Product());
-                string Product_Edit_Results = string.Empty;
-                if (!PreventProduct)
-                {
-                    logger.LogInformation("Performing Edits on Changed Products");
-                    logger.LogInformation($"Number of Changed Products: {changedProducts.Count()}");
-                    Product_Edit_Results = ReeceShopify.Products_Edit(changedProducts);
-                    string FileNameChangedProducts = settings.OutputDirectory + "\\changedProducts.json.txt";
-                    string content = System.Text.Json.JsonSerializer.Serialize(changedProducts.ToList(), typeof(List<Shopify_Product>));
-                    System.IO.File.WriteAllText(FileNameChangedProducts, content);
-                }
-                else { logger.LogInformation("Preventing edits on changed products"); }
-
-                changedPrices = ChangedRecords_Prices.Select(p => p.AsShopify_Prices());
-                string Prices_Edit_Results = string.Empty;
-                if (!PreventPrices)
-                {
-                    logger.LogInformation("Performing Edits on Changed Prices");
-                    logger.LogInformation($"Number of Changed Prices {changedPrices.Count()}");
-                    Prices_Edit_Results = ReeceShopify.Prices_Edit(changedPrices);
-                    string FileNameChangedPrices = settings.OutputDirectory + "\\changedPrices.json.txt";
-                    string content = System.Text.Json.JsonSerializer.Serialize(changedPrices.ToList(), typeof(List<Shopify_Prices>));
-                    System.IO.File.WriteAllText(FileNameChangedPrices, content);
-                }
-                else { logger.LogInformation("Preventing edits on changed prices"); }
-
-                changedQuantities = ChangedRecords_Quantities.Select(p => p.AsShopify_Quantities());
-                string Quantities_Edit_Results = string.Empty;
-                if (!PreventQuantities)
-                {
-                    logger.LogInformation("Performing Edits on Changed Quantities");
-                    logger.LogInformation($"Number of Changed Quantities: {changedQuantities.Count()}");
-                    Quantities_Edit_Results = ReeceShopify.Quantities_Edit(changedQuantities);
-                    string FileNameChangedQuantities = settings.OutputDirectory + "\\changedQuantities.json.txt";
-                    string content = System.Text.Json.JsonSerializer.Serialize(changedQuantities.ToList(), typeof(List<Shopify_Quantities>));
-                    System.IO.File.WriteAllText(FileNameChangedQuantities, content);
-                }
-                else { logger.LogInformation("Preventing edits on changed quantities"); }
-
-            }
-            else
-            {
-                logger.LogInformation("All Perform Edits Supressed due to Settings");
-            }
-            #endregion Perform Edits
-
-            #region Perform Adds
-            logger.LogInformation("Begin Perform Adds");
-            IEnumerable<Tuple<IShopify_Product, IShopify_Product>> NewProductsPairs = new List<Tuple<IShopify_Product, IShopify_Product>>();
-            IEnumerable<Tuple<IShopify_Prices, IShopify_Prices>> NewPricesPairs = new List<Tuple<IShopify_Prices, IShopify_Prices>>();
-            IEnumerable<Tuple<IShopify_Quantities, IShopify_Quantities>> NewQuantitiesPairs = new List<Tuple<IShopify_Quantities, IShopify_Quantities>>();
-
-            //API_Products, jp, jq
-            NewProductsPairs = GenericJoins<IShopify_Product, IShopify_Product, int>
-            .LeftJoin(adapters, API_Products, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
-            IEnumerable<Shopify_Product> NewProducts = NewProductsPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsShopify_Product());
-            if (!PreventApiAddsNEdits)
-            {
-                if (!PreventProduct)
-                {
-                    logger.LogInformation("Performing Products_Add on NewProducts");
-                    logger.LogInformation($"Number of records in NewProducts: {NewProducts.Count()}");
-                    string Product_Add_Results = ReeceShopify.Products_Add(NewProducts);
-                }
-                else { logger.LogInformation("Prevented adding of NewProducts"); }
-            }
-            try
-            {
-                string FileNameNewProducts = settings.OutputDirectory + "\\NewProducts.json.txt";
-                logger.LogInformation($"Saving NewProducts to file: {FileNameNewProducts}");
-                string content = System.Text.Json.JsonSerializer.Serialize(NewProducts.ToList(), typeof(List<Shopify_Product>));
-                System.IO.File.WriteAllText(FileNameNewProducts, content);
-            }
-            catch (Exception e)
-            {
-                logger.LogInformation("Error serializing and saving new products to file. Message: " + e.Message);
-            }
-
-            NewPricesPairs = GenericJoins<IShopify_Prices, IShopify_Prices, int>
-                .LeftJoin(adapters, jp, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
-            IEnumerable<Shopify_Prices> NewPrices = NewPricesPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsShopify_Prices());
-            if (!PreventApiAddsNEdits)
-            {
-                if (!PreventPrices)
-                {
-                    logger.LogInformation("Performing Prices_Add on NewPrices");
-                    logger.LogInformation($"Number of records in NewPrices: {NewPrices.Count()}");
-                    string Prices_Add_Results = ReeceShopify.Prices_Add(NewPrices);
-                }
-                else { logger.LogInformation("Prevented adding of NewPrices"); }
-            }
-            try
-            {
-                string FileNameNewPrices = settings.OutputDirectory + "\\NewPrices.json.txt";
-                logger.LogInformation($"Saving NewPrices to file: {FileNameNewPrices}");
-                string content = System.Text.Json.JsonSerializer.Serialize(NewPrices.ToList(), typeof(List<Shopify_Prices>));
-                System.IO.File.WriteAllText(FileNameNewPrices, content);
-            }
-            catch (Exception e)
-            {
-                logger.LogInformation("Error serializing and saving new prices to file. Message: " + e.Message);
-            }
-
-            NewQuantitiesPairs = GenericJoins<IShopify_Quantities, IShopify_Quantities, int>
-                .LeftJoin(adapters, jq, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
-            IEnumerable<Shopify_Quantities> NewQuantities = NewQuantitiesPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsShopify_Quantities());
-            if (!PreventApiAddsNEdits)
-            {
-                if (!PreventQuantities)
-                {
-                    logger.LogInformation("Performing Quantities_Add on NewQuantities");
-                    logger.LogInformation($"Number of records in NewQuantities: {NewQuantities.Count()}");
-                    string Quantities_Add_Results = ReeceShopify.Quantities_Add(NewQuantities);
-                }
-                else { logger.LogInformation("Prevented addinf of NewQuantities"); }
-            }
-            try
-            {
-                string FileNameNewQuantities = settings.OutputDirectory + "\\NewQuantities.json.txt";
-                logger.LogInformation($"Saving NewQuantities to file: {FileNameNewQuantities}");
-                string content = System.Text.Json.JsonSerializer.Serialize(NewQuantities.ToList(), typeof(List<Shopify_Quantities>));
-                System.IO.File.WriteAllText(FileNameNewQuantities, content);
-            }
-            catch (Exception e)
-            {
-                logger.LogInformation("Error serializing and saving new quantities to file. Message: " + e.Message);
-            }
-            #endregion Perform Adds
 
             // ----- Reporting goes here -----
 

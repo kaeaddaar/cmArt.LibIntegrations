@@ -20,6 +20,46 @@ namespace cmArt.LibIntegrations.ApiCallerService
         {
             _ApiConnectorData = data ?? new ApiConnectorData();
         }
+        protected string MakeApiPostCall(ApiCallData data, Func<string, int> MakeLogEntry)
+        {
+            string urlCommand = data.UrlCommand;
+            string content = data.Body;
+            try
+            {
+                MakeLogEntry("urlCommand: " + urlCommand);
+                MakeLogEntry("content: " + content);
+            }
+            catch (Exception e)
+            {
+                return "Error in MapApiPostCall_Unsecured while trying to MakeLogEntry. Message: " + e.Message;
+            }
+
+            HttpClient client = new HttpClient();
+
+            Uri baseUri = new Uri(_ApiConnectorData.Url + urlCommand);
+            client.BaseAddress = baseUri;
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.ConnectionClose = true;
+
+            string clientId = _ApiConnectorData.UserName;
+            string clientSecret = _ApiConnectorData.Password;
+
+            var authenticationString = $"{clientId}:{clientSecret}";
+            var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, baseUri);
+            requestMessage.Content = new StringContent(content);
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+            //requestMessage.Content = content;
+
+            //make the request
+            var task = client.SendAsync(requestMessage);
+            var response = task.Result;
+            response.EnsureSuccessStatusCode();
+            string responseBody = response.Content.ReadAsStringAsync().Result;
+
+            return responseBody;
+        }
         protected string MapApiPostCall_Unsecured(ApiCallData data, Func<string, int> MakeLogEntry)
         {
             string urlCommand = data.UrlCommand;
@@ -31,13 +71,13 @@ namespace cmArt.LibIntegrations.ApiCallerService
             }
             catch (Exception e)
             {
-                return "Error in MapApiPostCall_Unsecured. Message: " + e.Message;
+                return "Error in MapApiPostCall_Unsecured while trying to MakeLogEntry. Message: " + e.Message;
             }
             string results = MakeApiPostCall_Unsecured(urlCommand, content);
             MakeLogEntry("results: " + results);
             return results;
         }
-        private string MakeApiPostCall_Unsecured(string urlCommand, string content)
+        protected string MakeApiPostCall_Unsecured(string urlCommand, string content)
         {
             Console.WriteLine("urlCommand: " + urlCommand);
             Console.WriteLine("content: " + content);
@@ -68,7 +108,7 @@ namespace cmArt.LibIntegrations.ApiCallerService
             return responseBody;
         }
 
-        private string MakeApiGetCall_Unsecured(string urlCommand)
+        protected string MakeApiGetCall_Unsecured(string urlCommand)
         {
             HttpClient client = new HttpClient();
             client.Timeout = TimeSpan.FromMinutes(10); // 1000 tics per second * 60 Seconds is a minute * 10 is 10 minutes
@@ -96,7 +136,7 @@ namespace cmArt.LibIntegrations.ApiCallerService
 
             return responseBody;
         }
-        private string MakeApiGetCall(string urlCommand)
+        protected string MakeApiGetCall(string urlCommand)
         {
             HttpClient client = new HttpClient();
 
