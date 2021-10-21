@@ -7,6 +7,11 @@ namespace cmArt.WebJaguar.Connector
     public class Product_Root : IProduct_Root
     {
         public List<int> supplierIds { get; set; }
+        public Product_PrimaryLocation primaryLocation { get; set; }
+        public List<int> catIds { get; set; }
+        public List<Product_Price> price { get; set; }
+        public List<Product_RegionProductMapping> regionProductMapping { get; set; }
+        public List<KitPart> kitParts { get; set; }
         public string name { get; set; }
         public string sku { get; set; }
         public string note { get; set; }
@@ -23,7 +28,6 @@ namespace cmArt.WebJaguar.Connector
         public bool hideMsrp { get; set; }
         public int unitPrice { get; set; }
         public bool priceByCustomer { get; set; }
-        public List<int> catIds { get; set; }
         public string categoryIds { get; set; }
         public double catalogPrice { get; set; }
         public double price1 { get; set; }
@@ -118,8 +122,6 @@ namespace cmArt.WebJaguar.Connector
         public double priceCasePack9 { get; set; }
         public double priceCasePack10 { get; set; }
         public bool quote { get; set; }
-        public List<Product_Price> price { get; set; }
-        public List<Product_RegionProductMapping> regionProductMapping { get; set; }
         public string field1 { get; set; }
         public string field2 { get; set; }
         public string field3 { get; set; }
@@ -221,7 +223,6 @@ namespace cmArt.WebJaguar.Connector
         public string field99 { get; set; }
         public string field100 { get; set; }
         public string keywords { get; set; }
-        public List<KitPart> kitParts { get; set; }
         public int kitCost { get; set; }
         public int salesTagId { get; set; }
         public int caseContent { get; set; }
@@ -328,7 +329,6 @@ namespace cmArt.WebJaguar.Connector
         public string decoSku { get; set; }
         public string productCustomerMarkupTitle { get; set; }
         public string configLabel { get; set; }
-        public Product_PrimaryLocation primaryLocation { get; set; }
         public int locationMinAmount { get; set; }
         public int locationDesiredAmount { get; set; }
         public bool commissionable { get; set; }

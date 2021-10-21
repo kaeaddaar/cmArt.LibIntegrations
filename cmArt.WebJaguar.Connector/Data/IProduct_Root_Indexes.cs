@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace cmArt.WebJaguar.Connector.Data
+namespace cmArt.WebJaguar.Connector
 {
     public static class IProduct_Root_Indexes
     {

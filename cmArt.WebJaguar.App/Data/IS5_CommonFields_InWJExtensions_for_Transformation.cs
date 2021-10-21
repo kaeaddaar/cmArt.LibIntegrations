@@ -1,4 +1,5 @@
 ﻿using cmArt.LibIntegrations.GenericJoinsService;
+using cmArt.WebJaguar.Connector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,6 +55,19 @@ namespace cmArt.WebJaguar.App.Data
             to.WebDescription = from.WebDescription;
             to.weight = from.weight;
             return to;
+        }
+        public static Product_Root AsProduct_Root(this IS5_CommonFields_In_WJ data)
+        {
+            IS5_CommonFields_In_WJ _data = data ?? new S5_CommonFields();
+            Product_Root_Common result = new Product_Root_Common();
+            result.SetNotEditableDefaults();
+
+            IWJ_CommonFields_In_S5 result_updater = (IWJ_CommonFields_In_S5)result;
+            adapterS5_from_WJ adapter = new adapterS5_from_WJ();
+            adapter.init(result_updater);
+            adapter.CopyFrom(_data);
+            Product_Root finalResult = (Product_Root)result;
+            return finalResult;
         }
     }
 }
