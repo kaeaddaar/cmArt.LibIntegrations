@@ -332,7 +332,7 @@ namespace cmArt.WebJaguar.App
             GetNewRecords();
             PerformAdds();
 
-
+            #region reporting
             // ----- Reporting goes here -----
 
             //string result2 = SerializeForExport(adapters);
@@ -354,6 +354,7 @@ namespace cmArt.WebJaguar.App
             //string FileName = settings.OutputDirectory + "\\_ChangedRecords_Product.json.txt";
             //logger.LogInformation($"Saving ChangedRecords_Product to file: {FileName}");
             //File.WriteAllText(FileName, result);
+            #endregion reporting
 
             Console.WriteLine("Done");
             Console.ReadKey();
