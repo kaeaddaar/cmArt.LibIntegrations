@@ -176,11 +176,11 @@ namespace cmArt.Shopify.App
         private static void FilterForECommAndSave()
         {
             logger.LogInformation("Filtering for Ecommerce equals Y");
-            ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y");
+            ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y").Take(10);
             string strECommInvAss = SerializeForExport(ECommInvAss);
             File.WriteAllText(settings.OutputDirectory + "\\strEcommInvAss.txt", strECommInvAss);
         }
-        private static void CreateDataLoadLists()
+        private static void Transform_Assembled_Inventory_To_Products_Prices_And_Quantities()
         {
             // Use facade to create data load format from Assembled Inventory Data
             logger.LogInformation("Begin converting Assembled Inventory Records to the Shopify Data Load Format via an adapter.");
@@ -191,6 +191,7 @@ namespace cmArt.Shopify.App
                 return tmp;
             }
             );
+            Reports.SaveReport(adapters, settings, logger);
 
             logger.LogInformation(" -- Get products from adapter");
             PocoProductsAdapted = adapters.Select(x => x.AsShopify_Product());
@@ -204,12 +205,12 @@ namespace cmArt.Shopify.App
             PocoQuantitiesAdapted = adapters.Select(x => x.AsShopify_Quantities());
             quantities = PocoQuantitiesAdapted;
 
-            // The old way - DNU
+            // The old way - DNU unless you need to convert back to the adapter later on
             //prods = adapters.Select(x => (IShopify_Product)x);
             //prices = adapters.Select(x => (IShopify_Prices)x);
             //quantities = adapters.Select(x => (IShopify_Quantities)x);
         }
-        private static void GetPrevDataLoadListsAndOverwrite()
+        private static void Cache_And_Overwrite_Products_Prices_And_Quantities()
         {
             CachingPattern_Shopify_Product cacheShopify_Product = new CachingPattern_Shopify_Product("PocoProductsAdapted", settings);
             PrevDataLoad_Product = cacheShopify_Product._01_GetPrev();
@@ -352,6 +353,10 @@ namespace cmArt.Shopify.App
             ChangedRecords_Quantities = UpdateProcessPattern<IShopify_Quantities, Shopify_Quantities, int>
                 .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Quantities, adapters, jq);
         }
+        private static void ProduceReportsBeforeProcessing()
+        {
+
+        }
         public static void Main_Console(string[] args)
         {
             SetupLogging();
@@ -367,14 +372,14 @@ namespace cmArt.Shopify.App
 
             FilterForECommAndSave();
 
-            CreateDataLoadLists();
+            Transform_Assembled_Inventory_To_Products_Prices_And_Quantities();
 
 
             GetEqualityFunctions();
 
             if (RunAsSelfCompare)
             {
-                GetPrevDataLoadListsAndOverwrite();
+                Cache_And_Overwrite_Products_Prices_And_Quantities();
             }
             else
             {
@@ -382,6 +387,8 @@ namespace cmArt.Shopify.App
             }
 
             GetChangedRecords();
+
+            ProduceReportsBeforeProcessing();
 
             // Direct from Shopify
             if (false)
