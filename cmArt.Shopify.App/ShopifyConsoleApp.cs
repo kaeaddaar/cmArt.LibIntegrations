@@ -25,6 +25,7 @@ using cmArt.Reece.ShopifyConnector;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using cmArt.Shopify.App.Services;
+using cmArt.LibIntegrations.VennMapService;
 
 namespace cmArt.Shopify.App
 {
@@ -92,6 +93,8 @@ namespace cmArt.Shopify.App
         private static IEnumerable<IShopify_Product> ChangedRecords_Product;
         private static IEnumerable<IShopify_Prices> ChangedRecords_Prices;
         private static IEnumerable<IShopify_Quantities> ChangedRecords_Quantities;
+        //ProduceVennMap()
+        private static VennMap<Shopify_Product, int> map;
 
         #endregion variables
 
@@ -353,9 +356,37 @@ namespace cmArt.Shopify.App
             ChangedRecords_Quantities = UpdateProcessPattern<IShopify_Quantities, Shopify_Quantities, int>
                 .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Quantities, adapters, jq);
         }
+        private static void ProduceVennMap()
+        {
+            Func<IS5InvAssembled, S5InvAssembledObj> As_S5InvAssembledObj = (x) =>
+            {
+                return new S5InvAssembledObj
+                (
+                    x.Inv
+                    , x.InvPrices_PerInventry_27 ?? new List<IInvPrice>()
+                    , x.StokLines_PerInventry_27 ?? new List<IStok>()
+                    , x.CommentsLines_PerInventry_27 ?? new List<IComments>()
+                    , x.AltSuplies_PerInventry_27 ?? new List<IAltSuply>()
+                );
+            };
+
+            map = new VennMap<Shopify_Product, int>
+            (
+                API_Products
+                , InvAss.Select(x => As_S5InvAssembledObj(x))
+                , IShopifyDataLoadFormat_Indexes.UniqueId
+                , IS5InvAssembled_Indexes.InvUnique
+            );
+
+        }
         private static void ProduceReportsBeforeProcessing()
         {
-
+            // Venn Reports are relevant for the Sync process only because it compares System Five and the Web Site we're syncing to.
+            bool UsingSyncProcess = (map != null);
+            if (UsingSyncProcess)
+            {
+                Reports.SaveReport(map, settings, logger);
+            }
         }
         public static void Main_Console(string[] args)
         {
@@ -384,6 +415,7 @@ namespace cmArt.Shopify.App
             else
             {
                 GetShopifyData();
+                ProduceVennMap();
             }
 
             GetChangedRecords();

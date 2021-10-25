@@ -10,6 +10,12 @@ namespace cmArt.System5.Inventory
         {
             return (int)record.Inv.Supplier;
         }
+        public static int InvUnique(IS5InvAssembled record)
+        {
+            if (record == null) { return 0; }
+            if (record.Inv == null) { return 0; }
+            return record.Inv.InvUnique;
+        }
 
     }
 }
