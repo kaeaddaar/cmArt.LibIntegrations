@@ -4,7 +4,7 @@ using System.Text;
 
 namespace cmArt.Reece.ShopifyConnector
 {
-    public struct S5PricePair
+    public class S5PricePair
     {
         public S5PricePair(short level, decimal price)
         {

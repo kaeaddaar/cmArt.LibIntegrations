@@ -14,11 +14,11 @@ namespace cmArt.LibIntegrations.VennMapService
         private Func<S5InvAssembledObj, IndexOfT> _S5InvAssembled_Index;
 
         // build zenn filter
-        public IEnumerable<ValueTuple<T, S5InvAssembledObj>> TOnly { get; set; }
-        public IEnumerable<ValueTuple<T, S5InvAssembledObj>> Both_Ecomm { get; set; }
-        public IEnumerable<ValueTuple<T, S5InvAssembledObj>> Both_NoEcomm { get; set; }
-        public IEnumerable<ValueTuple<T, S5InvAssembledObj>> InvOnly_Ecomm { get; set; }
-        public IEnumerable<ValueTuple<T, S5InvAssembledObj>> InvOnly_NoEcomm { get; set; }
+        public List<ValueTuple<T, S5InvAssembledObj>> TOnly { get; set; }
+        public List<ValueTuple<T, S5InvAssembledObj>> Both_Ecomm { get; set; }
+        public List<ValueTuple<T, S5InvAssembledObj>> Both_NoEcomm { get; set; }
+        public List<ValueTuple<T, S5InvAssembledObj>> InvOnly_Ecomm { get; set; }
+        public List<ValueTuple<T, S5InvAssembledObj>> InvOnly_NoEcomm { get; set; }
 
         public List<ValueTuple<T, S5InvAssembledObj>> Both { get; set; } // combination of two from above
 
@@ -71,11 +71,11 @@ namespace cmArt.LibIntegrations.VennMapService
 
                 select new ValueTuple<T, S5InvAssembledObj>(infoNullRecord, invRecord);
 
-            TOnly = ABC.Where(x => x.Item2 == null);
-            Both_Ecomm = ABC.Where(x => x.Item2 != null && x.Item2.Inv.Ecommerce == "Y");
-            Both_NoEcomm = ABC.Where(x => x.Item2 != null && x.Item2.Inv.Ecommerce == "N");
-            InvOnly_Ecomm = DE.Where(x => x.Item1 == null && x.Item2.Inv.Ecommerce == "Y");
-            InvOnly_NoEcomm = DE.Where(x => x.Item1 == null && x.Item2.Inv.Ecommerce == "N");
+            TOnly = ABC.Where(x => x.Item2 == null).ToList();
+            Both_Ecomm = ABC.Where(x => x.Item2 != null && x.Item2.Inv.Ecommerce == "Y").ToList();
+            Both_NoEcomm = ABC.Where(x => x.Item2 != null && x.Item2.Inv.Ecommerce == "N").ToList();
+            InvOnly_Ecomm = DE.Where(x => x.Item1 == null && x.Item2.Inv.Ecommerce == "Y").ToList();
+            InvOnly_NoEcomm = DE.Where(x => x.Item1 == null && x.Item2.Inv.Ecommerce == "N").ToList();
 
             Both = new List<ValueTuple<T, S5InvAssembledObj>>(Both_Ecomm);
             foreach (var rs in Both_NoEcomm)

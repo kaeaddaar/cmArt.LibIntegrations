@@ -1,11 +1,12 @@
 ﻿using cmArt.System5.Data;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace cmArt.System5.Inventory
 {
-    public class S5InvAssembledObj : IS5InvAssembled
+    public class S5InvAssembledObj
     {
         public S5InvAssembledObj
         (
@@ -17,15 +18,15 @@ namespace cmArt.System5.Inventory
         )
         {
             _Inv = Inv;
-            _Price_PerInventry_27 = Price_PerInventry_27 ?? new List<IInvPrice>();
-            _Stok_PerInventry_27 = Stok_PerInventry_27 ?? new List<IStok>();
-            _Comments_PerInventry_27 = Comments_PerInventry_27 ?? new List<IComments>();
-            _AltSuply_PerInventry_27 = AltSuply_PerInventry_27 ?? new List<IAltSuply>();
+            _Price_PerInventry_27 = (Price_PerInventry_27 ?? new List<IInvPrice>()).ToList();
+            _Stok_PerInventry_27 = (Stok_PerInventry_27 ?? new List<IStok>()).ToList();
+            _Comments_PerInventry_27 = (Comments_PerInventry_27 ?? new List<IComments>()).ToList();
+            _AltSuply_PerInventry_27 = (AltSuply_PerInventry_27 ?? new List<IAltSuply>()).ToList();
         }
 
-        private IEnumerable<IAltSuply> _AltSuply_PerInventry_27;
+        private List<IAltSuply> _AltSuply_PerInventry_27;
 
-        public IEnumerable<IAltSuply> AltSuplies_PerInventry_27
+        public List<IAltSuply> AltSuplies_PerInventry_27
         {
             get { return _AltSuply_PerInventry_27; }
         }
@@ -38,23 +39,23 @@ namespace cmArt.System5.Inventory
             get { return _Inv; }
         }
 
-        private IEnumerable<IInvPrice> _Price_PerInventry_27;
+        private List<IInvPrice> _Price_PerInventry_27;
 
-        public IEnumerable<IInvPrice> InvPrices_PerInventry_27
+        public List<IInvPrice> InvPrices_PerInventry_27
         {
             get { return _Price_PerInventry_27; }
         }
 
-        private IEnumerable<IStok> _Stok_PerInventry_27;
+        private List<IStok> _Stok_PerInventry_27;
 
-        public IEnumerable<IStok> StokLines_PerInventry_27
+        public List<IStok> StokLines_PerInventry_27
         {
             get { return _Stok_PerInventry_27; }
         }
 
-        private IEnumerable<IComments> _Comments_PerInventry_27;
+        private List<IComments> _Comments_PerInventry_27;
 
-        public IEnumerable<IComments> CommentsLines_PerInventry_27
+        public List<IComments> CommentsLines_PerInventry_27
         {
             get { return _Comments_PerInventry_27; }
         }

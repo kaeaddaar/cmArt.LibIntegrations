@@ -238,11 +238,11 @@ namespace cmArt.Shopify.App
             try
             {
                 API_Products = ReeceShopify.GetAllShopify_Products();
-                logger.LogInformation($"Saving Shopify Products for API_Products");
+                logger.LogInformation($"Saving Shopify Products for ShopifyAPI_Products");
                 try
                 {
-                    GenericSerialization<Shopify_Product>.RemoveCachedFileNamesFromDirectory(settings.OutputDirectory, "API_Products");
-                    GenericSerialization<Shopify_Product>.SerializeToJSON(API_Products.ToList(), "API_Products", settings.OutputDirectory, 50000);
+                    GenericSerialization<Shopify_Product>.RemoveCachedFileNamesFromDirectory(settings.OutputDirectory, "ShopifyAPI_Products");
+                    GenericSerialization<Shopify_Product>.SerializeToJSON(API_Products.ToList(), "ShopifyAPI_Products", settings.OutputDirectory, 50000);
                 }
                 catch
                 {
@@ -262,7 +262,7 @@ namespace cmArt.Shopify.App
             try
             {
                 tmpPrices = ReeceShopify.GetAlltmpShopify_Prices();
-                string FileOrTableName = "tmpPrices";
+                string FileOrTableName = "ShopifyAPI_Prices";
                 logger.LogInformation($"Saving Shopify Prices to file: {FileOrTableName}");
                 try
                 {
@@ -303,7 +303,7 @@ namespace cmArt.Shopify.App
             try
             {
                 tmpApi_Quantities = ReeceShopify.GetAlltmpShopify_Quantities();
-                string FileOrTableName = "tmpQuantities";
+                string FileOrTableName = "ShopifyAPI_Quantities";
                 logger.LogInformation($"Saving Shopify Quantities to file: {FileOrTableName}");
                 try
                 {
@@ -375,7 +375,7 @@ namespace cmArt.Shopify.App
                 API_Products
                 , InvAss.Select(x => As_S5InvAssembledObj(x))
                 , IShopifyDataLoadFormat_Indexes.UniqueId
-                , IS5InvAssembled_Indexes.InvUnique
+                , S5InvAssembledObj_Indexes.InvUnique
             );
 
         }
