@@ -6,7 +6,7 @@ using System.Text;
 
 namespace cmArt.Shopify.App.ReportViews
 {
-    public class RightSideAdapter : IShopify_Product
+    public class Shopify_Product_RightSideAdapter : IShopify_Product
     {
         private Shopify_Product _S5;
         private Shopify_Product _Shopify;
@@ -16,11 +16,11 @@ namespace cmArt.Shopify.App.ReportViews
         public int InvUnique { get => ((IShopify_Identity)_Shopify).InvUnique; set => ((IShopify_Identity)_Shopify).InvUnique = value; }
         public string PartNumber { get => ((IShopify_Identity)_Shopify).PartNumber; set => ((IShopify_Identity)_Shopify).PartNumber = value; }
 
-        public RightSideAdapter()
+        public Shopify_Product_RightSideAdapter()
         {
             _Init();
         }
-        public RightSideAdapter(Shopify_Product_Pair shopify_Product_Pair)
+        public Shopify_Product_RightSideAdapter(Shopify_Product_Pair shopify_Product_Pair)
         {
             _Init(shopify_Product_Pair);
         }

@@ -196,7 +196,6 @@ namespace cmArt.Shopify.App
                 return tmp;
             }
             );
-            Reports.SaveReport(adapters, settings, logger);
 
             logger.LogInformation(" -- Get products from adapter");
             PocoProductsAdapted = adapters.Select(x => x.AsShopify_Product());

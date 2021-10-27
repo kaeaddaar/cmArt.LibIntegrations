@@ -17,6 +17,31 @@ namespace cmArt.Shopify.App
     {
         public static void SaveReport
         (
+            IEnumerable<IShopify_Product> data
+            , string TableName
+            , StaticSettings settings
+            , ILogger logger
+        )
+        {
+            IEnumerable<IShopify_Product> _data = data ?? new List<IShopify_Product>();
+
+            Func<IShopify_Product, Shopify_Product_Pair_Flat> Transform =
+            (IShopProd) =>
+            {
+;               Shopify_Product tmp = IShopProd.AsShopify_Product();
+                Shopify_Product_Pair tmpSP = new Shopify_Product_Pair(new Shopify_Product(), tmp);
+                Shopify_Product_Pair_Adapter tmpFlatAdapter = new Shopify_Product_Pair_Adapter(tmpSP);
+                return tmpFlatAdapter.AsShopify_Product_Pair_Flat();
+            };
+
+            IEnumerable<Shopify_Product_Pair_Flat> flatData = _data.Select(d =>
+            {
+                return Transform(d);
+            });
+            SaveReport(flatData, TableName, settings, logger);
+        }
+        public static void SaveReport
+        (
             IEnumerable<IS5InvAssembled> data
             , string TableName
             , StaticSettings settings
@@ -55,56 +80,58 @@ namespace cmArt.Shopify.App
             }
 
         }
-        public static void SaveReport(IEnumerable<AdaptToShopifyDataLoadFormat> adapters, StaticSettings settings, ILogger logger)
-        {
-            string TableName = "AdaptToShopifyDataLoadFormat";
-            logger.LogInformation($"Saving {TableName}");
-            try
-            {
-                GenericSerialization<AdaptToShopifyDataLoadFormat>.RemoveCachedFileNamesFromDirectory(settings.OutputDirectory, TableName);
-                GenericSerialization<AdaptToShopifyDataLoadFormat>.SerializeToJSON(adapters.ToList(), TableName, settings.OutputDirectory, 50000);
-            }
-            catch
-            {
-                logger.LogInformation($"Failed to serialize {TableName}. {TableName} file(s) will not be written.");
-            }
+        #region don't need any more, remove
+        //public static void SaveReport(IEnumerable<AdaptToShopifyDataLoadFormat> adapters, StaticSettings settings, ILogger logger)
+        //{
+        //    string TableName = "AdaptToShopifyDataLoadFormat";
+        //    logger.LogInformation($"Saving {TableName}");
+        //    try
+        //    {
+        //        GenericSerialization<AdaptToShopifyDataLoadFormat>.RemoveCachedFileNamesFromDirectory(settings.OutputDirectory, TableName);
+        //        GenericSerialization<AdaptToShopifyDataLoadFormat>.SerializeToJSON(adapters.ToList(), TableName, settings.OutputDirectory, 50000);
+        //    }
+        //    catch
+        //    {
+        //        logger.LogInformation($"Failed to serialize {TableName}. {TableName} file(s) will not be written.");
+        //    }
 
-        }
-        public static void SaveReport(VennMap<Shopify_Product, int> map, StaticSettings settings, ILogger logger)
-        {
-            if (map == null) { throw new ArgumentNullException("the map argument in the method call to SaveReport must not be null"); }
-            VennMap<Shopify_Product, int> _map = map;
+        //}
+        //public static void SaveReport(VennMap<Shopify_Product, int> map, StaticSettings settings, ILogger logger)
+        //{
+        //    if (map == null) { throw new ArgumentNullException("the map argument in the method call to SaveReport must not be null"); }
+        //    VennMap<Shopify_Product, int> _map = map;
 
-            throw new NotImplementedException("SerializeVennMapResult functionality should be replaced by CSV report, so I commented it out" +
-                " instead of changing the type info. Just Skip this routine.");
-            //SerializeVennMapResult("VenMapp_InvOnly_Ecomm", map.InvOnly_Ecomm, settings, logger);
-            //SerializeVennMapResult("VenMapp_InvOnly_NoEcomm", map.InvOnly_NoEcomm, settings, logger);
-            //SerializeVennMapResult("VenMapp_Both_Ecomm", map.Both_Ecomm, settings, logger);
-            //SerializeVennMapResult("VenMapp_Both_NoEcomm", map.Both_NoEcomm, settings, logger);
-            //SerializeVennMapResult("VenMapp_TOnly", map.TOnly, settings, logger);
+        //    throw new NotImplementedException("SerializeVennMapResult functionality should be replaced by CSV report, so I commented it out" +
+        //        " instead of changing the type info. Just Skip this routine.");
+        //    //SerializeVennMapResult("VenMapp_InvOnly_Ecomm", map.InvOnly_Ecomm, settings, logger);
+        //    //SerializeVennMapResult("VenMapp_InvOnly_NoEcomm", map.InvOnly_NoEcomm, settings, logger);
+        //    //SerializeVennMapResult("VenMapp_Both_Ecomm", map.Both_Ecomm, settings, logger);
+        //    //SerializeVennMapResult("VenMapp_Both_NoEcomm", map.Both_NoEcomm, settings, logger);
+        //    //SerializeVennMapResult("VenMapp_TOnly", map.TOnly, settings, logger);
 
-        }
-        private static void SerializeVennMapResult
-        (
-            string TableName
-            , IEnumerable<(Shopify_Product, System5.Inventory.S5InvAssembledObj)> VennMapResult
-            , StaticSettings settings
-            , ILogger logger
-        )
-        {
-            string tmpTableName = TableName;
-            logger.LogInformation($"Saving {tmpTableName}");
-            try
-            {
-                GenericSerialization<(Shopify_Product, S5InvAssembledObj)>
-                    .RemoveCachedFileNamesFromDirectory(settings.OutputDirectory, tmpTableName);
-                GenericSerialization<(Shopify_Product, S5InvAssembledObj)>
-                    .SerializeToJSON(VennMapResult.ToList(), tmpTableName, settings.OutputDirectory, 50000);
-            }
-            catch
-            {
-                logger.LogInformation($"Failed to serialize {tmpTableName}. {tmpTableName} file(s) will not be written.");
-            }
-        }
+        //}
+        //private static void SerializeVennMapResult
+        //(
+        //    string TableName
+        //    , IEnumerable<(Shopify_Product, System5.Inventory.S5InvAssembledObj)> VennMapResult
+        //    , StaticSettings settings
+        //    , ILogger logger
+        //)
+        //{
+        //    string tmpTableName = TableName;
+        //    logger.LogInformation($"Saving {tmpTableName}");
+        //    try
+        //    {
+        //        GenericSerialization<(Shopify_Product, S5InvAssembledObj)>
+        //            .RemoveCachedFileNamesFromDirectory(settings.OutputDirectory, tmpTableName);
+        //        GenericSerialization<(Shopify_Product, S5InvAssembledObj)>
+        //            .SerializeToJSON(VennMapResult.ToList(), tmpTableName, settings.OutputDirectory, 50000);
+        //    }
+        //    catch
+        //    {
+        //        logger.LogInformation($"Failed to serialize {tmpTableName}. {tmpTableName} file(s) will not be written.");
+        //    }
+        //}
+        #endregion don't need any more, remove
     }
 }
