@@ -26,11 +26,11 @@ namespace cmArt.Shopify.App.ReportViews
         {
             _Init();
         }
-        public Shopify_Product_Pair_Adapter(Shopify_Product_Pair shopify_Product_Pair)
+        public Shopify_Product_Pair_Adapter(Generic_Pair<Shopify_Product> shopify_Product_Pair)
         {
             _Init(shopify_Product_Pair);
         }
-        private void _Init(Shopify_Product_Pair shopify_Product_Pair)
+        private void _Init(Generic_Pair<Shopify_Product> shopify_Product_Pair)
         {
             _S5 = shopify_Product_Pair.S5 ?? new Shopify_Product();
             _Shopify = shopify_Product_Pair.Shopify ?? new Shopify_Product();
@@ -40,7 +40,7 @@ namespace cmArt.Shopify.App.ReportViews
             _S5 = _S5 ?? new Shopify_Product();
             _Shopify = _Shopify ?? new Shopify_Product();
         }
-        public void Init(Shopify_Product_Pair shopify_Product_Pair)
+        public void Init(Generic_Pair<Shopify_Product> shopify_Product_Pair)
         {
             _Init(shopify_Product_Pair);
         }

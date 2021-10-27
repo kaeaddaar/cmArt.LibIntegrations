@@ -54,7 +54,7 @@ namespace cmArt.Shopify.App
             (IShopProd) =>
             {
 ;               Shopify_Product tmp = IShopProd.AsShopify_Product();
-                Shopify_Product_Pair tmpSP = new Shopify_Product_Pair(new Shopify_Product(), tmp);
+                Generic_Pair<Shopify_Product> tmpSP = new Generic_Pair<Shopify_Product>(new Shopify_Product(), tmp);
                 Shopify_Product_Pair_Adapter tmpFlatAdapter = new Shopify_Product_Pair_Adapter(tmpSP);
                 return tmpFlatAdapter.AsShopify_Product_Pair_Flat();
             };
@@ -79,7 +79,7 @@ namespace cmArt.Shopify.App
             {
                 AdaptToShopifyDataLoadFormat tmpAdapter = new AdaptToShopifyDataLoadFormat();
                 tmpAdapter.Init(IS5InvAss);
-                Shopify_Product_Pair tmpSP = new Shopify_Product_Pair(new Shopify_Product(), tmpAdapter.AsShopify_Product());
+                Generic_Pair<Shopify_Product> tmpSP = new Generic_Pair<Shopify_Product>(new Shopify_Product(), tmpAdapter.AsShopify_Product());
                 Shopify_Product_Pair_Adapter tmpFlatAdapter = new Shopify_Product_Pair_Adapter(tmpSP);
                 return tmpFlatAdapter.AsShopify_Product_Pair_Flat();
             };

@@ -394,7 +394,7 @@ namespace cmArt.Shopify.App
                     {
                         AdaptToShopifyDataLoadFormat tmpAdapter = new AdaptToShopifyDataLoadFormat();
                         tmpAdapter.Init(m.Item2);
-                        Shopify_Product_Pair tmpSP = new Shopify_Product_Pair(m.Item1, tmpAdapter.AsShopify_Product());
+                        Generic_Pair<Shopify_Product> tmpSP = new Generic_Pair<Shopify_Product>(m.Item1, tmpAdapter.AsShopify_Product());
                         Shopify_Product_Pair_Adapter tmpFlatAdapter = new Shopify_Product_Pair_Adapter(tmpSP);
                         return tmpFlatAdapter.AsShopify_Product_Pair_Flat();
                     });
