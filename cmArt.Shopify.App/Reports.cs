@@ -50,11 +50,13 @@ namespace cmArt.Shopify.App
             if (map == null) { throw new ArgumentNullException("the map argument in the method call to SaveReport must not be null"); }
             VennMap<Shopify_Product, int> _map = map;
 
-            SerializeVennMapResult("VenMapp_InvOnly_Ecomm", map.InvOnly_Ecomm, settings, logger);
-            SerializeVennMapResult("VenMapp_InvOnly_NoEcomm", map.InvOnly_NoEcomm, settings, logger);
-            SerializeVennMapResult("VenMapp_Both_Ecomm", map.Both_Ecomm, settings, logger);
-            SerializeVennMapResult("VenMapp_Both_NoEcomm", map.Both_NoEcomm, settings, logger);
-            SerializeVennMapResult("VenMapp_TOnly", map.TOnly, settings, logger);
+            throw new NotImplementedException("SerializeVennMapResult functionality should be replaced by CSV report, so I commented it out" +
+                " instead of changing the type info. Just Skip this routine.");
+            //SerializeVennMapResult("VenMapp_InvOnly_Ecomm", map.InvOnly_Ecomm, settings, logger);
+            //SerializeVennMapResult("VenMapp_InvOnly_NoEcomm", map.InvOnly_NoEcomm, settings, logger);
+            //SerializeVennMapResult("VenMapp_Both_Ecomm", map.Both_Ecomm, settings, logger);
+            //SerializeVennMapResult("VenMapp_Both_NoEcomm", map.Both_NoEcomm, settings, logger);
+            //SerializeVennMapResult("VenMapp_TOnly", map.TOnly, settings, logger);
 
         }
         private static void SerializeVennMapResult
