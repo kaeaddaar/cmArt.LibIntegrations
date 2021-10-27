@@ -181,8 +181,9 @@ namespace cmArt.Shopify.App
         {
             logger.LogInformation("Filtering for Ecommerce equals Y");
             ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y").Take(10);
-            string strECommInvAss = SerializeForExport(ECommInvAss);
-            File.WriteAllText(settings.OutputDirectory + "\\strEcommInvAss.txt", strECommInvAss);
+            Reports.SaveReport(ECommInvAss, "EcommProduct_From_SystemFive", settings, logger);
+            //string strECommInvAss = SerializeForExport(ECommInvAss);
+            //File.WriteAllText(settings.OutputDirectory + "\\strEcommInvAss.txt", strECommInvAss);
         }
         private static void Transform_Assembled_Inventory_To_Products_Prices_And_Quantities()
         {

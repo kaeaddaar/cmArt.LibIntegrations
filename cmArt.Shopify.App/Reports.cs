@@ -15,6 +15,31 @@ namespace cmArt.Shopify.App
 {
     public static class Reports
     {
+        public static void SaveReport
+        (
+            IEnumerable<IS5InvAssembled> data
+            , string TableName
+            , StaticSettings settings
+            , ILogger logger
+        )
+        {
+            IEnumerable<IS5InvAssembled> _data = data ?? new List<IS5InvAssembled>();
+            Func<IS5InvAssembled, Shopify_Product_Pair_Flat> Transform =
+            (IS5InvAss) =>
+            {
+                AdaptToShopifyDataLoadFormat tmpAdapter = new AdaptToShopifyDataLoadFormat();
+                tmpAdapter.Init(IS5InvAss);
+                Shopify_Product_Pair tmpSP = new Shopify_Product_Pair(new Shopify_Product(), tmpAdapter.AsShopify_Product());
+                Shopify_Product_Pair_Adapter tmpFlatAdapter = new Shopify_Product_Pair_Adapter(tmpSP);
+                return tmpFlatAdapter.AsShopify_Product_Pair_Flat();
+            };
+
+            IEnumerable<Shopify_Product_Pair_Flat> flatData = _data.Select(d =>
+            {
+                return Transform(d);
+            });
+            SaveReport(flatData, TableName, settings, logger);
+        }
         public static void SaveReport(IEnumerable<Shopify_Product_Pair_Flat> data, string TableName, StaticSettings settings, ILogger logger)
         {
             IEnumerable<Shopify_Product_Pair_Flat> _data = data ?? new List<Shopify_Product_Pair_Flat>();
