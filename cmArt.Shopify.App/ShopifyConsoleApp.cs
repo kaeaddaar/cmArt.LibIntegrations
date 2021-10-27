@@ -386,18 +386,33 @@ namespace cmArt.Shopify.App
             bool UsingSyncProcess = (map != null);
             if (UsingSyncProcess)
             {
-                Reports.SaveReport(map, settings, logger);
+                //Reports.SaveReport(map, settings, logger);
+                Func<(Shopify_Product, IS5InvAssembled), Shopify_Product_Pair_Flat> Transform =
+                    (m =>
+                    {
+                        AdaptToShopifyDataLoadFormat tmpAdapter = new AdaptToShopifyDataLoadFormat();
+                        tmpAdapter.Init(m.Item2);
+                        Shopify_Product_Pair tmpSP = new Shopify_Product_Pair(m.Item1, tmpAdapter.AsShopify_Product());
+                        Shopify_Product_Pair_Adapter tmpFlatAdapter = new Shopify_Product_Pair_Adapter(tmpSP);
+                        return tmpFlatAdapter.AsShopify_Product_Pair_Flat();
+                    });
+
                 IEnumerable<(Shopify_Product, IS5InvAssembled)> Map_Both_Ecomm = map.Both_Ecomm;
-                IEnumerable<Shopify_Product_Pair_Flat> Both_Ecomm = Map_Both_Ecomm.Select
-                (m => 
-                {
-                    AdaptToShopifyDataLoadFormat tmpAdapter = new AdaptToShopifyDataLoadFormat();
-                    tmpAdapter.Init(m.Item2);
-                    Shopify_Product_Pair tmpSP = new Shopify_Product_Pair(m.Item1, tmpAdapter.AsShopify_Product());
-                    Shopify_Product_Pair_Adapter tmpFlatAdapter = new Shopify_Product_Pair_Adapter(tmpSP);
-                    return tmpFlatAdapter.AsShopify_Product_Pair_Flat();
-                });
-                Reports.SaveReport(Both_Ecomm, "Venn_Both_Ecomm", settings, logger);
+                IEnumerable<Shopify_Product_Pair_Flat> Both_Ecomm = Map_Both_Ecomm.Select(m => Transform(m));
+                Reports.SaveReport(Both_Ecomm, "Venn_Product_Both_Ecomm", settings, logger);
+
+                IEnumerable<(Shopify_Product, IS5InvAssembled)> Map_Both_NoEcomm = map.Both_NoEcomm;
+                IEnumerable<Shopify_Product_Pair_Flat> Both_NoEcomm = Map_Both_NoEcomm.Select(m => Transform(m));
+                Reports.SaveReport(Both_NoEcomm, "Venn_Product_Both_NoEcomm", settings, logger);
+
+                IEnumerable<(Shopify_Product, IS5InvAssembled)> Map_InvOnly_Ecomm = map.InvOnly_Ecomm;
+                IEnumerable<Shopify_Product_Pair_Flat> InvOnly_Ecomm = Map_InvOnly_Ecomm.Select(m => Transform(m));
+                Reports.SaveReport(InvOnly_Ecomm, "Venn_Product_InvOnly_Ecomm", settings, logger);
+
+                IEnumerable<(Shopify_Product, IS5InvAssembled)> Map_InvOnly_NoEcomm = map.InvOnly_NoEcomm;
+                IEnumerable<Shopify_Product_Pair_Flat> InvOnly_NoEcomm = Map_InvOnly_NoEcomm.Select(m => Transform(m));
+                Reports.SaveReport(InvOnly_NoEcomm, "Venn_Product_InvOnly_NoEcomm", settings, logger);
+
             }
         }
         public static void Main_Console(string[] args)
