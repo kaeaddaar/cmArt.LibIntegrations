@@ -8,11 +8,28 @@ using Microsoft.Extensions.Logging;
 using cmArt.LibIntegrations.VennMapService;
 using cmArt.Reece.ShopifyConnector;
 using cmArt.System5.Inventory;
+using cmArt.Shopify.App.ReportViews;
+using FileHelpers;
 
 namespace cmArt.Shopify.App
 {
     public static class Reports
     {
+        public static void SaveReport(IEnumerable<Shopify_Product_Pair_Flat> data, string TableName, StaticSettings settings, ILogger logger)
+        {
+            IEnumerable<Shopify_Product_Pair_Flat> _data = data ?? new List<Shopify_Product_Pair_Flat>();
+            var engine = new FileHelperAsyncEngine<Shopify_Product_Pair_Flat>();
+            engine.HeaderText = "LeftCat, LeftDescription, LeftInvUnique, LeftPartNumber, RightCat, RightDescription " +
+                ", RightInvUnique, RightPartNumber";
+            using (engine.BeginWriteFile(settings.OutputDirectory + $"\\{TableName}.csv"))
+            {
+                foreach (var record in _data)
+                {
+                    engine.WriteNext(record);
+                }
+            }
+
+        }
         public static void SaveReport(IEnumerable<AdaptToShopifyDataLoadFormat> adapters, StaticSettings settings, ILogger logger)
         {
             string TableName = "AdaptToShopifyDataLoadFormat";

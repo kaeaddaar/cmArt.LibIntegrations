@@ -14,10 +14,10 @@ namespace cmArt.Shopify.App.ReportViews
             S5 = S5 ?? new Shopify_Product();
             Shopify = Shopify ?? new Shopify_Product();
         }
-        public Shopify_Product_Pair(ValueTuple<Shopify_Product, Shopify_Product> S5_Shopify_Pair)
+        public Shopify_Product_Pair(Shopify_Product S5In, Shopify_Product ShopifyIn)
         {
-            S5 = S5_Shopify_Pair.Item1 ?? new Shopify_Product();
-            Shopify = S5_Shopify_Pair.Item2 ?? new Shopify_Product();
+            S5 = S5In ?? new Shopify_Product();
+            Shopify = ShopifyIn ?? new Shopify_Product();
         }
     }
 }

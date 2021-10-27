@@ -9,25 +9,25 @@ namespace cmArt.LibIntegrations.VennMapService
     public class VennMap<T,IndexOfT>
     {
         private IEnumerable<T> _infoRecords { get; set; }
-        private IEnumerable<S5InvAssembledObj> _InvAssRecords { get; set; }
+        private IEnumerable<IS5InvAssembled> _InvAssRecords { get; set; }
         private Func<T, IndexOfT> _Info_Index;
-        private Func<S5InvAssembledObj, IndexOfT> _S5InvAssembled_Index;
+        private Func<IS5InvAssembled, IndexOfT> _S5InvAssembled_Index;
 
         // build zenn filter
-        public List<ValueTuple<T, S5InvAssembledObj>> TOnly { get; set; }
-        public List<ValueTuple<T, S5InvAssembledObj>> Both_Ecomm { get; set; }
-        public List<ValueTuple<T, S5InvAssembledObj>> Both_NoEcomm { get; set; }
-        public List<ValueTuple<T, S5InvAssembledObj>> InvOnly_Ecomm { get; set; }
-        public List<ValueTuple<T, S5InvAssembledObj>> InvOnly_NoEcomm { get; set; }
+        public IEnumerable<ValueTuple<T, IS5InvAssembled>> TOnly { get; set; }
+        public IEnumerable<ValueTuple<T, IS5InvAssembled>> Both_Ecomm { get; set; }
+        public IEnumerable<ValueTuple<T, IS5InvAssembled>> Both_NoEcomm { get; set; }
+        public IEnumerable<ValueTuple<T, IS5InvAssembled>> InvOnly_Ecomm { get; set; }
+        public IEnumerable<ValueTuple<T, IS5InvAssembled>> InvOnly_NoEcomm { get; set; }
 
-        public List<ValueTuple<T, S5InvAssembledObj>> Both { get; set; } // combination of two from above
+        public List<ValueTuple<T, IS5InvAssembled>> Both { get; set; } // combination of two from above
 
         public VennMap
         (
             IEnumerable<T> InfoIn_Records
-            , IEnumerable<S5InvAssembledObj> S5InvAssembledIn_Records
+            , IEnumerable<IS5InvAssembled> S5InvAssembledIn_Records
             , Func<T, IndexOfT> Info_Index
-            , Func<S5InvAssembledObj, IndexOfT> S5InvAssembled_Index
+            , Func<IS5InvAssembled, IndexOfT> S5InvAssembled_Index
         )
         {
             _infoRecords = InfoIn_Records;
@@ -51,25 +51,25 @@ namespace cmArt.LibIntegrations.VennMapService
             }
 
             IEnumerable<T> InfoRecords = InfoIn_Records;
-            IEnumerable<S5InvAssembledObj> Inventry_27s = S5InvAssembledIn_Records;
+            IEnumerable<IS5InvAssembled> InvAssRecords = S5InvAssembledIn_Records;
 
             var ABC =
                 from infoRecord in InfoRecords
-                join invRecord in Inventry_27s
+                join invRecord in InvAssRecords
                 on _Info_Index(infoRecord) equals _S5InvAssembled_Index(invRecord)
                 into invNullRecords
                 from invNullRecord in invNullRecords.DefaultIfEmpty()
-                select new ValueTuple<T, S5InvAssembledObj>(infoRecord, invNullRecord);
+                select new ValueTuple<T, IS5InvAssembled>(infoRecord, invNullRecord);
 
             var DE =
-                from invRecord in Inventry_27s
+                from invRecord in InvAssRecords
                 join infoRecord in InfoRecords
                 on _S5InvAssembled_Index(invRecord) equals _Info_Index(infoRecord)
                 into infoNullRecords
                 from infoNullRecord in infoNullRecords.DefaultIfEmpty()
                 where infoNullRecord == null
 
-                select new ValueTuple<T, S5InvAssembledObj>(infoNullRecord, invRecord);
+                select new ValueTuple<T, IS5InvAssembled>(infoNullRecord, invRecord);
 
             TOnly = ABC.Where(x => x.Item2 == null).ToList();
             Both_Ecomm = ABC.Where(x => x.Item2 != null && x.Item2.Inv.Ecommerce == "Y").ToList();
@@ -77,8 +77,8 @@ namespace cmArt.LibIntegrations.VennMapService
             InvOnly_Ecomm = DE.Where(x => x.Item1 == null && x.Item2.Inv.Ecommerce == "Y").ToList();
             InvOnly_NoEcomm = DE.Where(x => x.Item1 == null && x.Item2.Inv.Ecommerce == "N").ToList();
 
-            Both = new List<ValueTuple<T, S5InvAssembledObj>>(Both_Ecomm);
-            foreach (var rs in Both_NoEcomm)
+            Both = new List<ValueTuple<T, IS5InvAssembled>>(Both_Ecomm);
+            foreach ((T, IS5InvAssembled) rs in Both_NoEcomm)
             {
                 Both.Add(rs);
             }

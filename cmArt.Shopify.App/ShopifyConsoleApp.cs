@@ -26,6 +26,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using cmArt.Shopify.App.Services;
 using cmArt.LibIntegrations.VennMapService;
+using cmArt.Shopify.App.ReportViews;
 
 namespace cmArt.Shopify.App
 {
@@ -358,9 +359,9 @@ namespace cmArt.Shopify.App
         }
         private static void ProduceVennMap()
         {
-            Func<IS5InvAssembled, S5InvAssembledObj> As_S5InvAssembledObj = (x) =>
+            Func<IS5InvAssembled, IS5InvAssembled> As_S5InvAssembledObj = (x) =>
             {
-                return new S5InvAssembledObj
+                return new S5InvAssembled
                 (
                     x.Inv
                     , x.InvPrices_PerInventry_27 ?? new List<IInvPrice>()
@@ -375,7 +376,7 @@ namespace cmArt.Shopify.App
                 API_Products
                 , InvAss.Select(x => As_S5InvAssembledObj(x))
                 , IShopifyDataLoadFormat_Indexes.UniqueId
-                , S5InvAssembledObj_Indexes.InvUnique
+                , IS5InvAssembled_Indexes.InvUnique
             );
 
         }
@@ -386,6 +387,17 @@ namespace cmArt.Shopify.App
             if (UsingSyncProcess)
             {
                 Reports.SaveReport(map, settings, logger);
+                IEnumerable<(Shopify_Product, IS5InvAssembled)> Map_Both_Ecomm = map.Both_Ecomm;
+                IEnumerable<Shopify_Product_Pair_Flat> Both_Ecomm = Map_Both_Ecomm.Select
+                (m => 
+                {
+                    AdaptToShopifyDataLoadFormat tmpAdapter = new AdaptToShopifyDataLoadFormat();
+                    tmpAdapter.Init(m.Item2);
+                    Shopify_Product_Pair tmpSP = new Shopify_Product_Pair(m.Item1, tmpAdapter.AsShopify_Product());
+                    Shopify_Product_Pair_Adapter tmpFlatAdapter = new Shopify_Product_Pair_Adapter(tmpSP);
+                    return tmpFlatAdapter.AsShopify_Product_Pair_Flat();
+                });
+                Reports.SaveReport(Both_Ecomm, "Venn_Both_Ecomm", settings, logger);
             }
         }
         public static void Main_Console(string[] args)
