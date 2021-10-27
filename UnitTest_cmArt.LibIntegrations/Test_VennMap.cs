@@ -23,9 +23,9 @@ namespace UnitTest_cmArt.LibIntegrations
         public void TestUsingBasicScenario()
         {
             IEnumerable<InfoType> infoRecords = GetSampleInfoTypeRecords();
-            IEnumerable<S5InvAssembledObj> S5Records = GetSampleS5InvAssembledRecords();
+            IEnumerable<IS5InvAssembled> S5Records = GetSampleS5InvAssembledRecords();
             Func<InfoType, int> fInfoIndex = (info) => info.UniqueId;
-            Func<S5InvAssembledObj, int> fS5Index = (S5) => S5.Inv.InvUnique;
+            Func<IS5InvAssembled, int> fS5Index = (S5) => S5.Inv.InvUnique;
             VennMap<InfoType, int> map = new VennMap<InfoType, int>(infoRecords, S5Records, fInfoIndex, fS5Index);
 
             Assert.AreEqual(1, map.Both_Ecomm.First().Item1.UniqueId);
@@ -44,13 +44,13 @@ namespace UnitTest_cmArt.LibIntegrations
             Assert.IsNull(map.TOnly.First().Item2);
 
         }
-        private IEnumerable<S5InvAssembledObj> GetSampleS5InvAssembledRecords()
+        private IEnumerable<IS5InvAssembled> GetSampleS5InvAssembledRecords()
         {
-            List<S5InvAssembledObj> s5InvAssembledObjs = new List<S5InvAssembledObj>();
+            List<IS5InvAssembled> s5InvAssembledObjs = new List<IS5InvAssembled>();
 
             #region Create S5InvAssembledObj Item1, Ecomm=Y Exists on Web
             IS5InvAssembled tmpItem1 = Get_Sample_S5Inventory_for_one_Inventory_Item().ToAssembled().First();
-            S5InvAssembledObj Item1 = new S5InvAssembledObj
+            IS5InvAssembled Item1 = new S5InvAssembled
             (
                 tmpItem1.Inv
                 , tmpItem1.InvPrices_PerInventry_27
@@ -69,7 +69,7 @@ namespace UnitTest_cmArt.LibIntegrations
 
             #region Create S5InvAssembledObj Item2, Ecomm=Y Doesn't Exist on Web
             IS5InvAssembled tmpItem2 = Get_Sample_S5Inventory_for_one_Inventory_Item().ToAssembled().First();
-            S5InvAssembledObj Item2 = new S5InvAssembledObj
+            IS5InvAssembled Item2 = new S5InvAssembled
             (
                 tmpItem2.Inv
                 , tmpItem2.InvPrices_PerInventry_27
@@ -88,7 +88,7 @@ namespace UnitTest_cmArt.LibIntegrations
 
             #region Create S5InvAssembledObj Item3, Ecomm=N Exists on Web
             IS5InvAssembled tmpItem3 = Get_Sample_S5Inventory_for_one_Inventory_Item().ToAssembled().First();
-            S5InvAssembledObj Item3 = new S5InvAssembledObj
+            IS5InvAssembled Item3 = new S5InvAssembled
             (
                 tmpItem3.Inv
                 , tmpItem3.InvPrices_PerInventry_27
@@ -107,7 +107,7 @@ namespace UnitTest_cmArt.LibIntegrations
 
             #region Create S5InvAssembledObj Item4, Ecomm=N Doesn't Exist on Web
             IS5InvAssembled tmpItem4 = Get_Sample_S5Inventory_for_one_Inventory_Item().ToAssembled().First();
-            S5InvAssembledObj Item4 = new S5InvAssembledObj
+            IS5InvAssembled Item4 = new S5InvAssembled
             (
                 tmpItem4.Inv
                 , tmpItem4.InvPrices_PerInventry_27

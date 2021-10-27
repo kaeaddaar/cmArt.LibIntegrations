@@ -29,7 +29,7 @@ namespace cmArt.Shopify.App
             (IShopData) =>
             {
                 ; Shopify_Prices tmp = IShopData.AsShopify_Prices();
-                Shopify_Prices_Pair tmpSP = new Shopify_Prices_Pair(new Shopify_Prices(), tmp);
+                Generic_Pair<Shopify_Prices> tmpSP = new Generic_Pair<Shopify_Prices>(new Shopify_Prices(), tmp);
                 Shopify_Prices_Pair_Adapter tmpFlatAdapter = new Shopify_Prices_Pair_Adapter(tmpSP);
                 return tmpFlatAdapter.AsShopify_Prices_Pair_Flat();
             };
