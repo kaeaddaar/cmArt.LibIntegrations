@@ -200,10 +200,12 @@ namespace cmArt.Shopify.App
             logger.LogInformation(" -- Get products from adapter");
             PocoProductsAdapted = adapters.Select(x => x.AsShopify_Product());
             prods = PocoProductsAdapted;
+            Reports.SaveReport(prods, "ProductsFromAdapter", settings, logger);
 
             logger.LogInformation(" -- Get prices from adapter");
             PocoPricesAdapted = adapters.Select(x => x.AsShopify_Prices());
             prices = PocoPricesAdapted;
+            Reports.SaveReport(prices, "PricesFromAdapter", settings, logger);
 
             logger.LogInformation(" -- Get quantities from adapter");
             PocoQuantitiesAdapted = adapters.Select(x => x.AsShopify_Quantities());

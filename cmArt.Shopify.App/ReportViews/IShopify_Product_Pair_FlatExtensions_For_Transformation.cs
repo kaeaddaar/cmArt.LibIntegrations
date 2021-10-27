@@ -4,7 +4,7 @@ using System.Text;
 
 namespace cmArt.Shopify.App.ReportViews
 {
-    public static class IShopify_Product_PairExtensionsForTransformation
+    public static class IShopify_Product_PairExtensions_For_Transformation
     {
         public static Shopify_Product_Pair_Flat AsShopify_Product_Pair_Flat(this IShopify_Product_Pair_Flat data)
         {

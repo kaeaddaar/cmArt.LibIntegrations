@@ -17,6 +17,31 @@ namespace cmArt.Shopify.App
     {
         public static void SaveReport
         (
+            IEnumerable<IShopify_Prices> data
+            , string TableName
+            , StaticSettings settings
+            , ILogger logger
+        )
+        {
+            IEnumerable<IShopify_Prices> _data = data ?? new List<IShopify_Prices>();
+
+            Func<IShopify_Prices, Shopify_Prices_Pair_Flat> Transform =
+            (IShopData) =>
+            {
+                ; Shopify_Prices tmp = IShopData.AsShopify_Prices();
+                Shopify_Prices_Pair tmpSP = new Shopify_Prices_Pair(new Shopify_Prices(), tmp);
+                Shopify_Prices_Pair_Adapter tmpFlatAdapter = new Shopify_Prices_Pair_Adapter(tmpSP);
+                return tmpFlatAdapter.AsShopify_Prices_Pair_Flat();
+            };
+
+            IEnumerable<Shopify_Prices_Pair_Flat> flatData = _data.Select(d =>
+            {
+                return Transform(d);
+            });
+            SaveReport(flatData, TableName, settings, logger);
+        }
+        public static void SaveReport
+        (
             IEnumerable<IShopify_Product> data
             , string TableName
             , StaticSettings settings
@@ -65,12 +90,12 @@ namespace cmArt.Shopify.App
             });
             SaveReport(flatData, TableName, settings, logger);
         }
-        public static void SaveReport(IEnumerable<Shopify_Product_Pair_Flat> data, string TableName, StaticSettings settings, ILogger logger)
+        public static void SaveReport(IEnumerable<Shopify_Prices_Pair_Flat> data, string TableName, StaticSettings settings, ILogger logger)
         {
-            IEnumerable<Shopify_Product_Pair_Flat> _data = data ?? new List<Shopify_Product_Pair_Flat>();
-            var engine = new FileHelperAsyncEngine<Shopify_Product_Pair_Flat>();
-            engine.HeaderText = "LeftCat, LeftDescription, LeftInvUnique, LeftPartNumber, RightCat, RightDescription " +
-                ", RightInvUnique, RightPartNumber";
+            IEnumerable<Shopify_Prices_Pair_Flat> _data = data ?? new List<Shopify_Prices_Pair_Flat>();
+            var engine = new FileHelperAsyncEngine<Shopify_Prices_Pair_Flat>();
+            engine.HeaderText = "LeftInvUnique, LeftCat, LeftPartNumber, LeftPrices, LeftWholesaleCost, RightInvUnique, RightCat, " + 
+                "RightPartNumber, RightPrices, RightWholesaleCost";
             using (engine.BeginWriteFile(settings.OutputDirectory + $"\\{TableName}.csv"))
             {
                 foreach (var record in _data)
@@ -78,7 +103,20 @@ namespace cmArt.Shopify.App
                     engine.WriteNext(record);
                 }
             }
-
+        }
+        public static void SaveReport(IEnumerable<Shopify_Product_Pair_Flat> data, string TableName, StaticSettings settings, ILogger logger)
+        {
+            IEnumerable<Shopify_Product_Pair_Flat> _data = data ?? new List<Shopify_Product_Pair_Flat>();
+            var engine = new FileHelperAsyncEngine<Shopify_Product_Pair_Flat>();
+            engine.HeaderText = "LeftInvUnique, LeftCat, LeftPartNumber, LeftDescription, RightInvUnique, RightCat, RightPartNumber, " +
+                "RightDescription";
+            using (engine.BeginWriteFile(settings.OutputDirectory + $"\\{TableName}.csv"))
+            {
+                foreach (var record in _data)
+                {
+                    engine.WriteNext(record);
+                }
+            }
         }
         #region don't need any more, remove
         //public static void SaveReport(IEnumerable<AdaptToShopifyDataLoadFormat> adapters, StaticSettings settings, ILogger logger)
