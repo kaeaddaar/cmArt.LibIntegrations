@@ -7,7 +7,7 @@ using FileHelpers;
 namespace cmArt.Shopify.App.ReportViews
 {
     [DelimitedRecord(",")]
-    public class Shopify_Product_Pair_Flat : IShopify_Product_Pair_Flat
+    public class Shopify_Quantities_Pair_Flat : IShopify_Quantities_Pair_Flat
     {
         public int LeftInvUnique { get; set; }
 
@@ -21,7 +21,7 @@ namespace cmArt.Shopify.App.ReportViews
 
         [FieldQuoted]
         [FieldNullValue(typeof(string), "")]
-        public string LeftDescription { get; set; }
+        public string LeftQuantities { get; set; }
 
         public int RightInvUnique { get; set; }
 
@@ -35,6 +35,6 @@ namespace cmArt.Shopify.App.ReportViews
 
         [FieldQuoted]
         [FieldNullValue(typeof(string), "")]
-        public string RightDescription { get; set; }
+        public string RightQuantities { get; set; }
     }
 }

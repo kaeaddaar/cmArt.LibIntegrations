@@ -210,6 +210,7 @@ namespace cmArt.Shopify.App
             logger.LogInformation(" -- Get quantities from adapter");
             PocoQuantitiesAdapted = adapters.Select(x => x.AsShopify_Quantities());
             quantities = PocoQuantitiesAdapted;
+            Reports.SaveReport(quantities, "QuantitiesFromAdapter", settings, logger);
 
             // The old way - DNU unless you need to convert back to the adapter later on
             //prods = adapters.Select(x => (IShopify_Product)x);

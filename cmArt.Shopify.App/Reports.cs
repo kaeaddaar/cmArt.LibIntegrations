@@ -17,6 +17,31 @@ namespace cmArt.Shopify.App
     {
         public static void SaveReport
         (
+            IEnumerable<IShopify_Quantities> data
+            , string TableName
+            , StaticSettings settings
+            , ILogger logger
+        )
+        {
+            IEnumerable<IShopify_Quantities> _data = data ?? new List<IShopify_Quantities>();
+
+            Func<IShopify_Quantities, Shopify_Quantities_Pair_Flat> Transform =
+            (IShopData) =>
+            {
+                ; Shopify_Quantities tmp = IShopData.AsShopify_Quantities();
+                Generic_Pair<Shopify_Quantities> tmpSP = new Generic_Pair<Shopify_Quantities>(new Shopify_Quantities(), tmp);
+                Shopify_Quantities_Pair_Adapter tmpFlatAdapter = new Shopify_Quantities_Pair_Adapter(tmpSP);
+                return tmpFlatAdapter.AsShopify_Quantities_Pair_Flat();
+            };
+
+            IEnumerable<Shopify_Quantities_Pair_Flat> flatData = _data.Select(d =>
+            {
+                return Transform(d);
+            });
+            SaveReport(flatData, TableName, settings, logger);
+        }
+        public static void SaveReport
+        (
             IEnumerable<IShopify_Prices> data
             , string TableName
             , StaticSettings settings
@@ -89,6 +114,20 @@ namespace cmArt.Shopify.App
                 return Transform(d);
             });
             SaveReport(flatData, TableName, settings, logger);
+        }
+        public static void SaveReport(IEnumerable<Shopify_Quantities_Pair_Flat> data, string TableName, StaticSettings settings, ILogger logger)
+        {
+            IEnumerable<Shopify_Quantities_Pair_Flat> _data = data ?? new List<Shopify_Quantities_Pair_Flat>();
+            var engine = new FileHelperAsyncEngine<Shopify_Quantities_Pair_Flat>();
+            engine.HeaderText = "LeftInvUnique, LeftCat, LeftPartNumber, LeftQuantities, RightInvUnique, RightCat, " +
+                "RightPartNumber, RightQuantities";
+            using (engine.BeginWriteFile(settings.OutputDirectory + $"\\{TableName}.csv"))
+            {
+                foreach (var record in _data)
+                {
+                    engine.WriteNext(record);
+                }
+            }
         }
         public static void SaveReport(IEnumerable<Shopify_Prices_Pair_Flat> data, string TableName, StaticSettings settings, ILogger logger)
         {
