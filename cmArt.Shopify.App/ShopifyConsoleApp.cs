@@ -95,7 +95,9 @@ namespace cmArt.Shopify.App
         private static IEnumerable<IShopify_Prices> ChangedRecords_Prices;
         private static IEnumerable<IShopify_Quantities> ChangedRecords_Quantities;
         //ProduceVennMap()
-        private static VennMap<Shopify_Product, int> map;
+        private static VennMap<Shopify_Product, int> map_Product;
+        private static VennMap<Shopify_Prices, int> map_Prices;
+        private static VennMap<Shopify_Quantities, int> map_Quantities;
 
         #endregion variables
 
@@ -372,29 +374,30 @@ namespace cmArt.Shopify.App
             ChangedRecords_Quantities = UpdateProcessPattern<IShopify_Quantities, Shopify_Quantities, int>
                 .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Quantities, adapters, jq);
         }
-        private static void GetDetailedDifferences_Product()
+        private static void GetDetailedDifferences()
         {
-            IEnumerable<IShopify_Product> srcRs = adapters.Select(x => adapters);
-            IEnumerable<IShopify_Product> destRs = adapters.Select(x => API_Products);
-            Func<IShopify_Identity, int> _fGetKey = IShopifyDataLoadFormat_Indexes.UniqueId;
-            var fEquals = fEquals_Product;
+            var ChangedRecords_Product_Pairs = UpdateProcessPattern<IShopify_Product, Shopify_Product, int>
+                .GetChangedRecordPairs(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Product, adapters, API_Products);
 
-            var Common =
-            from src in srcRs
-            join dest in destRs
-            on _fGetKey(src) equals _fGetKey(dest)
-            where !fEquals(src, dest)
-            select new Tuple<IShopify_Product, IShopify_Product>(src, dest);
+            var ChangedRecords_Prices_Pairs = UpdateProcessPattern<IShopify_Prices, Shopify_Prices, int>
+                .GetChangedRecordPairs(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Prices, adapters, jp);
 
-            IEnumerable<IEnumerable<Changes_View>> tmp = Common.Select(x => x.Item1.Diff(x.Item2));
-            IEnumerable<Changes_View> tmpDetail = tmp.SelectMany(x => x);
-            tmpDetail.Select(x =>
-            {
-                changes.Add(x);
-                return x;
-            });
+            var ChangedRecords_Quantities_Pairs = UpdateProcessPattern<IShopify_Quantities, Shopify_Quantities, int>
+                .GetChangedRecordPairs(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Quantities, adapters, jq);
+
+            IEnumerable<IEnumerable<Changes_View>> tmpProd = ChangedRecords_Product_Pairs.Select(x => x.Item1.Diff(x.Item2));
+            IEnumerable<Changes_View> tmpDetailProd = tmpProd.SelectMany(x => x);
+            foreach (var x in tmpDetailProd) { changes.Add(x); }
+
+            IEnumerable<IEnumerable<Changes_View>> tmpPrices = ChangedRecords_Prices_Pairs.Select(x => x.Item1.Diff(x.Item2));
+            IEnumerable<Changes_View> tmpDetailPrices = tmpPrices.SelectMany(x => x);
+            foreach (var x in tmpDetailPrices) { changes.Add(x); }
+
+            IEnumerable<IEnumerable<Changes_View>> tmpQuantities = ChangedRecords_Quantities_Pairs.Select(x => x.Item1.Diff(x.Item2));
+            IEnumerable<Changes_View> tmpDetailQuantities = tmpQuantities.SelectMany(x => x);
+            foreach (var x in tmpDetailQuantities) { changes.Add(x); }
         }
-        private static void ProduceVennMap()
+        private static VennMap<Shopify_Product, int> ProduceVennMap(VennMap<Shopify_Product, int> map)
         {
             Func<IS5InvAssembled, IS5InvAssembled> As_S5InvAssembled = (x) =>
             {
@@ -415,13 +418,66 @@ namespace cmArt.Shopify.App
                 , IShopifyDataLoadFormat_Indexes.UniqueId
                 , IS5InvAssembled_Indexes.InvUnique
             );
+            return map;
+        }
+        private static VennMap<IShopify_Prices, int> ProduceVennMap(VennMap<IShopify_Prices, int> map)
+        {
+            Func<IS5InvAssembled, IS5InvAssembled> As_S5InvAssembled = (x) =>
+            {
+                return new S5InvAssembled
+                (
+                    x.Inv
+                    , x.InvPrices_PerInventry_27 ?? new List<IInvPrice>()
+                    , x.StokLines_PerInventry_27 ?? new List<IStok>()
+                    , x.CommentsLines_PerInventry_27 ?? new List<IComments>()
+                    , x.AltSuplies_PerInventry_27 ?? new List<IAltSuply>()
+                );
+            };
 
+            map = new VennMap<IShopify_Prices, int>
+            (
+                jp
+                , InvAss.Select(x => As_S5InvAssembled(x))
+                , IShopifyDataLoadFormat_Indexes.UniqueId
+                , IS5InvAssembled_Indexes.InvUnique
+            );
+            return map;
+        }
+        private static VennMap<IShopify_Quantities, int> ProduceVennMap(VennMap<IShopify_Quantities, int> map)
+        {
+            Func<IS5InvAssembled, IS5InvAssembled> As_S5InvAssembled = (x) =>
+            {
+                return new S5InvAssembled
+                (
+                    x.Inv
+                    , x.InvPrices_PerInventry_27 ?? new List<IInvPrice>()
+                    , x.StokLines_PerInventry_27 ?? new List<IStok>()
+                    , x.CommentsLines_PerInventry_27 ?? new List<IComments>()
+                    , x.AltSuplies_PerInventry_27 ?? new List<IAltSuply>()
+                );
+            };
+
+            map = new VennMap<IShopify_Quantities, int>
+            (
+                jq
+                , InvAss.Select(x => As_S5InvAssembled(x))
+                , IShopifyDataLoadFormat_Indexes.UniqueId
+                , IS5InvAssembled_Indexes.InvUnique
+            );
+            return map;
         }
         private static void ProduceReportsBeforeProcessing()
         {
             Reports.SaveReport(changes, "Differences_Detail", settings, logger);
+            ProduceReportsBeforeProcessing_Product();
+            ProduceReportsBeforeProcessing_Prices();
+            ProduceReportsBeforeProcessing_Quantities();
+        }
+        private static void ProduceReportsBeforeProcessing_Product()
+        {
+            Reports.SaveReport(changes, "Differences_Detail", settings, logger);
             // Venn Reports are relevant for the Sync process only because it compares System Five and the Web Site we're syncing to.
-            bool UsingSyncProcess = (map != null);
+            bool UsingSyncProcess = (map_Product != null);
             if (UsingSyncProcess)
             {
                 //Reports.SaveReport(map, settings, logger);
@@ -435,22 +491,92 @@ namespace cmArt.Shopify.App
                         return tmpFlatAdapter.AsShopify_Product_Pair_Flat();
                     });
 
-                IEnumerable<(Shopify_Product, IS5InvAssembled)> Map_Both_Ecomm = map.Both_Ecomm;
+                IEnumerable<(Shopify_Product, IS5InvAssembled)> Map_Both_Ecomm = map_Product.Both_Ecomm;
                 IEnumerable<Shopify_Product_Pair_Flat> Both_Ecomm = Map_Both_Ecomm.Select(m => Transform(m));
                 Reports.SaveReport(Both_Ecomm, "Venn_Product_Both_Ecomm", settings, logger);
 
-                IEnumerable<(Shopify_Product, IS5InvAssembled)> Map_Both_NoEcomm = map.Both_NoEcomm;
+                IEnumerable<(Shopify_Product, IS5InvAssembled)> Map_Both_NoEcomm = map_Product.Both_NoEcomm;
                 IEnumerable<Shopify_Product_Pair_Flat> Both_NoEcomm = Map_Both_NoEcomm.Select(m => Transform(m));
                 Reports.SaveReport(Both_NoEcomm, "Venn_Product_Both_NoEcomm", settings, logger);
 
-                IEnumerable<(Shopify_Product, IS5InvAssembled)> Map_InvOnly_Ecomm = map.InvOnly_Ecomm;
+                IEnumerable<(Shopify_Product, IS5InvAssembled)> Map_InvOnly_Ecomm = map_Product.InvOnly_Ecomm;
                 IEnumerable<Shopify_Product_Pair_Flat> InvOnly_Ecomm = Map_InvOnly_Ecomm.Select(m => Transform(m));
                 Reports.SaveReport(InvOnly_Ecomm, "Venn_Product_InvOnly_Ecomm", settings, logger);
 
-                IEnumerable<(Shopify_Product, IS5InvAssembled)> Map_InvOnly_NoEcomm = map.InvOnly_NoEcomm;
+                IEnumerable<(Shopify_Product, IS5InvAssembled)> Map_InvOnly_NoEcomm = map_Product.InvOnly_NoEcomm;
                 IEnumerable<Shopify_Product_Pair_Flat> InvOnly_NoEcomm = Map_InvOnly_NoEcomm.Select(m => Transform(m));
                 Reports.SaveReport(InvOnly_NoEcomm, "Venn_Product_InvOnly_NoEcomm", settings, logger);
 
+            }
+        }
+        private static void ProduceReportsBeforeProcessing_Prices()
+        {
+            // Venn Reports are relevant for the Sync process only because it compares System Five and the Web Site we're syncing to.
+            bool UsingSyncProcess = (map_Prices != null);
+            if (UsingSyncProcess)
+            {
+                //Reports.SaveReport(map, settings, logger);
+                Func<(Shopify_Prices, IS5InvAssembled), Shopify_Prices_Pair_Flat> Transform =
+                    (m =>
+                    {
+                        AdaptToShopifyDataLoadFormat tmpAdapter = new AdaptToShopifyDataLoadFormat();
+                        tmpAdapter.Init(m.Item2);
+                        Generic_Pair<Shopify_Prices> tmpSP = new Generic_Pair<Shopify_Prices>(m.Item1, tmpAdapter.AsShopify_Prices());
+                        Shopify_Prices_Pair_Adapter tmpFlatAdapter = new Shopify_Prices_Pair_Adapter(tmpSP);
+                        return tmpFlatAdapter.AsShopify_Prices_Pair_Flat();
+                    });
+
+                string DataName = "Prices";
+                IEnumerable<(Shopify_Prices, IS5InvAssembled)> Map_Both_Ecomm = map_Prices.Both_Ecomm;
+                IEnumerable<Shopify_Prices_Pair_Flat> Both_Ecomm = Map_Both_Ecomm.Select(m => Transform(m));
+                Reports.SaveReport(Both_Ecomm, $"Venn_{DataName}_Both_Ecomm", settings, logger);
+
+                IEnumerable<(Shopify_Prices, IS5InvAssembled)> Map_Both_NoEcomm = map_Prices.Both_NoEcomm;
+                IEnumerable<Shopify_Prices_Pair_Flat> Both_NoEcomm = Map_Both_NoEcomm.Select(m => Transform(m));
+                Reports.SaveReport(Both_NoEcomm, $"Venn_{DataName}_Both_NoEcomm", settings, logger);
+
+                IEnumerable<(Shopify_Prices, IS5InvAssembled)> Map_InvOnly_Ecomm = map_Prices.InvOnly_Ecomm;
+                IEnumerable<Shopify_Prices_Pair_Flat> InvOnly_Ecomm = Map_InvOnly_Ecomm.Select(m => Transform(m));
+                Reports.SaveReport(InvOnly_Ecomm, $"Venn_{DataName}_InvOnly_Ecomm", settings, logger);
+
+                IEnumerable<(Shopify_Prices, IS5InvAssembled)> Map_InvOnly_NoEcomm = map_Prices.InvOnly_NoEcomm;
+                IEnumerable<Shopify_Prices_Pair_Flat> InvOnly_NoEcomm = Map_InvOnly_NoEcomm.Select(m => Transform(m));
+                Reports.SaveReport(InvOnly_NoEcomm, $"Venn_{DataName}_InvOnly_NoEcomm", settings, logger);
+            }
+        }
+        private static void ProduceReportsBeforeProcessing_Quantities()
+        {
+            // Venn Reports are relevant for the Sync process only because it compares System Five and the Web Site we're syncing to.
+            bool UsingSyncProcess = (map_Quantities != null);
+            if (UsingSyncProcess)
+            {
+                //Reports.SaveReport(map, settings, logger);
+                Func<(Shopify_Quantities, IS5InvAssembled), Shopify_Quantities_Pair_Flat> Transform =
+                    (m =>
+                    {
+                        AdaptToShopifyDataLoadFormat tmpAdapter = new AdaptToShopifyDataLoadFormat();
+                        tmpAdapter.Init(m.Item2);
+                        Generic_Pair<Shopify_Quantities> tmpSP = new Generic_Pair<Shopify_Quantities>(m.Item1, tmpAdapter.AsShopify_Quantities());
+                        Shopify_Quantities_Pair_Adapter tmpFlatAdapter = new Shopify_Quantities_Pair_Adapter(tmpSP);
+                        return tmpFlatAdapter.AsShopify_Quantities_Pair_Flat();
+                    });
+
+                string DataName = "Quantities";
+                IEnumerable<(Shopify_Quantities, IS5InvAssembled)> Map_Both_Ecomm = map_Quantities.Both_Ecomm;
+                IEnumerable<Shopify_Quantities_Pair_Flat> Both_Ecomm = Map_Both_Ecomm.Select(m => Transform(m));
+                Reports.SaveReport(Both_Ecomm, $"Venn_{DataName}_Both_Ecomm", settings, logger);
+
+                IEnumerable<(Shopify_Quantities, IS5InvAssembled)> Map_Both_NoEcomm = map_Quantities.Both_NoEcomm;
+                IEnumerable<Shopify_Quantities_Pair_Flat> Both_NoEcomm = Map_Both_NoEcomm.Select(m => Transform(m));
+                Reports.SaveReport(Both_NoEcomm, $"Venn_{DataName}_Both_NoEcomm", settings, logger);
+
+                IEnumerable<(Shopify_Quantities, IS5InvAssembled)> Map_InvOnly_Ecomm = map_Quantities.InvOnly_Ecomm;
+                IEnumerable<Shopify_Quantities_Pair_Flat> InvOnly_Ecomm = Map_InvOnly_Ecomm.Select(m => Transform(m));
+                Reports.SaveReport(InvOnly_Ecomm, $"Venn_{DataName}_InvOnly_Ecomm", settings, logger);
+
+                IEnumerable<(Shopify_Quantities, IS5InvAssembled)> Map_InvOnly_NoEcomm = map_Quantities.InvOnly_NoEcomm;
+                IEnumerable<Shopify_Quantities_Pair_Flat> InvOnly_NoEcomm = Map_InvOnly_NoEcomm.Select(m => Transform(m));
+                Reports.SaveReport(InvOnly_NoEcomm, $"Venn_{DataName}_InvOnly_NoEcomm", settings, logger);
             }
         }
         public static void Main_Console(string[] args)
@@ -480,12 +606,14 @@ namespace cmArt.Shopify.App
             else
             {
                 GetShopifyData();
-                ProduceVennMap();
+                map_Product = ProduceVennMap(map_Product);
+                map_Prices = ProduceVennMap(map_Prices);
+                map_Quantities = ProduceVennMap(map_Quantities);
             }
 
             GetChangedRecords();
 
-            GetDetailedDifferences_Product();
+            GetDetailedDifferences();
 
             ProduceReportsBeforeProcessing();
 

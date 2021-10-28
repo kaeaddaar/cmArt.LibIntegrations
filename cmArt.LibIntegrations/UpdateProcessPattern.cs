@@ -7,23 +7,33 @@ namespace cmArt.LibIntegrations
 {
     public static class UpdateProcessPattern<IofT, T, Key>
     {
-        public static IEnumerable<IofT> GetChangedRecords
+        public static IEnumerable<Tuple<IofT, IofT>> GetChangedRecordPairs
         (
             Func<IofT, Key> fGetKey
-            , Func<IofT, IofT, bool> fEquals_Prices
+            , Func<IofT, IofT, bool> fEquals
             , IEnumerable<IofT> adapters
             , IEnumerable<IofT> Data
         )
         {
-            // get changed records (prices comparison)
             UpdateProcess<IofT, Key> updater = new UpdateProcess<IofT, Key>();
             updater.fGetKey = fGetKey;
             updater.SourceRecords = adapters;
             updater.DestRecords = Data;
 
-            IEnumerable<Tuple<IofT, IofT>> ChangedRecordPairs_Prices = updater.GetUpdatesByCommonFields(fEquals_Prices);
-            IEnumerable<IofT> ChangedRecords_Prices = ChangedRecordPairs_Prices.Select(p => p.Item1);
-            return ChangedRecords_Prices;
+            IEnumerable<Tuple<IofT, IofT>> ChangedRecordPairs = updater.GetUpdatesByCommonFields(fEquals);
+            return ChangedRecordPairs;
+        }       
+        public static IEnumerable<IofT> GetChangedRecords
+        (
+            Func<IofT, Key> fGetKey
+            , Func<IofT, IofT, bool> fEquals
+            , IEnumerable<IofT> adapters
+            , IEnumerable<IofT> Data
+        )
+        {
+            IEnumerable<Tuple<IofT, IofT>> ChangedRecordPairs = GetChangedRecordPairs(fGetKey, fEquals, adapters, Data);
+            IEnumerable<IofT> ChangedRecords = ChangedRecordPairs.Select(p => p.Item1);
+            return ChangedRecords;
         }
     }
 }

@@ -128,7 +128,7 @@ namespace cmArt.LibIntegrations
         {
             return GetUpdatesByCommonFields(SourceRecords: _SourceRecords, DestRecords: _DestRecords, fEquals: fEquals);
         }
-        private IEnumerable<Tuple<TCommon, TCommon>> GetUpdatesByCommonFields
+        public IEnumerable<Tuple<TCommon, TCommon>> GetUpdatesByCommonFields
         (
             IEnumerable<TCommon> SourceRecords
             , IEnumerable<TCommon> DestRecords
