@@ -115,6 +115,20 @@ namespace cmArt.Shopify.App
             });
             SaveReport(flatData, TableName, settings, logger);
         }
+        public static void SaveReport(IEnumerable<Changes_View> data, string TableName, StaticSettings settings, ILogger logger)
+        {
+            IEnumerable<Changes_View> _data = data ?? new List<Changes_View>();
+            var engine = new FileHelperAsyncEngine<Changes_View>();
+            engine.HeaderText = "InvUnique, Cat, PartNumber, FieldName, S5ValueToSendToShopify, ShopifyValueBeforeUpdate";
+
+            using (engine.BeginWriteFile(settings.OutputDirectory + $"\\{TableName}.csv"))
+            {
+                foreach (var record in _data)
+                {
+                    engine.WriteNext(record);
+                }
+            }
+        }
         public static void SaveReport(IEnumerable<Shopify_Quantities_Pair_Flat> data, string TableName, StaticSettings settings, ILogger logger)
         {
             IEnumerable<Shopify_Quantities_Pair_Flat> _data = data ?? new List<Shopify_Quantities_Pair_Flat>();

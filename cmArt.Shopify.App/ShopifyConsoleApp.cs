@@ -79,10 +79,10 @@ namespace cmArt.Shopify.App
         private static IEnumerable<Shopify_Quantities> PrevDataLoad_Quantities;
         private static IEnumerable<Shopify_Prices> PrevDataLoad_Prices;
         //GetShopifyData()
-        private static Func<IShopifyDataLoadFormat, IShopifyDataLoadFormat, bool> fEquals = (from, to) => { return from.Equals(to); };
-        private static Func<IShopify_Prices, IShopify_Prices, bool> fEquals_Prices = (from, to) => { return from.Equals(to); };
-        private static Func<IShopify_Quantities, IShopify_Quantities, bool> fEquals_Quantities = (from, to) => { return from.Equals(to); };
-        private static Func<IShopify_Product, IShopify_Product, bool> fEquals_Product = (from, to) => { return from.Equals(to); };
+        private static List<Changes_View> changes = new List<Changes_View>();
+        private static Func<IShopify_Prices, IShopify_Prices, bool> fEquals_Prices;
+        private static Func<IShopify_Quantities, IShopify_Quantities, bool> fEquals_Quantities;
+        private static Func<IShopify_Product, IShopify_Product, bool> fEquals_Product;
         //GetShopifyData_Reece_Products()
         private static IEnumerable<Shopify_Product> API_Products;
         private static IEnumerable<IShopify_Prices> jp;
@@ -338,13 +338,25 @@ namespace cmArt.Shopify.App
         }
         private static void GetShopifyData()
         {
+            changes = changes ?? new List<Changes_View>();
+
             GetShopifyData_Reece_Products();
             GetShopifyData_Reece_Prices();
             GetShopifyData_Reece_Quantities();
         }
         private static void GetEqualityFunctions()
         {
-            fEquals = (from, to) => { return from.Equals(to); };
+            //fEquals = (from, to) => 
+            //{
+            //    IEnumerable<Changes_View> tmp = from.Diff(to);
+            //    tmp.Select(x =>
+            //    {
+            //        changes.Add(x);
+            //        return x;
+            //    }); 
+            //    return from.Equals(to); 
+            //};
+
             fEquals_Prices = (from, to) => { return from.Equals(to); };
             fEquals_Quantities = (from, to) => { return from.Equals(to); };
             fEquals_Product = (from, to) => { return from.Equals(to); };
@@ -360,9 +372,31 @@ namespace cmArt.Shopify.App
             ChangedRecords_Quantities = UpdateProcessPattern<IShopify_Quantities, Shopify_Quantities, int>
                 .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Quantities, adapters, jq);
         }
+        private static void GetDetailedDifferences_Product()
+        {
+            IEnumerable<IShopify_Product> srcRs = adapters.Select(x => adapters);
+            IEnumerable<IShopify_Product> destRs = adapters.Select(x => API_Products);
+            Func<IShopify_Identity, int> _fGetKey = IShopifyDataLoadFormat_Indexes.UniqueId;
+            var fEquals = fEquals_Product;
+
+            var Common =
+            from src in srcRs
+            join dest in destRs
+            on _fGetKey(src) equals _fGetKey(dest)
+            where !fEquals(src, dest)
+            select new Tuple<IShopify_Product, IShopify_Product>(src, dest);
+
+            IEnumerable<IEnumerable<Changes_View>> tmp = Common.Select(x => x.Item1.Diff(x.Item2));
+            IEnumerable<Changes_View> tmpDetail = tmp.SelectMany(x => x);
+            tmpDetail.Select(x =>
+            {
+                changes.Add(x);
+                return x;
+            });
+        }
         private static void ProduceVennMap()
         {
-            Func<IS5InvAssembled, IS5InvAssembled> As_S5InvAssembledObj = (x) =>
+            Func<IS5InvAssembled, IS5InvAssembled> As_S5InvAssembled = (x) =>
             {
                 return new S5InvAssembled
                 (
@@ -377,7 +411,7 @@ namespace cmArt.Shopify.App
             map = new VennMap<Shopify_Product, int>
             (
                 API_Products
-                , InvAss.Select(x => As_S5InvAssembledObj(x))
+                , InvAss.Select(x => As_S5InvAssembled(x))
                 , IShopifyDataLoadFormat_Indexes.UniqueId
                 , IS5InvAssembled_Indexes.InvUnique
             );
@@ -385,6 +419,7 @@ namespace cmArt.Shopify.App
         }
         private static void ProduceReportsBeforeProcessing()
         {
+            Reports.SaveReport(changes, "Differences_Detail", settings, logger);
             // Venn Reports are relevant for the Sync process only because it compares System Five and the Web Site we're syncing to.
             bool UsingSyncProcess = (map != null);
             if (UsingSyncProcess)
@@ -449,6 +484,8 @@ namespace cmArt.Shopify.App
             }
 
             GetChangedRecords();
+
+            GetDetailedDifferences_Product();
 
             ProduceReportsBeforeProcessing();
 

@@ -178,6 +178,8 @@ namespace cmArt.Shopify.App
             catch
             {
                 Console.WriteLine("Error emailing error message. Ignoring.");
+                Console.WriteLine("Error Body(See below):");
+                Console.WriteLine(body);
             }
         }
     }

@@ -16,12 +16,12 @@ namespace cmArt.LibIntegrations
         )
         {
             // get changed records (prices comparison)
-            UpdateProcess<IofT, Key> updater_Prices = new UpdateProcess<IofT, Key>();
-            updater_Prices.fGetKey = fGetKey;
-            updater_Prices.SourceRecords = adapters;
-            updater_Prices.DestRecords = Data;
+            UpdateProcess<IofT, Key> updater = new UpdateProcess<IofT, Key>();
+            updater.fGetKey = fGetKey;
+            updater.SourceRecords = adapters;
+            updater.DestRecords = Data;
 
-            IEnumerable<Tuple<IofT, IofT>> ChangedRecordPairs_Prices = updater_Prices.GetUpdatesByCommonFields(fEquals_Prices);
+            IEnumerable<Tuple<IofT, IofT>> ChangedRecordPairs_Prices = updater.GetUpdatesByCommonFields(fEquals_Prices);
             IEnumerable<IofT> ChangedRecords_Prices = ChangedRecordPairs_Prices.Select(p => p.Item1);
             return ChangedRecords_Prices;
         }
