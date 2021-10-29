@@ -17,6 +17,84 @@ namespace cmArt.Shopify.App
     {
         public static void SaveReport
         (
+            IEnumerable<Tuple<IShopify_Product, IShopify_Product>> data
+            , string TableName
+            , StaticSettings settings
+            , ILogger logger
+        )
+        {
+            IEnumerable<Tuple<IShopify_Product, IShopify_Product>> _data = data ?? new List<Tuple<IShopify_Product, IShopify_Product>>();
+
+            Func<Tuple<IShopify_Product, IShopify_Product>, Shopify_Product_Pair_Flat> Transform =
+            (IShopProd) =>
+            {
+                Shopify_Product tmp = IShopProd.Item2.AsShopify_Product();
+                Shopify_Product tmp1 = IShopProd.Item1.AsShopify_Product();
+                Generic_Pair<Shopify_Product> tmpSP = new Generic_Pair<Shopify_Product>(tmp1, tmp);
+                Shopify_Product_Pair_Adapter tmpFlatAdapter = new Shopify_Product_Pair_Adapter(tmpSP);
+                return tmpFlatAdapter.AsShopify_Product_Pair_Flat();
+            };
+
+            IEnumerable<Shopify_Product_Pair_Flat> flatData = _data.Select(d =>
+            {
+                return Transform(d);
+            });
+            SaveReport(flatData, TableName, settings, logger);
+        }
+        public static void SaveReport
+        (
+            IEnumerable<Tuple<IShopify_Prices, IShopify_Prices>> data
+            , string TableName
+            , StaticSettings settings
+            , ILogger logger
+        )
+        {
+            IEnumerable<Tuple<IShopify_Prices, IShopify_Prices>> _data = data ?? new List<Tuple<IShopify_Prices, IShopify_Prices>>();
+
+            Func<Tuple<IShopify_Prices, IShopify_Prices>, Shopify_Prices_Pair_Flat> Transform =
+            (IShopProd) =>
+            {
+                Shopify_Prices tmp = IShopProd.Item2.AsShopify_Prices();
+                Shopify_Prices tmp1 = IShopProd.Item1.AsShopify_Prices();
+                Generic_Pair<Shopify_Prices> tmpSP = new Generic_Pair<Shopify_Prices>(tmp1, tmp);
+                Shopify_Prices_Pair_Adapter tmpFlatAdapter = new Shopify_Prices_Pair_Adapter(tmpSP);
+                return tmpFlatAdapter.AsShopify_Prices_Pair_Flat();
+            };
+
+            IEnumerable<Shopify_Prices_Pair_Flat> flatData = _data.Select(d =>
+            {
+                return Transform(d);
+            });
+            SaveReport(flatData, TableName, settings, logger);
+        }
+        public static void SaveReport
+        (
+            IEnumerable<Tuple<IShopify_Quantities, IShopify_Quantities>> data
+            , string TableName
+            , StaticSettings settings
+            , ILogger logger
+        )
+        {
+            IEnumerable<Tuple<IShopify_Quantities, IShopify_Quantities>> _data = data ?? new List<Tuple<IShopify_Quantities, IShopify_Quantities>>();
+
+            Func<Tuple<IShopify_Quantities, IShopify_Quantities>, Shopify_Quantities_Pair_Flat> Transform =
+            (IShopProd) =>
+            {
+                Shopify_Quantities tmp = IShopProd.Item2.AsShopify_Quantities();
+                Shopify_Quantities tmp1 = IShopProd.Item1.AsShopify_Quantities();
+                Generic_Pair<Shopify_Quantities> tmpSP = new Generic_Pair<Shopify_Quantities>(tmp1, tmp);
+                Shopify_Quantities_Pair_Adapter tmpFlatAdapter = new Shopify_Quantities_Pair_Adapter(tmpSP);
+                return tmpFlatAdapter.AsShopify_Quantities_Pair_Flat();
+            };
+
+            IEnumerable<Shopify_Quantities_Pair_Flat> flatData = _data.Select(d =>
+            {
+                return Transform(d);
+            });
+            SaveReport(flatData, TableName, settings, logger);
+        }
+        public static void SaveReport
+        (
             IEnumerable<IShopify_Quantities> data
             , string TableName
             , StaticSettings settings

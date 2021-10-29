@@ -396,8 +396,9 @@ namespace cmArt.Shopify.App
 
             ChangedRecords_Quantities = UpdateProcessPattern<IShopify_Quantities, Shopify_Quantities, int>
                 .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Quantities, adapters, API_Quantities);
+
         }
-        private static void GetDetailedDifferences()
+        private static void GetDetailedDifferences_And_Create_Reports()
         {
             var ChangedRecords_Product_Pairs = UpdateProcessPattern<IShopify_Product, Shopify_Product, int>
                 .GetChangedRecordPairs(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Product, adapters, API_Products);
@@ -419,6 +420,10 @@ namespace cmArt.Shopify.App
             IEnumerable<IEnumerable<Changes_View>> tmpQuantities = ChangedRecords_Quantities_Pairs.Select(x => x.Item1.Diff(x.Item2));
             IEnumerable<Changes_View> tmpDetailQuantities = tmpQuantities.SelectMany(x => x);
             foreach (var x in tmpDetailQuantities) { changes.Add(x); }
+
+            Reports.SaveReport(ChangedRecords_Product_Pairs, "Changed_Product", settings, logger);
+            Reports.SaveReport(ChangedRecords_Prices_Pairs, "Changed_Prices", settings, logger);
+            Reports.SaveReport(ChangedRecords_Quantities_Pairs, "Changed_Quantities", settings, logger);
         }
         private static VennMap<Shopify_Product, int> ProduceVennMap(VennMap<Shopify_Product, int> map)
         {
@@ -636,7 +641,7 @@ namespace cmArt.Shopify.App
 
             GetChangedRecords();
 
-            GetDetailedDifferences();
+            GetDetailedDifferences_And_Create_Reports();
 
             ProduceReportsBeforeProcessing();
 
