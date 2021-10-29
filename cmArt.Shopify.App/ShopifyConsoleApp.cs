@@ -85,8 +85,8 @@ namespace cmArt.Shopify.App
         private static Func<IShopify_Product, IShopify_Product, bool> fEquals_Product;
         //GetShopifyData_Reece_Products()
         private static IEnumerable<Shopify_Product> API_Products;
-        private static IEnumerable<IShopify_Prices> jp;
-        private static IEnumerable<IShopify_Quantities> jq;
+        private static IEnumerable<Shopify_Prices> API_Prices;
+        private static IEnumerable<Shopify_Quantities> API_Quantities;
         //GetShopifyData_Reece_Prices()
         private static Func<IShopify_Product, string> fGetProductPartNumber;
         private static Func<IShopify_Prices, string> fGetPricesPartNumber;
@@ -182,7 +182,7 @@ namespace cmArt.Shopify.App
         private static void FilterForECommAndSave()
         {
             logger.LogInformation("Filtering for Ecommerce equals Y");
-            ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y").Take(10);
+            ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y");
             Reports.SaveReport(ECommInvAss, "EcommProduct_From_SystemFive", settings, logger);
             //string strECommInvAss = SerializeForExport(ECommInvAss);
             //File.WriteAllText(settings.OutputDirectory + "\\strEcommInvAss.txt", strECommInvAss);
@@ -202,17 +202,17 @@ namespace cmArt.Shopify.App
             logger.LogInformation(" -- Get products from adapter");
             PocoProductsAdapted = adapters.Select(x => x.AsShopify_Product());
             prods = PocoProductsAdapted;
-            Reports.SaveReport(prods, "ProductsFromAdapter", settings, logger);
+            Reports.SaveReport(prods, "FromSystem5_Products", settings, logger);
 
             logger.LogInformation(" -- Get prices from adapter");
             PocoPricesAdapted = adapters.Select(x => x.AsShopify_Prices());
             prices = PocoPricesAdapted;
-            Reports.SaveReport(prices, "PricesFromAdapter", settings, logger);
+            Reports.SaveReport(prices, "FromSystem5_Prices", settings, logger);
 
             logger.LogInformation(" -- Get quantities from adapter");
             PocoQuantitiesAdapted = adapters.Select(x => x.AsShopify_Quantities());
             quantities = PocoQuantitiesAdapted;
-            Reports.SaveReport(quantities, "QuantitiesFromAdapter", settings, logger);
+            Reports.SaveReport(quantities, "FromSystem5_Quantities", settings, logger);
 
             // The old way - DNU unless you need to convert back to the adapter later on
             //prods = adapters.Select(x => (IShopify_Product)x);
@@ -234,8 +234,8 @@ namespace cmArt.Shopify.App
             cacheShopify_Prices._02_SaveNewestToCache(PocoPricesAdapted);
 
             API_Products = PrevDataLoad_Product;
-            jp = PrevDataLoad_Prices;
-            jq = PrevDataLoad_Quantities;
+            API_Prices = PrevDataLoad_Prices;
+            API_Quantities = PrevDataLoad_Quantities;
         }
         private static void GetShopifyData_Reece_Products()
         {
@@ -260,6 +260,8 @@ namespace cmArt.Shopify.App
                 logger.LogInformation($"Failed to get All shopify products from Custom API. Message = \"{e.Message}\"");
                 Console.ReadKey();
             }
+
+            Reports.SaveReport(API_Products, "FromShopify_Products", settings, logger);
         }
         private static void GetShopifyData_Reece_Prices()
         {
@@ -285,14 +287,14 @@ namespace cmArt.Shopify.App
                 logger.LogInformation($"Failed to get All shopify prices from Custom API. Message = \"{e.Message}\"");
                 Console.ReadKey();
             }
-            IEnumerable<IShopify_Prices> MissingInfoPrices = tmpPrices.Select(p => p.AsShopify_Prices());
+            IEnumerable<Shopify_Prices> MissingInfoPrices = tmpPrices.Select(p => p.AsShopify_Prices());
             fGetProductPartNumber = (sp) => { return sp.PartNumber.TrimEnd(); };
             fGetPricesPartNumber = (sp) => { return sp.PartNumber.TrimEnd(); };
 
-            IEnumerable<Tuple<Shopify_Product, IShopify_Prices>> joined_prices =
-                GenericJoins<Shopify_Product, IShopify_Prices, string>.LeftJoin(API_Products, MissingInfoPrices, fGetProductPartNumber, fGetPricesPartNumber);
+            IEnumerable<Tuple<Shopify_Product, Shopify_Prices>> joined_prices =
+                GenericJoins<Shopify_Product, Shopify_Prices, string>.LeftJoin(API_Products, MissingInfoPrices, fGetProductPartNumber, fGetPricesPartNumber);
 
-            jp = joined_prices.Where(p => p.Item2 != null).Select(p =>
+            API_Prices = joined_prices.Where(p => p.Item2 != null).Select(p =>
             {
                 p.Item2.InvUnique = p.Item1.InvUnique;
                 p.Item2.Cat = p.Item1.Cat;
@@ -300,6 +302,7 @@ namespace cmArt.Shopify.App
                 return p.Item2;
             });
 
+            Reports.SaveReport(API_Prices, "FromShopify_Prices", settings, logger);
         }
         private static void GetShopifyData_Reece_Quantities()
         {
@@ -326,17 +329,19 @@ namespace cmArt.Shopify.App
                 logger.LogInformation($"Failed to get All shopify quantities from Custom API. Message = \"{e.Message}\"");
                 Console.ReadKey();
             }
-            IEnumerable<IShopify_Quantities> MissingInfoQuantities = tmpApi_Quantities.Select(p => p.AsShopify_Quantities());
+            IEnumerable<Shopify_Quantities> MissingInfoQuantities = tmpApi_Quantities.Select(p => p.AsShopify_Quantities());
             Func<IShopify_Quantities, string> fGetQuantitiesPartNumber = (sp) => { return sp.PartNumber; };
 
-            IEnumerable<Tuple<IShopify_Product, IShopify_Quantities>> joined_quantities =
-                GenericJoins<IShopify_Product, IShopify_Quantities, string>.LeftJoin(API_Products, MissingInfoQuantities, fGetProductPartNumber, fGetQuantitiesPartNumber);
-            jq = joined_quantities.Where(p => p.Item2 != null).Select(p =>
+            IEnumerable<Tuple<IShopify_Product, Shopify_Quantities>> joined_quantities =
+                GenericJoins<IShopify_Product, Shopify_Quantities, string>.LeftJoin(API_Products, MissingInfoQuantities, fGetProductPartNumber, fGetQuantitiesPartNumber);
+            API_Quantities = joined_quantities.Where(p => p.Item2 != null).Select(p =>
             {
                 p.Item2.InvUnique = p.Item1.InvUnique;
                 p.Item2.Cat = p.Item1.Cat;
                 return p.Item2;
             });
+
+            Reports.SaveReport(API_Quantities, "FromShopify_Quantities", settings, logger);
         }
         private static void GetShopifyData()
         {
@@ -345,6 +350,24 @@ namespace cmArt.Shopify.App
             GetShopifyData_Reece_Products();
             GetShopifyData_Reece_Prices();
             GetShopifyData_Reece_Quantities();
+        }
+        private static void CheckForDuplicates()
+        {
+            var Duplicates_Products = API_Products.GroupBy(x => x.PartNumber).Where(x => x.Count() > 1).Select(x => x.Key);
+            var Duplicates_Prices = API_Prices.GroupBy(x => x.PartNumber).Where(x => x.Count() > 1).Select(x => x.Key);
+            var Duplicates_Quantities = API_Quantities.GroupBy(x => x.PartNumber).Where(x => x.Count() > 1).Select(x => x.Key);
+
+            string Products = string.Join(Environment.NewLine, Duplicates_Products);
+            string Prices = string.Join(Environment.NewLine, Duplicates_Prices);
+            string Quantities = string.Join(Environment.NewLine, Duplicates_Quantities);
+
+            File.WriteAllText(settings.OutputDirectory + "\\DuplicateProducts.txt", Products);
+            File.WriteAllText(settings.OutputDirectory + "\\DuplicatePrices.txt", Prices);
+            File.WriteAllText(settings.OutputDirectory + "\\DuplicateQuantities.txt", Quantities);
+
+            var Duplicates_S5InvAss = InvAss.GroupBy(x => x.Inv.Part).Where(x => x.Count() > 1).Select(x => x.Key);
+            string Inv = string.Join(Environment.NewLine, Duplicates_S5InvAss);
+            File.WriteAllText(settings.OutputDirectory + "\\DuplicateS5Inventory.txt", Inv);
         }
         private static void GetEqualityFunctions()
         {
@@ -369,10 +392,10 @@ namespace cmArt.Shopify.App
                 .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Product, adapters, API_Products);
 
             ChangedRecords_Prices = UpdateProcessPattern<IShopify_Prices, Shopify_Prices, int>
-                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Prices, adapters, jp);
+                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Prices, adapters, API_Prices);
 
             ChangedRecords_Quantities = UpdateProcessPattern<IShopify_Quantities, Shopify_Quantities, int>
-                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Quantities, adapters, jq);
+                .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Quantities, adapters, API_Quantities);
         }
         private static void GetDetailedDifferences()
         {
@@ -380,10 +403,10 @@ namespace cmArt.Shopify.App
                 .GetChangedRecordPairs(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Product, adapters, API_Products);
 
             var ChangedRecords_Prices_Pairs = UpdateProcessPattern<IShopify_Prices, Shopify_Prices, int>
-                .GetChangedRecordPairs(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Prices, adapters, jp);
+                .GetChangedRecordPairs(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Prices, adapters, API_Prices);
 
             var ChangedRecords_Quantities_Pairs = UpdateProcessPattern<IShopify_Quantities, Shopify_Quantities, int>
-                .GetChangedRecordPairs(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Quantities, adapters, jq);
+                .GetChangedRecordPairs(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Quantities, adapters, API_Quantities);
 
             IEnumerable<IEnumerable<Changes_View>> tmpProd = ChangedRecords_Product_Pairs.Select(x => x.Item1.Diff(x.Item2));
             IEnumerable<Changes_View> tmpDetailProd = tmpProd.SelectMany(x => x);
@@ -420,7 +443,7 @@ namespace cmArt.Shopify.App
             );
             return map;
         }
-        private static VennMap<IShopify_Prices, int> ProduceVennMap(VennMap<IShopify_Prices, int> map)
+        private static VennMap<Shopify_Prices, int> ProduceVennMap(VennMap<Shopify_Prices, int> map)
         {
             Func<IS5InvAssembled, IS5InvAssembled> As_S5InvAssembled = (x) =>
             {
@@ -434,16 +457,16 @@ namespace cmArt.Shopify.App
                 );
             };
 
-            map = new VennMap<IShopify_Prices, int>
+            map = new VennMap<Shopify_Prices, int>
             (
-                jp
+                API_Prices
                 , InvAss.Select(x => As_S5InvAssembled(x))
                 , IShopifyDataLoadFormat_Indexes.UniqueId
                 , IS5InvAssembled_Indexes.InvUnique
             );
             return map;
         }
-        private static VennMap<IShopify_Quantities, int> ProduceVennMap(VennMap<IShopify_Quantities, int> map)
+        private static VennMap<Shopify_Quantities, int> ProduceVennMap(VennMap<Shopify_Quantities, int> map)
         {
             Func<IS5InvAssembled, IS5InvAssembled> As_S5InvAssembled = (x) =>
             {
@@ -457,9 +480,9 @@ namespace cmArt.Shopify.App
                 );
             };
 
-            map = new VennMap<IShopify_Quantities, int>
+            map = new VennMap<Shopify_Quantities, int>
             (
-                jq
+                API_Quantities
                 , InvAss.Select(x => As_S5InvAssembled(x))
                 , IShopifyDataLoadFormat_Indexes.UniqueId
                 , IS5InvAssembled_Indexes.InvUnique
@@ -475,7 +498,6 @@ namespace cmArt.Shopify.App
         }
         private static void ProduceReportsBeforeProcessing_Product()
         {
-            Reports.SaveReport(changes, "Differences_Detail", settings, logger);
             // Venn Reports are relevant for the Sync process only because it compares System Five and the Web Site we're syncing to.
             bool UsingSyncProcess = (map_Product != null);
             if (UsingSyncProcess)
@@ -609,6 +631,7 @@ namespace cmArt.Shopify.App
                 map_Product = ProduceVennMap(map_Product);
                 map_Prices = ProduceVennMap(map_Prices);
                 map_Quantities = ProduceVennMap(map_Quantities);
+                CheckForDuplicates();
             }
 
             GetChangedRecords();
@@ -713,7 +736,7 @@ namespace cmArt.Shopify.App
             }
 
             NewPricesPairs = GenericJoins<IShopify_Prices, IShopify_Prices, int>
-                .LeftJoin(adapters, jp, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
+                .LeftJoin(adapters, API_Prices, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
             IEnumerable<Shopify_Prices> NewPrices = NewPricesPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsShopify_Prices());
             if (!PreventApiAddsNEdits)
             {
@@ -738,7 +761,7 @@ namespace cmArt.Shopify.App
             }
 
             NewQuantitiesPairs = GenericJoins<IShopify_Quantities, IShopify_Quantities, int>
-                .LeftJoin(adapters, jq, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
+                .LeftJoin(adapters, API_Quantities, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
             IEnumerable<Shopify_Quantities> NewQuantities = NewQuantitiesPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsShopify_Quantities());
             if (!PreventApiAddsNEdits)
             {

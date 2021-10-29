@@ -16,8 +16,8 @@ namespace cmArt.Shopify.App.ReportViews
         private string AsString(IEnumerable<S5PricePair> data)
         {
             IEnumerable<S5PricePair> tmp = data ?? new List<S5PricePair>();
-            tmp = tmp.OrderBy((x) => x.Level);
-            IEnumerable<string> Ps = tmp.Select(x => x.Level.ToString() + ":" + x.Price.ToString());
+            tmp = tmp.OrderBy((x) => x.level);
+            IEnumerable<string> Ps = tmp.Select(x => x.level.ToString() + ":" + x.price.ToString());
             string CommaSeparatedList = string.Join(',', Ps);
             return CommaSeparatedList;
         }

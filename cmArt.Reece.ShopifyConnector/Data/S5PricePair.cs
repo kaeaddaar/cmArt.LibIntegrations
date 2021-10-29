@@ -6,12 +6,28 @@ namespace cmArt.Reece.ShopifyConnector
 {
     public class S5PricePair
     {
+        public S5PricePair()
+        {
+
+        }
         public S5PricePair(short level, decimal price)
         {
-            Level = level;
-            Price = price;
+            this.level = level;
+            this.price = price;
         }
-        public short Level { get; set; }
-        public decimal Price { get; set; }
+        public short level { get; set; }
+        public decimal price { get; set; }
+        public double pricing
+        {
+            get
+            {
+                return ((float)price);
+            }
+            set
+            {
+                price = ((decimal)value);
+            }
+        }
+
     }
 }

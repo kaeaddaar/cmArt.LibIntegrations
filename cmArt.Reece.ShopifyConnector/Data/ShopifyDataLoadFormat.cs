@@ -83,7 +83,7 @@ namespace cmArt.Reece.ShopifyConnector
                 prices.RemoveAll((x) => { return true; });
                 foreach(var price in value)
                 {
-                    prices.Add(new S5PricePair(price.Level, price.Price));
+                    prices.Add(new S5PricePair(price.level, price.price));
                 }
             }
         }

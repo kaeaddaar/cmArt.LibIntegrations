@@ -50,15 +50,15 @@ namespace cmArt.Reece.ShopifyConnector
                 .FullOuterJoin(LeftRecords: compareTo.Prices, RightRecords: compareTo.Prices, LeftKey: S5PricePairIndexes.Level, RightKey: S5PricePairIndexes.Level);
             foreach (var PricePair in PricePairs)
             {
-                if (PricePair.Item1.Price != PricePair.Item2.Price)
+                if (PricePair.Item1.price != PricePair.Item2.price)
                 {
                     Changes_View tmp = new Changes_View();
                     tmp.InvUnique = compareFrom.InvUnique;
                     tmp.Cat = compareFrom.Cat;
                     tmp.PartNumber = compareFrom.PartNumber;
-                    tmp.FieldName = "Prices(Level " + PricePair.Item1.Level.ToString() + ")";
-                    tmp.S5ValueToSendToExternal = PricePair.Item2.Price.ToString();
-                    tmp.ExternalValueBeforeUpdate = PricePair.Item1.Price.ToString();
+                    tmp.FieldName = "Prices(Level " + PricePair.Item1.level.ToString() + ")";
+                    tmp.S5ValueToSendToExternal = PricePair.Item2.price.ToString();
+                    tmp.ExternalValueBeforeUpdate = PricePair.Item1.price.ToString();
                     changes.Add(tmp);
                 }
             }
@@ -125,16 +125,48 @@ namespace cmArt.Reece.ShopifyConnector
                 .FullOuterJoin(LeftRecords: compareTo.Prices, RightRecords: compareTo.Prices, LeftKey: S5PricePairIndexes.Level, RightKey: S5PricePairIndexes.Level);
             foreach (var PricePair in PricePairs)
             {
-                if (PricePair.Item1.Price != PricePair.Item2.Price)
+                if (PricePair.Item1 == null || PricePair.Item2 == null)
                 {
                     Changes_View tmp = new Changes_View();
                     tmp.InvUnique = compareFrom.InvUnique;
                     tmp.Cat = compareFrom.Cat;
                     tmp.PartNumber = compareFrom.PartNumber;
-                    tmp.FieldName = "Prices(Level " + PricePair.Item1.Level.ToString() + ")";
-                    tmp.S5ValueToSendToExternal = PricePair.Item2.Price.ToString();
-                    tmp.ExternalValueBeforeUpdate = PricePair.Item1.Price.ToString();
+
+                    if (PricePair.Item1 == null)
+                    {
+                        tmp.FieldName = "Prices(Level " + "LeftSide(S5) was null" + ")";
+                        tmp.ExternalValueBeforeUpdate = "null";
+                    }
+                    else
+                    {
+                        tmp.FieldName = "Prices(Level " + PricePair.Item1.level.ToString() + ")";
+                        tmp.ExternalValueBeforeUpdate = PricePair.Item1.price.ToString();
+                    }
+
+                    if (PricePair.Item2 == null)
+                    {
+                        tmp.S5ValueToSendToExternal = "null";
+                    }
+                    else
+                    {
+                        tmp.S5ValueToSendToExternal = PricePair.Item2.price.ToString();
+                    }
+
                     changes.Add(tmp);
+                }
+                else
+                {
+                    if (PricePair.Item1.price != PricePair.Item2.price)
+                    {
+                        Changes_View tmp = new Changes_View();
+                        tmp.InvUnique = compareFrom.InvUnique;
+                        tmp.Cat = compareFrom.Cat;
+                        tmp.PartNumber = compareFrom.PartNumber;
+                        tmp.FieldName = "Prices(Level " + PricePair.Item1.level.ToString() + ")";
+                        tmp.S5ValueToSendToExternal = PricePair.Item2.price.ToString();
+                        tmp.ExternalValueBeforeUpdate = PricePair.Item1.price.ToString();
+                        changes.Add(tmp);
+                    }
                 }
             }
             if (compareTo.WholesaleCost != compareFrom.WholesaleCost)
@@ -225,7 +257,7 @@ namespace cmArt.Reece.ShopifyConnector
                         .FullOuterJoin(LeftRecords: compareTo.Prices, RightRecords: compareTo.Prices, LeftKey: S5PricePairIndexes.Level, RightKey: S5PricePairIndexes.Level);
                     foreach (var PricePair in PricePairs)
                     {
-                        if (PricePair.Item1.Price != PricePair.Item2.Price)
+                        if (PricePair.Item1.price != PricePair.Item2.price)
                         {
                             return false;
                         }

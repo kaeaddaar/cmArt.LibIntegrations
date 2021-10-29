@@ -6,7 +6,7 @@ namespace cmArt.Reece.ShopifyConnector
 {
     public class tmpShopify_Prices
     {
-        public IEnumerable<S5PricePair> prices { get; set; }
+        public List<S5PricePair> prices { get; set; }
         public string partNumber { get; set; }
         public Shopify_Prices AsShopify_Prices()
         {
