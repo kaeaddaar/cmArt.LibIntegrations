@@ -7,11 +7,41 @@ namespace cmArt.Reece.ShopifyConnector
 {
     public class tmpShopify_Product
     {
-        public string Description { get; set; }
+        private string _Description = string.Empty;
+        public string Description
+        {
+            get
+            {
+                return _Description;
+            }
+            set
+            {
+                _Description = FixEncoding(value ?? string.Empty);
+            }
+        }
+
         public decimal WholesaleCost { get; set; }
         public string Cat { get; set; }
         public string InvUnique { get; set; }
-        public string PartNumber { get; set; }
+        
+        private string _PartNumber = string.Empty;
+        public string PartNumber 
+        {
+            get
+            {
+                return _PartNumber;
+            }
+            set
+            {
+                _PartNumber = FixEncoding(value ?? string.Empty);
+            }
+        }
+        private string FixEncoding(string EncodedString)
+        {
+            string tmp = EncodedString;
+            tmp = tmp.Replace("&amp;", "&");
+            return tmp;
+        }
         public Shopify_Product AsShopify_Product()
         {
             Shopify_Product shopify_Product = new Shopify_Product();
