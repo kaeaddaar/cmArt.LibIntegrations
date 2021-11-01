@@ -606,6 +606,21 @@ namespace cmArt.Shopify.App
                 Reports.SaveReport(InvOnly_NoEcomm, $"Venn_{DataName}_InvOnly_NoEcomm", settings, logger);
             }
         }
+        private static void PauseToGiveSomeTimeForNewProductsToLoad(int numNewProducts)
+        {
+            int ticsPerMinute = 60 * 1000;
+            int ticsToWait = ticsPerMinute * 5 + numNewProducts * ticsPerMinute / 4;
+            int tics = 0;
+            int count = 0;
+            while (tics < ticsToWait)
+            {
+                System.Threading.Thread.Sleep(ticsPerMinute);
+                count++;
+                tics = ticsPerMinute * count;
+                logger.LogInformation((tics / ticsPerMinute).ToString() + " passed, " 
+                    + ((ticsToWait - tics) / ticsPerMinute).ToString() + " to go.");
+            }
+        }
         public static void Main_Console(string[] args)
         {
             SetupLogging();
@@ -739,6 +754,8 @@ namespace cmArt.Shopify.App
             {
                 logger.LogInformation("Error serializing and saving new products to file. Message: " + e.Message);
             }
+
+            PauseToGiveSomeTimeForNewProductsToLoad(NewProducts.Count());
 
             NewPricesPairs = GenericJoins<IShopify_Prices, IShopify_Prices, int>
                 .LeftJoin(adapters, API_Prices, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
