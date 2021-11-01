@@ -225,8 +225,10 @@ namespace cmArt.Shopify.App
         {
             IEnumerable<Shopify_Prices_Pair_Flat> _data = data ?? new List<Shopify_Prices_Pair_Flat>();
             var engine = new FileHelperAsyncEngine<Shopify_Prices_Pair_Flat>();
-            engine.HeaderText = "LeftInvUnique, LeftCat, LeftPartNumber, LeftPrices, LeftWholesaleCost, RightInvUnique, RightCat, " + 
-                "RightPartNumber, RightPrices, RightWholesaleCost";
+            //engine.HeaderText = "LeftInvUnique, LeftCat, LeftPartNumber, LeftPrices, LeftWholesaleCost, RightInvUnique, RightCat, " + 
+            //    "RightPartNumber, RightPrices, RightWholesaleCost";
+            engine.HeaderText = "LeftInvUnique, LeftCat, LeftPartNumber, LeftPrices, RightInvUnique, RightCat, " +
+                "RightPartNumber, RightPrices";
             using (engine.BeginWriteFile(settings.OutputDirectory + $"\\{TableName}.csv"))
             {
                 foreach (var record in _data)

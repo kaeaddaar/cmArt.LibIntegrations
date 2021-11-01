@@ -158,7 +158,7 @@ namespace cmArt.Shopify.App.Data
             this.InvUnique = IFrom.InvUnique;
             this.PartNumber = IFrom.PartNumber;
             this.Prices = IFrom.Prices;
-            this.WholesaleCost = IFrom.WholesaleCost;
+            //this.WholesaleCost = IFrom.WholesaleCost;
             return this;
         }
 

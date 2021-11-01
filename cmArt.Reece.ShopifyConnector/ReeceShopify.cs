@@ -245,11 +245,11 @@ namespace cmArt.Reece.ShopifyConnector
                 return msg;
             }
         }
-        public static string Products_Delete(IEnumerable<Shopify_Product> NewProducts)
+        public static string Products_Delete(IEnumerable<Shopify_Product> ProductsToDelete)
         {
             try
             { 
-                List<Shopify_Product> prods = new List<Shopify_Product>(NewProducts);
+                List<Shopify_Product> prods = new List<Shopify_Product>(ProductsToDelete);
                 string strEditProducts = JsonSerializer.Serialize(prods, typeof(List<Shopify_Product>));
                 string results = MakeApiPostCall_Unsecured("/product/delete/", strEditProducts);
                 return results;

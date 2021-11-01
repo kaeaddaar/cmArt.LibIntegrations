@@ -12,6 +12,7 @@ namespace cmArt.Shopify.App.ReportViews
         private Shopify_Product _Shopify;
 
         public string Description { get => ((IShopify_Product)_S5).Description; set => ((IShopify_Product)_S5).Description = value; }
+        public decimal WholesaleCost { get => ((IShopify_Product)_S5).WholesaleCost; set => ((IShopify_Product)_S5).WholesaleCost = value; }
         public string Cat { get => ((IShopify_Identity)_S5).Cat; set => ((IShopify_Identity)_S5).Cat = value; }
         public int InvUnique { get => ((IShopify_Identity)_S5).InvUnique; set => ((IShopify_Identity)_S5).InvUnique = value; }
         public string PartNumber { get => ((IShopify_Identity)_S5).PartNumber; set => ((IShopify_Identity)_S5).PartNumber = value; }

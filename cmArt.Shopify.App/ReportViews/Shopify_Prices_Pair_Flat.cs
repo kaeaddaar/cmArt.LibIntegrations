@@ -22,7 +22,7 @@ namespace cmArt.Shopify.App.ReportViews
         [FieldQuoted]
         [FieldNullValue(typeof(string), "")]
         public string LeftPrices { get; set; }
-        decimal LeftWholesaleCost { get; set; }
+        //decimal LeftWholesaleCost { get; set; }
 
         public int RightInvUnique { get; set; }
 
@@ -37,6 +37,6 @@ namespace cmArt.Shopify.App.ReportViews
         [FieldQuoted]
         [FieldNullValue(typeof(string), "")]
         public string RightPrices { get; set; }
-        decimal RightWholesaleCost { get; set; }
+        //decimal RightWholesaleCost { get; set; }
     }
 }

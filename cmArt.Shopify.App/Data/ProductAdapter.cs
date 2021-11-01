@@ -86,6 +86,18 @@ namespace cmArt.Shopify.App.Data
             }
         }
 
+        public decimal WholesaleCost // cost doesn't seem to get returned here, so I guess it's good that reece does return it in his API
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public IShopify_Product CopyFrom(IShopify_Product IFrom)
         {
             return IShopify_ProductExtensions.CopyFrom(this, IFrom);

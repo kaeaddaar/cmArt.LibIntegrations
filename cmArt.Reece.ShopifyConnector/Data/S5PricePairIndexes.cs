@@ -9,7 +9,7 @@ namespace cmArt.Reece.ShopifyConnector
         public static short Level(S5PricePair data)
         {
             if (data == null) { return -1; }
-            return data.level;
+            return data.Level;
         }
     }
 }

@@ -16,8 +16,8 @@ namespace cmArt.Shopify.App.ReportViews
         private string AsString(IEnumerable<S5PricePair> data)
         {
             IEnumerable<S5PricePair> tmp = data ?? new List<S5PricePair>();
-            tmp = tmp.OrderBy((x) => x.level);
-            IEnumerable<string> Ps = tmp.Select(x => x.level.ToString() + ":" + x.price.ToString());
+            tmp = tmp.OrderBy((x) => x.Level);
+            IEnumerable<string> Ps = tmp.Select(x => x.Level.ToString() + ":" + x.Price.ToString());
             string CommaSeparatedList = string.Join(',', Ps);
             return CommaSeparatedList;
         }
@@ -51,7 +51,7 @@ namespace cmArt.Shopify.App.ReportViews
         public string LeftCat { get => ((IShopify_Identity)_S5).Cat; set => ((IShopify_Identity)_S5).Cat = value; }
         public int LeftInvUnique { get => ((IShopify_Identity)_S5).InvUnique; set => ((IShopify_Identity)_S5).InvUnique = value; }
         public string LeftPartNumber { get => ((IShopify_Identity)_S5).PartNumber; set => ((IShopify_Identity)_S5).PartNumber = value; }
-        public decimal LeftWholesaleCost { get => ((IShopify_Prices)_S5).WholesaleCost; set => ((IShopify_Prices)_S5).WholesaleCost = value; }
+        //public decimal LeftWholesaleCost { get => ((IShopify_Prices)_S5).WholesaleCost; set => ((IShopify_Prices)_S5).WholesaleCost = value; }
 
         public string RightPrices
         {
@@ -68,7 +68,7 @@ namespace cmArt.Shopify.App.ReportViews
         public string RightCat { get => ((IShopify_Identity)_Shopify).Cat; set => ((IShopify_Identity)_Shopify).Cat = value; }
         public int RightInvUnique { get => ((IShopify_Identity)_Shopify).InvUnique; set => ((IShopify_Identity)_Shopify).InvUnique = value; }
         public string RightPartNumber { get => ((IShopify_Identity)_Shopify).PartNumber; set => ((IShopify_Identity)_Shopify).PartNumber = value; }
-        public decimal RightWholesaleCost { get => ((IShopify_Prices)_Shopify).WholesaleCost; set => ((IShopify_Prices)_Shopify).WholesaleCost = value; }
+        //public decimal RightWholesaleCost { get => ((IShopify_Prices)_Shopify).WholesaleCost; set => ((IShopify_Prices)_Shopify).WholesaleCost = value; }
 
 
         public Shopify_Prices_Pair_Adapter()

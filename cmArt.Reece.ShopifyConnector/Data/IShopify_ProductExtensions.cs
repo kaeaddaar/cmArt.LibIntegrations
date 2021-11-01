@@ -36,6 +36,7 @@ namespace cmArt.Reece.ShopifyConnector
                     && compareTo.Description.TrimEnd() == compareFrom.Description.TrimEnd()
                     && compareTo.InvUnique == compareFrom.InvUnique
                     && compareTo.PartNumber.TrimEnd() == compareFrom.PartNumber.TrimEnd()
+                    && Math.Round(compareTo.WholesaleCost,2) == Math.Round(compareFrom.WholesaleCost,2)
                 )
                 {
                     return true;
@@ -53,6 +54,7 @@ namespace cmArt.Reece.ShopifyConnector
             to.Description = from.Description.TrimEnd();
             to.InvUnique = from.InvUnique;
             to.PartNumber = from.PartNumber.TrimEnd();
+            to.WholesaleCost = from.WholesaleCost;
             return to;
         }
 

@@ -15,7 +15,7 @@ namespace cmArt.Reece.ShopifyConnector
             shopify_Prices.InvUnique = 0;
             shopify_Prices.PartNumber = this.partNumber;
             shopify_Prices.Prices = this.prices;
-            shopify_Prices.WholesaleCost = 0;
+            //shopify_Prices.WholesaleCost = 0;
             return shopify_Prices;
         }
     }

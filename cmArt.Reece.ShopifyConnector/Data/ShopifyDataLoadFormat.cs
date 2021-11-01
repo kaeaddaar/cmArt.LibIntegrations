@@ -26,7 +26,7 @@ namespace cmArt.Reece.ShopifyConnector
             this.InvUnique = IFrom.InvUnique;
             this.PartNumber = IFrom.PartNumber;
             this.Description = IFrom.Description;
-            this.WholesaleCost = IFrom.WholesaleCost;
+            //this.WholesaleCost = IFrom.WholesaleCost;
             foreach (var p in IFrom.Prices)
             {
                 this.prices.Add(p);
@@ -83,7 +83,7 @@ namespace cmArt.Reece.ShopifyConnector
                 prices.RemoveAll((x) => { return true; });
                 foreach(var price in value)
                 {
-                    prices.Add(new S5PricePair(price.level, price.price));
+                    prices.Add(new S5PricePair(price.Level, price.Price));
                 }
             }
         }

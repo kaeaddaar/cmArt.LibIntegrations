@@ -10,7 +10,7 @@ namespace cmArt.Reece.ShopifyConnector
         public string Cat { get; set; }
         public int InvUnique { get; set; }
         public string PartNumber { get; set; }
-        public decimal WholesaleCost { get; set; }
+        //public decimal WholesaleCost { get; set; }
 
         public bool Equals(IShopify_Prices compareTo)
         {

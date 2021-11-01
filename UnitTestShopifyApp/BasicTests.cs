@@ -93,8 +93,8 @@ namespace UnitTestShopifyApp
             Assert.AreEqual("211545 from Dakis for testing", ShopifyData.Description.Trim());
             Assert.AreEqual(12018, ShopifyData.InvUnique);
             Assert.AreEqual(StandardCost, ShopifyData.WholesaleCost); // avg cost is 30, standard cost is 29
-            Assert.AreEqual(0, ShopifyData.Prices.First().level);
-            Assert.AreEqual((decimal)(69.99), ShopifyData.Prices.First().price); // pulled the expected value from UnitTest_PriceCalculations in UnitTestAssembleS5Inventory
+            Assert.AreEqual(0, ShopifyData.Prices.First().Level);
+            Assert.AreEqual((decimal)(69.99), ShopifyData.Prices.First().Price); // pulled the expected value from UnitTest_PriceCalculations in UnitTestAssembleS5Inventory
 
         }
 

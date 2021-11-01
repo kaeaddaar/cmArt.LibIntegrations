@@ -298,7 +298,7 @@ namespace cmArt.Shopify.App
             {
                 p.Item2.InvUnique = p.Item1.InvUnique;
                 p.Item2.Cat = p.Item1.Cat;
-                p.Item2.WholesaleCost = Math.Round(p.Item1.WholesaleCost, 6);
+                //p.Item2.WholesaleCost = Math.Round(p.Item1.WholesaleCost, 6);
                 return p.Item2;
             });
 

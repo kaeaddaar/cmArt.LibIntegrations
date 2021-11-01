@@ -14,7 +14,7 @@ namespace cmArt.Reece.ShopifyConnector
             _prices.InvUnique = data.InvUnique;
             _prices.PartNumber = data.PartNumber;
             _prices.Prices = data.Prices;
-            _prices.WholesaleCost = data.WholesaleCost;
+            //_prices.WholesaleCost = data.WholesaleCost;
             return _prices;
         }
         public static bool Equals(this IShopify_Prices compareFrom, IShopify_Prices compareTo)
@@ -23,7 +23,7 @@ namespace cmArt.Reece.ShopifyConnector
             {
                 if (compareTo.InvUnique == compareFrom.InvUnique)
                 {
-                    if (compareTo.WholesaleCost != compareFrom.WholesaleCost) { return false; }
+                    //if (compareTo.WholesaleCost != compareFrom.WholesaleCost) { return false; }
 
                     if (compareFrom.Prices == null && compareTo.Prices != null) { return false; }
                     if (compareFrom.Prices != null && compareTo.Prices == null) { return false; }
@@ -34,7 +34,7 @@ namespace cmArt.Reece.ShopifyConnector
                     foreach (var PricePair in PricePairs)
                     {
                         if (PricePair.Item1 == null || PricePair.Item2 == null) { return false; }
-                        if (Math.Round(PricePair.Item1.price,2) != Math.Round(PricePair.Item2.price))
+                        if (Math.Round(PricePair.Item1.Price,2) != Math.Round(PricePair.Item2.Price,2))
                         {
                             return false;
                         }

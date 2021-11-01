@@ -50,15 +50,15 @@ namespace cmArt.Reece.ShopifyConnector
                 .FullOuterJoin(LeftRecords: compareTo.Prices, RightRecords: compareTo.Prices, LeftKey: S5PricePairIndexes.Level, RightKey: S5PricePairIndexes.Level);
             foreach (var PricePair in PricePairs)
             {
-                if (PricePair.Item1.price != PricePair.Item2.price)
+                if (PricePair.Item1.Price != PricePair.Item2.Price)
                 {
                     Changes_View tmp = new Changes_View();
                     tmp.InvUnique = compareFrom.InvUnique;
                     tmp.Cat = compareFrom.Cat;
                     tmp.PartNumber = compareFrom.PartNumber;
-                    tmp.FieldName = "Prices(Level " + PricePair.Item1.level.ToString() + ")";
-                    tmp.S5ValueToSendToExternal = PricePair.Item2.price.ToString();
-                    tmp.ExternalValueBeforeUpdate = PricePair.Item1.price.ToString();
+                    tmp.FieldName = "Prices(Level " + PricePair.Item1.Level.ToString() + ")";
+                    tmp.S5ValueToSendToExternal = PricePair.Item2.Price.ToString();
+                    tmp.ExternalValueBeforeUpdate = PricePair.Item1.Price.ToString();
                     changes.Add(tmp);
                 }
             }
@@ -139,8 +139,8 @@ namespace cmArt.Reece.ShopifyConnector
                     }
                     else
                     {
-                        tmp.FieldName = "Prices(Level " + PricePair.Item1.level.ToString() + ")";
-                        tmp.ExternalValueBeforeUpdate = PricePair.Item1.price.ToString();
+                        tmp.FieldName = "Prices(Level " + PricePair.Item1.Level.ToString() + ")";
+                        tmp.ExternalValueBeforeUpdate = PricePair.Item1.Price.ToString();
                     }
 
                     if (PricePair.Item2 == null)
@@ -149,37 +149,37 @@ namespace cmArt.Reece.ShopifyConnector
                     }
                     else
                     {
-                        tmp.S5ValueToSendToExternal = PricePair.Item2.price.ToString();
+                        tmp.S5ValueToSendToExternal = PricePair.Item2.Price.ToString();
                     }
 
                     changes.Add(tmp);
                 }
                 else
                 {
-                    if (PricePair.Item1.price != PricePair.Item2.price)
+                    if (PricePair.Item1.Price != PricePair.Item2.Price)
                     {
                         Changes_View tmp = new Changes_View();
                         tmp.InvUnique = compareFrom.InvUnique;
                         tmp.Cat = compareFrom.Cat;
                         tmp.PartNumber = compareFrom.PartNumber;
-                        tmp.FieldName = "Prices(Level " + PricePair.Item1.level.ToString() + ")";
-                        tmp.S5ValueToSendToExternal = PricePair.Item2.price.ToString();
-                        tmp.ExternalValueBeforeUpdate = PricePair.Item1.price.ToString();
+                        tmp.FieldName = "Prices(Level " + PricePair.Item1.Level.ToString() + ")";
+                        tmp.S5ValueToSendToExternal = PricePair.Item2.Price.ToString();
+                        tmp.ExternalValueBeforeUpdate = PricePair.Item1.Price.ToString();
                         changes.Add(tmp);
                     }
                 }
             }
-            if (compareTo.WholesaleCost != compareFrom.WholesaleCost)
-            {
-                Changes_View tmp = new Changes_View();
-                tmp.InvUnique = compareFrom.InvUnique;
-                tmp.Cat = compareFrom.Cat;
-                tmp.PartNumber = compareFrom.PartNumber;
-                tmp.FieldName = "WholesaleCost";
-                tmp.S5ValueToSendToExternal = compareFrom.WholesaleCost.ToString();
-                tmp.ExternalValueBeforeUpdate = compareTo.WholesaleCost.ToString();
-                changes.Add(tmp);
-            }
+            //if (compareTo.WholesaleCost != compareFrom.WholesaleCost)
+            //{
+            //    Changes_View tmp = new Changes_View();
+            //    tmp.InvUnique = compareFrom.InvUnique;
+            //    tmp.Cat = compareFrom.Cat;
+            //    tmp.PartNumber = compareFrom.PartNumber;
+            //    tmp.FieldName = "WholesaleCost";
+            //    tmp.S5ValueToSendToExternal = compareFrom.WholesaleCost.ToString();
+            //    tmp.ExternalValueBeforeUpdate = compareTo.WholesaleCost.ToString();
+            //    changes.Add(tmp);
+            //}
 
             return changes;
         }
@@ -250,14 +250,14 @@ namespace cmArt.Reece.ShopifyConnector
                     && compareTo.Description == compareFrom.Description
                     && compareTo.InvUnique == compareFrom.InvUnique
                     && compareTo.PartNumber == compareFrom.PartNumber
-                    && compareTo.WholesaleCost == compareFrom.WholesaleCost
+                    //&& compareTo.WholesaleCost == compareFrom.WholesaleCost
                 )
                 {
                     IEnumerable<Tuple<S5PricePair, S5PricePair>> PricePairs = GenericJoins<S5PricePair, S5PricePair, short>
                         .FullOuterJoin(LeftRecords: compareTo.Prices, RightRecords: compareTo.Prices, LeftKey: S5PricePairIndexes.Level, RightKey: S5PricePairIndexes.Level);
                     foreach (var PricePair in PricePairs)
                     {
-                        if (PricePair.Item1.price != PricePair.Item2.price)
+                        if (PricePair.Item1.Price != PricePair.Item2.Price)
                         {
                             return false;
                         }
