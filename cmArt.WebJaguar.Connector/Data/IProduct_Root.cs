@@ -193,7 +193,7 @@ namespace cmArt.WebJaguar.Connector
         int incrementalQty { get; set; }
         bool inventoryItem { get; set; }
         string keywords { get; set; }
-        int kitCost { get; set; }
+        double kitCost { get; set; }
         List<KitPart> kitParts { get; set; }
         int limitQty { get; set; }
         int locationDesiredAmount { get; set; }
@@ -240,7 +240,7 @@ namespace cmArt.WebJaguar.Connector
         List<Product_Price> price { get; set; }
         double price1 { get; set; }
         double price10 { get; set; }
-        int price2 { get; set; }
+        double price2 { get; set; }
         double price3 { get; set; }
         double price4 { get; set; }
         double price5 { get; set; }
@@ -263,7 +263,7 @@ namespace cmArt.WebJaguar.Connector
         int priceCasePackQty { get; set; }
         double priceTable1 { get; set; }
         double priceTable10 { get; set; }
-        int priceTable2 { get; set; }
+        double priceTable2 { get; set; }
         double priceTable3 { get; set; }
         double priceTable4 { get; set; }
         double priceTable5 { get; set; }

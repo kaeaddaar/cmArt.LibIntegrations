@@ -100,7 +100,7 @@ namespace cmArt.LibIntegrations.ApiCallerService
             //make the request
             var task = client.SendAsync(requestMessage);
             var response = task.Result;
-            response.EnsureSuccessStatusCode();
+            //response.EnsureSuccessStatusCode();
             string responseBody = response.Content.ReadAsStringAsync().Result;
 
             Console.WriteLine("responseBody: " + responseBody);
@@ -130,7 +130,7 @@ namespace cmArt.LibIntegrations.ApiCallerService
             //make the request
             var task = client.SendAsync(requestMessage);
             var response = task.Result;
-            response.EnsureSuccessStatusCode();
+            //response.EnsureSuccessStatusCode();
             string responseBody = response.Content.ReadAsStringAsync().Result;
 
             return responseBody;
@@ -158,7 +158,7 @@ namespace cmArt.LibIntegrations.ApiCallerService
             //make the request
             var task = client.SendAsync(requestMessage);
             var response = task.Result;
-            response.EnsureSuccessStatusCode();
+            //response.EnsureSuccessStatusCode();
             string responseBody = response.Content.ReadAsStringAsync().Result;
 
             return responseBody;

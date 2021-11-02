@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Text.Json;
 
 
 namespace IntegrationTestWebJaguarCalls
@@ -15,6 +16,10 @@ namespace IntegrationTestWebJaguarCalls
         public void Product_Add_Getting_Id_Back_and_Accessing_Product() // Product Add doesn't show on inventory search until index ran, can only grab them by unique
                                   // (may broken as well)
         {
+            //comment out the exception below when you actually want to run the test, and then uncomment it afterwards.
+            //throw new NotImplementedException("This is an integration test and should not be ran normally as the WebJaguar API" +
+            //    " can't clean up the added record afterwards.");
+
             WebJaguarConnector wj = new WebJaguarConnector();
             List<Product_Root> newRecords = new List<Product_Root>();
             Product_Root ToAdd = GetSampleProduct();
@@ -31,6 +36,21 @@ namespace IntegrationTestWebJaguarCalls
             int.TryParse(strNum, out id);
 
             string GetResults = wj.Product_Get(id);
+            //Product_Root AddedProd = (Product_Root)JsonSerializer.Deserialize(GetResults, typeof(Product_Root));
+            JsonDocument doc = JsonDocument.Parse(GetResults);
+            JsonElement root = doc.RootElement;
+            JsonElement prod = root.GetProperty("product");
+            JsonElement elemSku = prod.GetProperty("sku");
+            string sku = elemSku.GetString();
+            Assert.AreEqual(ToAdd.sku, sku);
+
+            // Test the serialization as well
+            Product_Root AddedProd = (Product_Root)JsonSerializer.Deserialize(prod.GetRawText(), typeof(Product_Root));
+            Assert.AreEqual(ToAdd.sku, AddedProd.sku);
+
+            // cleanup and delete the added product manually
+            // TIP: When trying to use this code in the App we have to track the unique id until a sync happens
+
         }
         private Product_Root GetSampleProduct()
         {

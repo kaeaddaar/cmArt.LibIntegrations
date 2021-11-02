@@ -31,7 +31,7 @@ namespace cmArt.WebJaguar.Connector
         public string categoryIds { get; set; }
         public double catalogPrice { get; set; }
         public double price1 { get; set; }
-        public int price2 { get; set; }
+        public double price2 { get; set; }
         public double price3 { get; set; }
         public double price4 { get; set; }
         public double price5 { get; set; }
@@ -100,7 +100,7 @@ namespace cmArt.WebJaguar.Connector
         public int qtyBreak8 { get; set; }
         public int qtyBreak9 { get; set; }
         public double priceTable1 { get; set; }
-        public int priceTable2 { get; set; }
+        public double priceTable2 { get; set; }
         public double priceTable3 { get; set; }
         public double priceTable4 { get; set; }
         public double priceTable5 { get; set; }
@@ -223,7 +223,7 @@ namespace cmArt.WebJaguar.Connector
         public string field99 { get; set; }
         public string field100 { get; set; }
         public string keywords { get; set; }
-        public int kitCost { get; set; }
+        public double kitCost { get; set; }
         public int salesTagId { get; set; }
         public int caseContent { get; set; }
         public string packing { get; set; }
