@@ -33,14 +33,21 @@ namespace cmArt.WebJaguar.Connector
             string results = this.MakeApiPostCall(data, logStub);
             return results;
         }
-        public string Products_Add(IEnumerable<Product_Root> ChangedRecords)
+        public string Products_Add(IEnumerable<Product_Root> NewRecords)
         {
-            IEnumerable<Product_Root> _ChangedRecords = ChangedRecords ?? new List<Product_Root>();
+            IEnumerable<Product_Root> _ChangedRecords = NewRecords ?? new List<Product_Root>();
             ApiCallData data = new ApiCallData();
-            data.UrlCommand = "";
-            data.Body = "";
-            Func<string, int> logStub = (x) => { Console.WriteLine("Logging not yet implemented"); return 0; };
-            string results = this.MakeApiPostCall(data, logStub);
+            data.UrlCommand = "/api/v1/createProduct.jhtm";
+            string results = string.Empty;
+            foreach (var newRecord in _ChangedRecords)
+            {
+                string strNewRecord = System.Text.Json.JsonSerializer.Serialize
+                    (newRecord, typeof(Product_Root));
+                data.Body = strNewRecord;
+                Func<string, int> logStub = (x) => { Console.WriteLine("Logging not yet implemented"); return 0; };
+                results += this.MakeApiPostCall(data, logStub);
+            }
+
             return results;
         }
         public IEnumerable<Product_Root> GetAll_Product_Root_Records()
@@ -54,6 +61,16 @@ namespace cmArt.WebJaguar.Connector
 
             throw new NotImplementedException();
             return new List<Product_Root>();
+        }
+        public string Product_Get(int ProductId)
+        {
+            ApiCallData data = new ApiCallData();
+            data.UrlCommand = "/api/v1/product.jhtm?id="+ ProductId;
+            data.Body = "";
+            Func<string, int> logStub = (x) => { Console.WriteLine("Logging not yet implemented"); return 0; };
+            //string results = this.MakeApiPostCall(data, logStub);
+            string results = this.MakeApiGetCall(data.UrlCommand);
+            return results;
         }
     }
 }

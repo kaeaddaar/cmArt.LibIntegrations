@@ -299,7 +299,7 @@ namespace cmArt.WebJaguar.Connector
         string recommendedListTitle { get; set; }
         string recommendedListTitle1 { get; set; }
         string recommendedListTitle2 { get; set; }
-        List<Product_RegionProductMapping> regionProductMapping { get; set; }
+        //List<Product_RegionProductMapping> regionProductMapping { get; set; }
         bool retainOnCart { get; set; }
         int salesTagId { get; set; }
         bool searchable { get; set; }

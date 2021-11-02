@@ -10,7 +10,7 @@ namespace cmArt.WebJaguar.Connector
         public Product_PrimaryLocation primaryLocation { get; set; }
         public List<int> catIds { get; set; }
         public List<Product_Price> price { get; set; }
-        public List<Product_RegionProductMapping> regionProductMapping { get; set; }
+        //public List<Product_RegionProductMapping> regionProductMapping { get; set; }
         public List<KitPart> kitParts { get; set; }
         public string name { get; set; }
         public string sku { get; set; }
