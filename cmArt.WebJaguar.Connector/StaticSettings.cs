@@ -11,9 +11,9 @@ namespace cmArt.WebJaguar.Connector
         {
             // Feature idea: Add ability validate existense of the keys used below
             string prefix = "info:";
-            WebJaguarApiUrl = config[$"{prefix}https://shopravis.webjaguar.dev"] ?? string.Empty;
-            WebJaguarApiUsername = config[$"{prefix}shopravis"] ?? string.Empty;
-            WebJaguarApiPassword = config[$"{prefix}H9pPG9yW58cMP45e"] ?? string.Empty;
+            WebJaguarApiUrl = config[$"{prefix}WebJaguarApiUrl"] ?? string.Empty;
+            WebJaguarApiUsername = config[$"{prefix}WebJaguarApiUsername"] ?? string.Empty;
+            WebJaguarApiPassword = config[$"{prefix}WebJaguarApiPassword"] ?? string.Empty;
         }
         public string WebJaguarApiUrl { get; }
         public string WebJaguarApiUsername { get; }
