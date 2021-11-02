@@ -15,7 +15,7 @@ namespace cmArt.WebJaguar.App.Data
             primaryLocation = new Product_PrimaryLocation();
             catIds = new List<int>();
             price = new List<Product_Price>();
-            regionProductMapping = new List<Product_RegionProductMapping>();
+            //regionProductMapping = new List<Product_RegionProductMapping>();
             kitParts = new List<KitPart>();
         }
         int IWJ_CommonFields_In_S5.sku 
