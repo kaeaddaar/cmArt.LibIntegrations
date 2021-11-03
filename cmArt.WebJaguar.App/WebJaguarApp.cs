@@ -172,8 +172,8 @@ namespace cmArt.WebJaguar.App
         {
             logger.LogInformation("Filtering for Ecommerce equals Y");
             ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y");
-            string strECommInvAss = SerializeForExport(ECommInvAss);
-            File.WriteAllText(settings.OutputDirectory + "\\strEcommInvAss.txt", strECommInvAss);
+            //string strECommInvAss = SerializeForExport(ECommInvAss);
+            //File.WriteAllText(settings.OutputDirectory + "\\strEcommInvAss.txt", strECommInvAss);
         }
         private static void CreateDataLoadLists()
         {
@@ -316,6 +316,7 @@ namespace cmArt.WebJaguar.App
             SetupArgs(args);
             logger.LogInformation("Loading Inventory From System Five");
             GetSystem5Data();
+
             FilterForECommAndSave();
             CreateDataLoadLists();
             GetEqualityFunctions();
@@ -331,6 +332,35 @@ namespace cmArt.WebJaguar.App
             PerformEdits();
             GetNewRecords();
             PerformAdds();
+
+            #region considering paging the processing of groups of records
+            //List<IS5InvAssembled> InvAss_Unfiltered = new List<IS5InvAssembled>(InvAss);
+            //int pageSize = 1000;
+            //int pagesProcessed = 0;
+            //InvAss = InvAss.Skip(pagesProcessed * pageSize).Take(pageSize);
+            //while (InvAss != null)
+            //{
+            //    FilterForECommAndSave();
+            //    CreateDataLoadLists();
+            //    GetEqualityFunctions();
+            //    if (RunAsSelfCompare)
+            //    {
+            //        GetPrevDataLoadListsAndOverwrite();
+            //    }
+            //    else
+            //    {
+            //        GetWebJaguarData_Product_Root();
+            //    }
+            //    GetChangedRecords();
+            //    PerformEdits();
+            //    GetNewRecords();
+            //    PerformAdds();
+
+            //    pagesProcessed++;
+            //    InvAss = InvAss.Skip(pagesProcessed * pageSize).Take(pageSize);
+            //}
+            #endregion considering paging the processing of groups of records
+
 
             #region reporting
             // ----- Reporting goes here -----
