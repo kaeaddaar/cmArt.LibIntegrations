@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace cmArt.WebJaguar.App.Data
+namespace cmArt.WebJaguar.Data
 {
     /// <summary>
     /// System Five (S5) fields common to Web Jaguar (WJ)

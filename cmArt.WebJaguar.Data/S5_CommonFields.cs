@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace cmArt.WebJaguar.App.Data
+namespace cmArt.WebJaguar.Data
 {
     /// <summary>
     /// Representation of data for only the common fields between WebJaguar Product and System Five Inventory
@@ -31,12 +31,12 @@ namespace cmArt.WebJaguar.App.Data
         public string WebDescription
         {
             get { return _WebDescription; }
-            set { _WebDescription = value; }
+            set { _WebDescription = value ?? string.Empty; }
         }
         public string Description
         {
             get { return _Description; }
-            set { _Description = value; }
+            set { _Description = value ?? string.Empty; }
         }
         public IEnumerable<string> barcodes
         {
@@ -50,8 +50,8 @@ namespace cmArt.WebJaguar.App.Data
         }
         public string PartNumber
         {
-            get { return PartNumber; }
-            set { PartNumber = value; }
+            get { return _PartNumber; }
+            set { _PartNumber = value ?? string.Empty; }
         }
 
     }

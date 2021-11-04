@@ -12,8 +12,22 @@ namespace cmArt.WebJaguar.Connector
         public List<Product_Price> price { get; set; }
         //public List<Product_RegionProductMapping> regionProductMapping { get; set; }
         public List<KitPart> kitParts { get; set; }
+        public double msrp { get; set; }
         public string name { get; set; }
         public string sku { get; set; }
+        int IWJ_CommonFields_In_S5.sku
+        {
+            get
+            {
+                int result;
+                int.TryParse(this.sku, out result);
+                return result;
+            }
+            set
+            {
+                this.sku = value.ToString();
+            }
+        }
         public string note { get; set; }
         public string masterSku { get; set; }
         public int slaveCount { get; set; }
@@ -24,9 +38,8 @@ namespace cmArt.WebJaguar.Connector
         public string shortDesc { get; set; }
         public string longDesc { get; set; }
         public float weight { get; set; }
-        public float msrp { get; set; }
         public bool hideMsrp { get; set; }
-        public int unitPrice { get; set; }
+        public double unitPrice { get; set; }
         public bool priceByCustomer { get; set; }
         public string categoryIds { get; set; }
         public double catalogPrice { get; set; }
@@ -40,26 +53,26 @@ namespace cmArt.WebJaguar.Connector
         public double price8 { get; set; }
         public double price9 { get; set; }
         public double price10 { get; set; }
-        public int cost1 { get; set; }
-        public int cost2 { get; set; }
-        public int cost3 { get; set; }
-        public int cost4 { get; set; }
-        public int cost5 { get; set; }
-        public int cost6 { get; set; }
-        public int cost7 { get; set; }
-        public int cost8 { get; set; }
-        public int cost9 { get; set; }
-        public int cost10 { get; set; }
-        public int discount1 { get; set; }
-        public int discount2 { get; set; }
-        public int discount3 { get; set; }
-        public int discount4 { get; set; }
-        public int discount5 { get; set; }
-        public int discount6 { get; set; }
-        public int discount7 { get; set; }
-        public int discount8 { get; set; }
-        public int discount9 { get; set; }
-        public int discount10 { get; set; }
+        public double cost1 { get; set; }
+        public double cost2 { get; set; }
+        public double cost3 { get; set; }
+        public double cost4 { get; set; }
+        public double cost5 { get; set; }
+        public double cost6 { get; set; }
+        public double cost7 { get; set; }
+        public double cost8 { get; set; }
+        public double cost9 { get; set; }
+        public double cost10 { get; set; }
+        public double discount1 { get; set; }
+        public double discount2 { get; set; }
+        public double discount3 { get; set; }
+        public double discount4 { get; set; }
+        public double discount5 { get; set; }
+        public double discount6 { get; set; }
+        public double discount7 { get; set; }
+        public double discount8 { get; set; }
+        public double discount9 { get; set; }
+        public double discount10 { get; set; }
         public bool discountPercent1 { get; set; }
         public bool discountPercent2 { get; set; }
         public bool discountPercent3 { get; set; }
@@ -317,11 +330,11 @@ namespace cmArt.WebJaguar.Connector
         public string defaultSupplierAccountNumber { get; set; }
         public int eventProtection { get; set; }
         public int productLevel { get; set; }
-        public int groupSpecialPrice { get; set; }
+        public double groupSpecialPrice { get; set; }
         public string caseUnitTitle { get; set; }
         public string productType { get; set; }
-        public int discountedCost { get; set; }
-        public int discountedPrice { get; set; }
+        public double discountedCost { get; set; }
+        public double discountedPrice { get; set; }
         public int limitQty { get; set; }
         public int selectedFieldGroupIndex { get; set; }
         public string qbIncomeAccountType { get; set; }

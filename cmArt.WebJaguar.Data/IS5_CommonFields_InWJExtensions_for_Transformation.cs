@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace cmArt.WebJaguar.App.Data
+namespace cmArt.WebJaguar.Data
 {
     public static class IS5_CommonFields_InWJExtensions_for_Transformation
     {

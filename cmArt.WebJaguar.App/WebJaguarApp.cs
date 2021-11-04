@@ -23,7 +23,7 @@ using cmArt.LibIntegrations.SerializationService;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 //using cmArt.Shopify.App.Services;
-using cmArt.WebJaguar.App.Data;
+using cmArt.WebJaguar.Data;
 using cmArt.WebJaguar.App.Services;
 using cmArt.WebJaguar.Connector;
 
@@ -210,6 +210,7 @@ namespace cmArt.WebJaguar.App
                 WebJaguarConnector api = new WebJaguarConnector();
                 IEnumerable<Product_Root> API_Products_WJ = api.GetAll_Product_Root_Records();
                 IEnumerable<WJ_CommonFields> wJ_CommonFields = API_Products_WJ.Select(prod => prod.AsWJ_CommonFields());
+                List<WJ_CommonFields> test = API_Products_WJ.Select(prod => prod.AsWJ_CommonFields()).ToList();
                 API_Products = wJ_CommonFields.Select(cf =>
                 {
                     adapterS5_from_WJ tmp = new adapterS5_from_WJ();
@@ -260,7 +261,7 @@ namespace cmArt.WebJaguar.App
                     //Product_Edit_Results = apiWJ.Products_Edit(changedProducts);
                     Product_Edit_Results = apiWJ.Products_Edit(WJ_WithChanges); // uses changes converted back to Product_Root (if it works)
                     string FileNameChangedProducts = settings.OutputDirectory + "\\changedProducts.json.txt";
-                    string content = System.Text.Json.JsonSerializer.Serialize(changedProducts.ToList(), typeof(List<Product_Root>));
+                    string content = System.Text.Json.JsonSerializer.Serialize(changedProducts.ToList(), typeof(List<S5_CommonFields>));
                     System.IO.File.WriteAllText(FileNameChangedProducts, content);
                 }
                 else { logger.LogInformation("Preventing edits on changed products"); }

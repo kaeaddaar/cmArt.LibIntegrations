@@ -1,8 +1,8 @@
 ﻿using cmArt.LibIntegrations.OdbcService;
 using cmArt.LibIntegrations.PagedJsonService;
 using cmArt.LibIntegrations.SerializationService;
-using cmArt.WebJaguar.App.Data;
 using cmArt.WebJaguar.Connector;
+using cmArt.WebJaguar.Data;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;

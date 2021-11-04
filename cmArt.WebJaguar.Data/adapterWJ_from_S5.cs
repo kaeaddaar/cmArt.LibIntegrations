@@ -1,10 +1,11 @@
-﻿using System;
+﻿using cmArt.WebJaguar.Connector;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace cmArt.WebJaguar.App.Data
+namespace cmArt.WebJaguar.Data
 {
     public class adapterWJ_from_S5 : IWJ_CommonFields_In_S5
     {

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using cmArt.WebJaguar.Connector;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace cmArt.WebJaguar.App.Data
+namespace cmArt.WebJaguar.Data
 {
     public class adapterS5_from_WJ : IS5_CommonFields_In_WJ
     {
@@ -21,7 +22,8 @@ namespace cmArt.WebJaguar.App.Data
         {
             get
             {
-                return _WJ.upc.Split(',');
+                string _upc = _WJ.upc ?? string.Empty;
+                return _upc.Split(',');
             }
             set
             {

@@ -2,7 +2,7 @@
 
 namespace cmArt.WebJaguar.Connector
 {
-    public interface IProduct_Root
+    public interface IProduct_Root : IWJ_CommonFields_In_S5
     {
         bool active { get; set; }
         bool addToList { get; set; }
@@ -26,16 +26,16 @@ namespace cmArt.WebJaguar.Connector
         bool compare { get; set; }
         string configLabel { get; set; }
         double cost { get; set; }
-        int cost1 { get; set; }
-        int cost10 { get; set; }
-        int cost2 { get; set; }
-        int cost3 { get; set; }
-        int cost4 { get; set; }
-        int cost5 { get; set; }
-        int cost6 { get; set; }
-        int cost7 { get; set; }
-        int cost8 { get; set; }
-        int cost9 { get; set; }
+        double cost1 { get; set; }
+        double cost10 { get; set; }
+        double cost2 { get; set; }
+        double cost3 { get; set; }
+        double cost4 { get; set; }
+        double cost5 { get; set; }
+        double cost6 { get; set; }
+        double cost7 { get; set; }
+        double cost8 { get; set; }
+        double cost9 { get; set; }
         bool costPercent { get; set; }
         string crossItemsCode { get; set; }
         double cubicSize { get; set; }
@@ -48,18 +48,18 @@ namespace cmArt.WebJaguar.Connector
         string defaultSupplierName { get; set; }
         string defaultSupplierSku { get; set; }
         int desiredInventory { get; set; }
-        int discount1 { get; set; }
-        int discount10 { get; set; }
-        int discount2 { get; set; }
-        int discount3 { get; set; }
-        int discount4 { get; set; }
-        int discount5 { get; set; }
-        int discount6 { get; set; }
-        int discount7 { get; set; }
-        int discount8 { get; set; }
-        int discount9 { get; set; }
-        int discountedCost { get; set; }
-        int discountedPrice { get; set; }
+        double discount1 { get; set; }
+        double discount10 { get; set; }
+        double discount2 { get; set; }
+        double discount3 { get; set; }
+        double discount4 { get; set; }
+        double discount5 { get; set; }
+        double discount6 { get; set; }
+        double discount7 { get; set; }
+        double discount8 { get; set; }
+        double discount9 { get; set; }
+        double discountedCost { get; set; }
+        double discountedPrice { get; set; }
         bool discountPercent1 { get; set; }
         bool discountPercent10 { get; set; }
         bool discountPercent2 { get; set; }
@@ -177,7 +177,7 @@ namespace cmArt.WebJaguar.Connector
         string field98 { get; set; }
         string field99 { get; set; }
         bool groundShipping { get; set; }
-        int groupSpecialPrice { get; set; }
+        double groupSpecialPrice { get; set; }
         int hazardousTier { get; set; }
         string headTag { get; set; }
         bool hideBreadCrumbs { get; set; }
@@ -225,7 +225,7 @@ namespace cmArt.WebJaguar.Connector
         int markupPercent9 { get; set; }
         string masterSku { get; set; }
         int minimumQty { get; set; }
-        float msrp { get; set; }
+        double msrp { get; set; }
         string name { get; set; }
         bool negInventory { get; set; }
         string note { get; set; }
@@ -336,7 +336,7 @@ namespace cmArt.WebJaguar.Connector
         bool taxable { get; set; }
         int temperature { get; set; }
         string type { get; set; }
-        int unitPrice { get; set; }
+        double unitPrice { get; set; }
         string upc { get; set; }
         int upsMaxItemsInPackage { get; set; }
         int uspsMaxItemsInPackage { get; set; }

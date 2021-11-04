@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace cmArt.WebJaguar.App.Data
+namespace cmArt.WebJaguar.Connector
 {
-    /// <summary>
-    /// Web Jaguar (WJ) fields common to System Five (S5)
-    /// </summary>
     public interface IWJ_CommonFields_In_S5
     {
         string upc { get; set; }//barcodes
@@ -14,4 +13,5 @@ namespace cmArt.WebJaguar.App.Data
         string longDesc { get; set; }//WebDescription
         float weight { get; set; }//weight
     }
+
 }

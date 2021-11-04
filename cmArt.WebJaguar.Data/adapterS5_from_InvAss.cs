@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace cmArt.WebJaguar.App.Data
+namespace cmArt.WebJaguar.Data
 {
     public class adapterS5_from_InvAss : IS5_CommonFields_In_WJ
     {
@@ -61,7 +61,11 @@ namespace cmArt.WebJaguar.App.Data
                 _InvAss.Inv.Part = value ?? string.Empty;
             }
         }
-        public string WebDescription { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string WebDescription 
+        {
+            get => string.Empty; 
+            set => throw new NotImplementedException(); 
+        }
         public float weight
         {
             get

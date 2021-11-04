@@ -1,10 +1,11 @@
-﻿using System;
+﻿using cmArt.WebJaguar.Connector;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace cmArt.WebJaguar.App.Data
+namespace cmArt.WebJaguar.Data
 {
     public static class IWJ_CommonFields_In_S5Extensions_for_Transformation
     {
@@ -13,7 +14,7 @@ namespace cmArt.WebJaguar.App.Data
             IWJ_CommonFields_In_S5 _from = from ?? new WJ_CommonFields();
 
             to.longDesc = _from.longDesc;
-            to.name = _from.longDesc;
+            to.name = _from.name;
             to.shortDesc = _from.shortDesc;
             to.sku = _from.sku;
             to.upc = _from.upc;
