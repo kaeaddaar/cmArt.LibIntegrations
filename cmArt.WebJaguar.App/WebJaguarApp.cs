@@ -259,7 +259,7 @@ namespace cmArt.WebJaguar.App
                     logger.LogInformation("Performing Edits on Changed Products");
                     logger.LogInformation($"Number of Changed Products: {changedProducts.Count()}");
                     //Product_Edit_Results = apiWJ.Products_Edit(changedProducts);
-                    Product_Edit_Results = apiWJ.Products_Edit(WJ_WithChanges); // uses changes converted back to Product_Root (if it works)
+                    Product_Edit_Results = apiWJ.Products_Edit(changedProducts); // uses changes converted back to Product_Root (if it works)
                     string FileNameChangedProducts = settings.OutputDirectory + "\\changedProducts.json.txt";
                     string content = System.Text.Json.JsonSerializer.Serialize(changedProducts.ToList(), typeof(List<S5_CommonFields>));
                     System.IO.File.WriteAllText(FileNameChangedProducts, content);

@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using cmArt.WebJaguar.Data;
+
 
 namespace cmArt.WebJaguar.Connector
 {
@@ -25,9 +27,9 @@ namespace cmArt.WebJaguar.Connector
             
             this.init(_ApiConnectorData);
         }
-        public string Products_Edit(IEnumerable<Product_Root> ChangedRecords)
+        public string Products_Edit(IEnumerable<S5_CommonFields> ChangedRecords)
         {
-            IEnumerable<Product_Root> _ChangedRecords = ChangedRecords ?? new List<Product_Root>();
+            IEnumerable<S5_CommonFields> _ChangedRecords = ChangedRecords ?? new List<S5_CommonFields>();
             ApiCallData data = new ApiCallData();
             data.UrlCommand = "/api/v1/updateProduct.jhtm";
             data.Body = "";

@@ -1,5 +1,4 @@
 ﻿using cmArt.LibIntegrations.GenericJoinsService;
-using cmArt.WebJaguar.Connector;
 using System;
 using System.Collections.Generic;
 using System.Linq;

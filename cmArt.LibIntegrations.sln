@@ -49,7 +49,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTestWebJaguarCal
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestWebJaguarIntegration", "UnitTestWebJaguarIntegration\UnitTestWebJaguarIntegration.csproj", "{4BFFB585-3E45-4514-8842-07ADD43F569C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmArt.WebJaguar.Data", "cmArt.WebJaguar.Data\cmArt.WebJaguar.Data.csproj", "{7ADD1544-3FB8-4EEF-AA26-03F1658F2211}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmArt.WebJaguar.Data", "cmArt.WebJaguar.Data\cmArt.WebJaguar.Data.csproj", "{0FB46D0B-F7C5-40AE-8496-5D9832FE8CEE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -149,10 +149,10 @@ Global
 		{4BFFB585-3E45-4514-8842-07ADD43F569C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BFFB585-3E45-4514-8842-07ADD43F569C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BFFB585-3E45-4514-8842-07ADD43F569C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7ADD1544-3FB8-4EEF-AA26-03F1658F2211}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7ADD1544-3FB8-4EEF-AA26-03F1658F2211}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7ADD1544-3FB8-4EEF-AA26-03F1658F2211}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7ADD1544-3FB8-4EEF-AA26-03F1658F2211}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FB46D0B-F7C5-40AE-8496-5D9832FE8CEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FB46D0B-F7C5-40AE-8496-5D9832FE8CEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FB46D0B-F7C5-40AE-8496-5D9832FE8CEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FB46D0B-F7C5-40AE-8496-5D9832FE8CEE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

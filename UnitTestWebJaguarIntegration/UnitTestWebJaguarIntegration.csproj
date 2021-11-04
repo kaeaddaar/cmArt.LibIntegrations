@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\cmArt.WebJaguar.Connector\cmArt.WebJaguar.Connector.csproj" />
-    <ProjectReference Include="..\cmArt.WebJaguar.Data\cmArt.WebJaguar.Data.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using cmArt.WebJaguar.Data;
 
-namespace cmArt.WebJaguar.Connector
+
+namespace cmArt.WebJaguar.Data
 {
     public interface IProduct_Root : IWJ_CommonFields_In_S5
     {

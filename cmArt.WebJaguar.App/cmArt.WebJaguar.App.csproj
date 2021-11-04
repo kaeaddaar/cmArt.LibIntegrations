@@ -18,6 +18,5 @@
     <ProjectReference Include="..\cmArt.Shopify.Connector\cmArt.Shopify.Connector.csproj" />
     <ProjectReference Include="..\cmArt.System5.Inventory\cmArt.System5.Inventory.csproj" />
     <ProjectReference Include="..\cmArt.WebJaguar.Connector\cmArt.WebJaguar.Connector.csproj" />
-    <ProjectReference Include="..\cmArt.WebJaguar.Data\cmArt.WebJaguar.Data.csproj" />
   </ItemGroup>
 </Project>

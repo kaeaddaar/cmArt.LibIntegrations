@@ -1,5 +1,4 @@
-﻿using cmArt.WebJaguar.Connector;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,7 +27,7 @@ namespace cmArt.WebJaguar.Data
             set
             {
                 IEnumerable<string> _value = value ?? new List<string>();
-                _WJ.upc = string.Join(',', _value);
+                _WJ.upc = string.Join(",", _value);
             }
         }
         public string Description

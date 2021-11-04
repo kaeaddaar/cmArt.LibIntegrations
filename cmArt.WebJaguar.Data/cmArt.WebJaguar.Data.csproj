@@ -1,11 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\cmArt.WebJaguar.Connector\cmArt.WebJaguar.Connector.csproj" />
+    <None Include="cmArt.WebJaguar.DataDNU.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\cmArt.LibIntegrations\cmArt.LibIntegrations.csproj" />
+    <ProjectReference Include="..\cmArt.System5.Inventory\cmArt.System5.Inventory.csproj" />
   </ItemGroup>
 
 </Project>

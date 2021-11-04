@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace cmArt.WebJaguar.Connector
+namespace cmArt.WebJaguar.Data
 {
     public interface IWJ_CommonFields_In_S5
     {
