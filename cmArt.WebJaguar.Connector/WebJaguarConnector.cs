@@ -40,7 +40,7 @@ namespace cmArt.WebJaguar.Connector
                 return CF;
             });
 
-            Func<string, int> logStub = (x) => { Console.WriteLine("Logging not yet implemented"); return 0; };
+            Func<string, int> logStub = (x) => { Console.WriteLine(x); return 0; };
 
             ApiCallData data = new ApiCallData();
             data.UrlCommand = "/api/v1/updateProduct.jhtm";
