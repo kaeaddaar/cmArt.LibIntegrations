@@ -30,11 +30,30 @@ namespace cmArt.WebJaguar.Connector
         public string Products_Edit(IEnumerable<S5_CommonFields> ChangedRecords)
         {
             IEnumerable<S5_CommonFields> _ChangedRecords = ChangedRecords ?? new List<S5_CommonFields>();
+            IEnumerable<WJ_CommonFields> WJ_ChangedRecords = _ChangedRecords.Select(x =>
+            {
+                adapterWJ_from_S5 tmpAdapter = new adapterWJ_from_S5();
+                tmpAdapter.Init(x);
+                IWJ_CommonFields_In_S5 iCF = tmpAdapter;
+                WJ_CommonFields CF = new WJ_CommonFields();
+                CF.CopyFrom(iCF);
+                return CF;
+            });
+
+            Func<string, int> logStub = (x) => { Console.WriteLine("Logging not yet implemented"); return 0; };
+
             ApiCallData data = new ApiCallData();
             data.UrlCommand = "/api/v1/updateProduct.jhtm";
-            data.Body = "";
-            Func<string, int> logStub = (x) => { Console.WriteLine("Logging not yet implemented"); return 0; };
-            string results = this.MakeApiPostCall(data, logStub);
+            //data.Body = JsonSerializer.Serialize(WJ_ChangedRecords, typeof(IEnumerable<WJ_CommonFields>));
+
+            string results = string.Empty;
+            foreach (var record in WJ_ChangedRecords)
+            {
+                data.Body = JsonSerializer.Serialize(record, typeof(WJ_CommonFields));
+                string tmpResults = this.MakeApiPostCall(data, logStub);
+                results += tmpResults;
+            }
+
             return results;
         }
         public string Products_Add(IEnumerable<Product_Root> NewRecords)
