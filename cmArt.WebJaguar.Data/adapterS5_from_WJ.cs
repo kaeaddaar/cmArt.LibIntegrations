@@ -45,11 +45,13 @@ namespace cmArt.WebJaguar.Data
         {
             get
             {
-                return _WJ.sku;
+                int result;
+                int.TryParse(_WJ.sku, out result);
+                return result;
             }
             set
             {
-                _WJ.sku = value;
+                _WJ.sku = value.ToString();
             }
         }
         public string PartNumber

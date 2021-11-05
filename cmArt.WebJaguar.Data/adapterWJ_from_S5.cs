@@ -11,7 +11,19 @@ namespace cmArt.WebJaguar.Data
         protected IS5_CommonFields_In_WJ _CommonFields { get; set; }
         public string upc { get => string.Join(",", _CommonFields.barcodes); set => _CommonFields.barcodes = value.Split(',').AsEnumerable(); }
         public string shortDesc { get => _CommonFields.Description; set => _CommonFields.Description = value; }
-        public int sku { get => _CommonFields.InvUnique; set => _CommonFields.InvUnique = value; }
+        public string sku 
+        {
+            get
+            {
+                return _CommonFields.InvUnique.ToString();
+            }
+            set 
+            {
+                int result;
+                int.TryParse(value, out result);
+                _CommonFields.InvUnique = result;
+            }
+        }
         public string name { get => _CommonFields.PartNumber; set => _CommonFields.PartNumber = value; }
         public string longDesc { get => _CommonFields.WebDescription; set => _CommonFields.WebDescription = value; }
         public float weight { get => _CommonFields.weight; set => _CommonFields.weight = value; }

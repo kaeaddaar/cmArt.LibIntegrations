@@ -17,17 +17,20 @@ namespace cmArt.WebJaguar.Data
             //regionProductMapping = new List<Product_RegionProductMapping>();
             kitParts = new List<KitPart>();
         }
-        int IWJ_CommonFields_In_S5.sku 
+        private string _sku;
+        public string sku 
         { 
             get
             {
                 int result;
-                int.TryParse(this.sku, out result);
-                return result;
+                int.TryParse(_sku, out result);
+                return result.ToString();
             }
             set
             {
-                this.sku = value.ToString();
+                int result;
+                int.TryParse(value, out result);
+                _sku = result.ToString();
             }
         }
         public Product_Root_Common SetNotEditableDefaults()

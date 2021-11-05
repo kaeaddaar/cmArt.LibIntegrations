@@ -8,7 +8,7 @@ namespace cmArt.WebJaguar.Data
     {
         string upc { get; set; }//barcodes
         string shortDesc { get; set; }//Description
-        int sku { get; set; }//InvUnique
+        string sku { get; set; }//InvUnique
         string name { get; set; }//PartNumber
         string longDesc { get; set; }//WebDescription
         float weight { get; set; }//weight

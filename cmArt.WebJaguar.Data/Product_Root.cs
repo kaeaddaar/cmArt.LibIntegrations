@@ -14,18 +14,20 @@ namespace cmArt.WebJaguar.Data
         public List<KitPart> kitParts { get; set; }
         public double msrp { get; set; }
         public string name { get; set; }
-        public string sku { get; set; }
-        int IWJ_CommonFields_In_S5.sku
+        private string _sku;
+        public string sku
         {
             get
             {
                 int result;
-                int.TryParse(this.sku, out result);
-                return result;
+                int.TryParse(_sku, out result);
+                return result.ToString();
             }
             set
             {
-                this.sku = value.ToString();
+                int result;
+                int.TryParse(value, out result);
+                _sku = result.ToString();
             }
         }
         public string note { get; set; }
