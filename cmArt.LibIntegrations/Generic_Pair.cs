@@ -1,9 +1,8 @@
-﻿using cmArt.Reece.ShopifyConnector;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace cmArt.Shopify.App.ReportViews
+namespace cmArt.LibIntegrations
 {
     public class Generic_Pair<TCommon> where TCommon : new()
     {
@@ -20,4 +19,5 @@ namespace cmArt.Shopify.App.ReportViews
             Shopify = ShopifyIn ?? new TCommon();
         }
     }
+
 }

@@ -19,4 +19,8 @@
     <ProjectReference Include="..\cmArt.System5.Inventory\cmArt.System5.Inventory.csproj" />
     <ProjectReference Include="..\cmArt.WebJaguar.Connector\cmArt.WebJaguar.Connector.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ReportViews\" />
+  </ItemGroup>
 </Project>
