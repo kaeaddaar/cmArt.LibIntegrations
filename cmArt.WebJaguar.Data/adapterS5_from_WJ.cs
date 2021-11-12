@@ -87,5 +87,40 @@ namespace cmArt.WebJaguar.Data
                 _WJ.weight = value;
             }
         }
+
+        public string Cat
+        {
+            get
+            {
+                return _WJ.field12 ?? string.Empty;
+            }
+            set
+            {
+                _WJ.field12 = value ?? "000";
+            }
+        }
+        public string FF22
+        {
+            get
+            {
+                IEnumerable<int> tmpIds = _WJ.catIds ?? new List<int>();
+                IEnumerable<string> tmpStrIds = tmpIds.Select(x => x.ToString());
+                string results = string.Join(",", tmpStrIds);
+                return results;
+            }
+            set
+            {
+                string strIds = value ?? string.Empty;
+                IEnumerable<string> tmpStrIds = strIds.Split(',');
+                List<int> tmpIds = new List<int>();
+                foreach (var StrId in tmpStrIds)
+                {
+                    int tmp;
+                    int.TryParse(StrId, out tmp);
+                    tmpIds.Add(tmp);
+                }
+                _WJ.catIds = tmpIds;
+            }
+        }
     }
 }

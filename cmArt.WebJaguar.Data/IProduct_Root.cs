@@ -6,6 +6,8 @@ namespace cmArt.WebJaguar.Data
 {
     public interface IProduct_Root : IWJ_CommonFields_In_S5
     {
+        string categoryIds { get; set; }
+        List<int> catIds { get; set; }
         bool active { get; set; }
         bool addToList { get; set; }
         bool addToPresentation { get; set; }
@@ -22,8 +24,6 @@ namespace cmArt.WebJaguar.Data
         int caseContent { get; set; }
         string caseUnitTitle { get; set; }
         double catalogPrice { get; set; }
-        string categoryIds { get; set; }
-        List<int> catIds { get; set; }
         bool commissionable { get; set; }
         bool compare { get; set; }
         string configLabel { get; set; }

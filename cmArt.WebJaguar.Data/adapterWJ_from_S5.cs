@@ -27,6 +27,34 @@ namespace cmArt.WebJaguar.Data
         public string name { get => _CommonFields.PartNumber; set => _CommonFields.PartNumber = value; }
         public string longDesc { get => _CommonFields.WebDescription; set => _CommonFields.WebDescription = value; }
         public float weight { get => _CommonFields.weight; set => _CommonFields.weight = value; }
+        public List<int> catIds//Inventory Free Form field 22 (22 is Marked For Deletion)
+        {
+            get
+            {
+                string strIds = _CommonFields.FF22 ?? string.Empty;
+                IEnumerable<string> tmpStrIds = strIds.Split(',');
+                List<int> tmpIds = new List<int>();
+                foreach (var StrId in tmpStrIds)
+                {
+                    int tmp;
+                    int.TryParse(StrId, out tmp);
+                    tmpIds.Add(tmp);
+                }
+                return tmpIds;
+            }
+            set
+            {
+                IEnumerable<int> tmpIds = value ?? new List<int>();
+                IEnumerable<string> tmpStrIds = tmpIds.Select(x => x.ToString());
+                string results = string.Join(",", tmpStrIds);
+                _CommonFields.FF22 = results;
+            }
+        }
+        public string field12//Sub Category
+        {
+            get { return _CommonFields.Cat ?? string.Empty; }
+            set { _CommonFields.Cat = value ?? string.Empty; }
+        }
 
         public adapterWJ_from_S5()
         {

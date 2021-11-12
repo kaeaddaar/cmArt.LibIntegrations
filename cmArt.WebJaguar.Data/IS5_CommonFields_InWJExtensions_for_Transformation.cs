@@ -13,10 +13,10 @@ namespace cmArt.WebJaguar.Data
         {
 
             if (data == null || compareTo == null) { return false; }
-            
-            Func<string, string> key = (x) => x;
+
+            Func<string, string> keyBarcodes = (x) => x;
             var BarcodePairs = GenericJoins<string, string, string>
-                .FullOuterJoin(data.barcodes, compareTo.barcodes, key, key);
+                .FullOuterJoin(data.barcodes, compareTo.barcodes, keyBarcodes, keyBarcodes);
             foreach (var pair in BarcodePairs)
             {
                 if (pair.Item1 == null || pair.Item2 == null) { return false; }
@@ -28,6 +28,7 @@ namespace cmArt.WebJaguar.Data
             if (data.PartNumber.TrimEnd() != compareTo.PartNumber.TrimEnd()) { return false; }
             if (data.WebDescription.TrimEnd() != compareTo.WebDescription.TrimEnd()) { return false; }
             if (data.weight != compareTo.weight) { return false; }
+            if (data.Cat != compareTo.Cat) { return false; }
 
             return true;
         }
@@ -42,6 +43,7 @@ namespace cmArt.WebJaguar.Data
             result.PartNumber = _data.PartNumber;
             result.WebDescription = _data.WebDescription;
             result.weight = _data.weight;
+            result.Cat = _data.Cat;
 
             return result;
         }
@@ -53,6 +55,8 @@ namespace cmArt.WebJaguar.Data
             to.PartNumber = from.PartNumber;
             to.WebDescription = from.WebDescription;
             to.weight = from.weight;
+            to.Cat = from.Cat;
+
             return to;
         }
         public static Product_Root AsProduct_Root(this IS5_CommonFields_In_WJ data)

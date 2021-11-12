@@ -18,6 +18,13 @@ namespace cmArt.WebJaguar.Data
         private string _Description; //shortDesc
         private IEnumerable<string> _barcodes; //upc
         private int _InvUnique; //sku
+        private string _Cat; // needs to map to list of category Ids in WebJaguar
+        private string _FF22;
+        public string Cat
+        {
+            get { return (_Cat ?? string.Empty).TrimEnd(); }
+            set { _Cat = (value ?? string.Empty).TrimEnd(); }
+        }
         public S5_CommonFields()
         {
             _barcodes = _barcodes ?? new List<string>();
@@ -52,6 +59,11 @@ namespace cmArt.WebJaguar.Data
         {
             get { return _PartNumber; }
             set { _PartNumber = value ?? string.Empty; }
+        }
+        public string FF22
+        {
+            get { return _FF22 ?? string.Empty; }
+            set { _FF22 = value ?? string.Empty; }
         }
 
     }

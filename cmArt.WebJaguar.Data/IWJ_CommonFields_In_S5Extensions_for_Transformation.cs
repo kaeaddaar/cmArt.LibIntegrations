@@ -18,6 +18,7 @@ namespace cmArt.WebJaguar.Data
             to.sku = _from.sku;
             to.upc = _from.upc;
             to.weight = _from.weight;
+            to.catIds = new List<int>(_from.catIds);
 
             return to;
         }

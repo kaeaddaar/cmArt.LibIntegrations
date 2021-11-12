@@ -47,9 +47,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.SystemFive.Cache.Inve
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTestWebJaguarCalls", "IntegrationTestWebJaguarCalls\IntegrationTestWebJaguarCalls.csproj", "{69CD144C-36DD-4CFC-BEDE-0846B301E0A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestWebJaguarIntegration", "UnitTestWebJaguarIntegration\UnitTestWebJaguarIntegration.csproj", "{4BFFB585-3E45-4514-8842-07ADD43F569C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTestWebJaguarIntegration", "UnitTestWebJaguarIntegration\UnitTestWebJaguarIntegration.csproj", "{4BFFB585-3E45-4514-8842-07ADD43F569C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmArt.WebJaguar.Data", "cmArt.WebJaguar.Data\cmArt.WebJaguar.Data.csproj", "{0FB46D0B-F7C5-40AE-8496-5D9832FE8CEE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.WebJaguar.Data", "cmArt.WebJaguar.Data\cmArt.WebJaguar.Data.csproj", "{0FB46D0B-F7C5-40AE-8496-5D9832FE8CEE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

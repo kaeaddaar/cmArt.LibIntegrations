@@ -1,4 +1,5 @@
-﻿using cmArt.System5.Inventory;
+﻿using cmArt.System5.Data;
+using cmArt.System5.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,6 +76,25 @@ namespace cmArt.WebJaguar.Data
             set
             {
                 _InvAss.Inv.Weight = value;
+            }
+        }
+
+        public string Cat
+        {
+            get { return _InvAss.Inv.Cat ?? "000"; }
+            set { _InvAss.Inv.Cat = value ?? "000"; }
+        }
+        public string FF22
+        {
+            get 
+            {
+                IComments tmp = _InvAss.CommentsLines_PerInventry_27.Where(x => x.LineNo == 22).FirstOrDefault() ?? new Comments();
+                return tmp.Comment ?? string.Empty; 
+            }
+            set 
+            {
+                IComments tmp = _InvAss.CommentsLines_PerInventry_27.Where(x => x.LineNo == 22).FirstOrDefault() ?? new Comments();
+                tmp.Comment = value ?? string.Empty;
             }
         }
 
