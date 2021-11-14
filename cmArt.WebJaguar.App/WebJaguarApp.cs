@@ -248,7 +248,7 @@ namespace cmArt.WebJaguar.App
             logger.LogInformation("Begin Performing Edits");
             changedProducts = new List<S5_CommonFields>();
             // Get original Product Records from Shopify with Changes
-            WJ_WithChanges = ChangedRecords_Product.Select(p => (Product_Root)p);
+            WJ_WithChanges = ChangedRecords_Product.Select(p => p.AsProduct_Root());
             WebJaguarConnector apiWJ = new WebJaguarConnector();
             if (!PreventApiAddsNEdits)
             {

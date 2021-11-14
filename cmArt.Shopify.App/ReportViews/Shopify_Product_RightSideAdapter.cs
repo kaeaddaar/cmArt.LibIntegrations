@@ -27,7 +27,7 @@ namespace cmArt.Shopify.App.ReportViews
         private void _Init(Generic_Pair<Shopify_Product> shopify_Product_Pair)
         {
             _S5 = shopify_Product_Pair.S5 ?? new Shopify_Product();
-            _Shopify = shopify_Product_Pair.Shopify ?? new Shopify_Product();
+            _Shopify = shopify_Product_Pair.External ?? new Shopify_Product();
         }
         private void _Init()
         {
