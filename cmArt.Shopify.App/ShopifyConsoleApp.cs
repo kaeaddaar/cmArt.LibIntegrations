@@ -27,6 +27,7 @@ using Microsoft.Extensions.DependencyInjection;
 using cmArt.Shopify.App.Services;
 using cmArt.LibIntegrations.VennMapService;
 using cmArt.Shopify.App.ReportViews;
+using cmArt.LibIntegrations.ReportService;
 
 namespace cmArt.Shopify.App
 {

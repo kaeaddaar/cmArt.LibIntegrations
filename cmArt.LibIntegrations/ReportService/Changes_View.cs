@@ -4,7 +4,7 @@ using System.Text;
 using FileHelpers;
 
 
-namespace cmArt.Reece.ShopifyConnector
+namespace cmArt.LibIntegrations.ReportService
 {
     [DelimitedRecord(",")]
     public class Changes_View

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using cmArt.Reece.ShopifyConnector;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -54,6 +55,193 @@ namespace cmArt.WebJaguar.Data
         {
             get { return _CommonFields.Cat ?? string.Empty; }
             set { _CommonFields.Cat = value ?? string.Empty; }
+        }
+
+        public decimal inventory
+        {
+            get
+            {
+                return _CommonFields.Quantities.Sum(x => x.Qty);
+            }
+            set
+            {
+                List<S5QtyPair> tmpQuantities = new List<S5QtyPair>();
+                tmpQuantities.Add(new S5QtyPair(0, value));
+                _CommonFields.Quantities = tmpQuantities;
+            }
+        }
+
+        public decimal inventoryAFS
+        {
+            get
+            {
+                return this.inventory;
+            }
+            set
+            {
+                this.inventory = value;
+            }
+        }
+        public double cost
+        {
+            get
+            {
+                return (double)_CommonFields.WholesaleCost;
+            }
+            set
+            {
+                _CommonFields.WholesaleCost = (decimal)value;
+            }
+        }
+        public double priceTable1
+        {
+            get
+            {
+                short sched = 0;
+                return (double)(_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price;
+            }
+            set
+            {
+                // WARNING: Ignores when price is missing. Performs assignment on value that will be tossed
+                short sched = 0;
+                (_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price = (decimal)value;
+                Console.WriteLine($"priceTable1 Set failed due to price scheule {sched} being null");
+            }
+        }
+        public double priceTable2
+        {
+            get
+            {
+                short sched = 1;
+                return (double)(_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price;
+            }
+            set
+            {
+                // WARNING: Ignores when price is missing. Performs assignment on value that will be tossed
+                short sched = 1;
+                (_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price = (decimal)value;
+                Console.WriteLine($"priceTable1 Set failed due to price scheule {sched} being null");
+            }
+        }
+        public double priceTable3
+        {
+            get
+            {
+                short sched = 2;
+                return (double)(_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price;
+            }
+            set
+            {
+                // WARNING: Ignores when price is missing. Performs assignment on value that will be tossed
+                short sched = 2;
+                (_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price = (decimal)value;
+                Console.WriteLine($"priceTable1 Set failed due to price scheule {sched} being null");
+            }
+        }
+        public double priceTable4
+        {
+            get
+            {
+                short sched = 3;
+                return (double)(_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price;
+            }
+            set
+            {
+                // WARNING: Ignores when price is missing. Performs assignment on value that will be tossed
+                short sched = 3;
+                (_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price = (decimal)value;
+                Console.WriteLine($"priceTable1 Set failed due to price scheule {sched} being null");
+            }
+        }
+        public double priceTable5
+        {
+            get
+            {
+                short sched = 4;
+                return (double)(_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price;
+            }
+            set
+            {
+                // WARNING: Ignores when price is missing. Performs assignment on value that will be tossed
+                short sched = 4;
+                (_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price = (decimal)value;
+                Console.WriteLine($"priceTable1 Set failed due to price scheule {sched} being null");
+            }
+        }
+        public double priceTable6
+        {
+            get
+            {
+                short sched = 5;
+                return (double)(_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price;
+            }
+            set
+            {
+                // WARNING: Ignores when price is missing. Performs assignment on value that will be tossed
+                short sched = 5;
+                (_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price = (decimal)value;
+                Console.WriteLine($"priceTable1 Set failed due to price scheule {sched} being null");
+            }
+        }
+        public double priceTable7
+        {
+            get
+            {
+                short sched = 6;
+                return (double)(_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price;
+            }
+            set
+            {
+                // WARNING: Ignores when price is missing. Performs assignment on value that will be tossed
+                short sched = 6;
+                (_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price = (decimal)value;
+                Console.WriteLine($"priceTable1 Set failed due to price scheule {sched} being null");
+            }
+        }
+        public double priceTable8
+        {
+            get
+            {
+                short sched = 7;
+                return (double)(_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price;
+            }
+            set
+            {
+                // WARNING: Ignores when price is missing. Performs assignment on value that will be tossed
+                short sched = 7;
+                (_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price = (decimal)value;
+                Console.WriteLine($"priceTable1 Set failed due to price scheule {sched} being null");
+            }
+        }
+        public double priceTable9
+        {
+            get
+            {
+                short sched = 8;
+                return (double)(_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price;
+            }
+            set
+            {
+                // WARNING: Ignores when price is missing. Performs assignment on value that will be tossed
+                short sched = 8;
+                (_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price = (decimal)value;
+                Console.WriteLine($"priceTable1 Set failed due to price scheule {sched} being null");
+            }
+        }
+        public double priceTable10
+        {
+            get
+            {
+                short sched = 9;
+                return (double)(_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price;
+            }
+            set
+            {
+                // WARNING: Ignores when price is missing. Performs assignment on value that will be tossed
+                short sched = 9;
+                (_CommonFields.Prices.Where(x => x.Level == sched).FirstOrDefault() ?? new S5PricePair()).Price = (decimal)value;
+                Console.WriteLine($"priceTable1 Set failed due to price scheule {sched} being null");
+            }
         }
 
         public adapterWJ_from_S5()

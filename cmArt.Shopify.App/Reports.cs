@@ -11,6 +11,7 @@ using cmArt.System5.Inventory;
 using cmArt.Shopify.App.ReportViews;
 using FileHelpers;
 using cmArt.LibIntegrations;
+using cmArt.LibIntegrations.ReportService;
 
 namespace cmArt.Shopify.App
 {

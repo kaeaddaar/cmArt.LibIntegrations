@@ -1,10 +1,13 @@
-﻿using cmArt.System5.Data;
+﻿using cmArt.Reece.ShopifyConnector;
+using cmArt.System5.Data;
 using cmArt.System5.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using cmArt.LibIntegrations.PriceCalculations;
+
 
 namespace cmArt.WebJaguar.Data
 {
@@ -98,10 +101,53 @@ namespace cmArt.WebJaguar.Data
             }
         }
 
+        public decimal WholesaleCost
+        {
+            get
+            {
+                return (decimal)_InvAss.Inv.Wholesale_1;
+            }
+            set
+            {
+                _InvAss.Inv.Wholesale_1 = (double)value;
+            }
+        }
+        public IEnumerable<S5PricePair> Prices
+        {
+            get
+            {
+                List<S5PricePair> tmpPrices = new List<S5PricePair>();
+                for (short i = 0; i < 10; i++)
+                {
+                    tmpPrices.Add(new S5PricePair(i, (decimal)GetPriceSchedule(i).Price));
+                }
+                return tmpPrices;
+            }
+            set
+            {
+                throw new NotImplementedException("Doesn't yet support converting a price back into percentage " +
+                "based on a formula");
+            }
+        }
+
+        public IEnumerable<S5QtyPair> Quantities { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         public void init(IS5InvAssembled data)
         {
             _InvAss = data ?? new S5InvAssembled();
         }
 
+
+        protected PriceScheduleView GetPriceSchedule(short ScheduleNum)
+        {
+            var FirstRecord = _InvAss;
+
+            var Bases = FirstRecord.InvPrices_PerInventry_27.PopulateBasePriceSchedInfo_NoPrice(FirstRecord.Inv, 0, 0, 0);
+            var prices = Bases.CalculatePrices(FirstRecord.InvPrices_PerInventry_27);
+
+            var price = prices.Where(p => p.Level == ScheduleNum).FirstOrDefault();
+
+            return price;
+        }
     }
 }

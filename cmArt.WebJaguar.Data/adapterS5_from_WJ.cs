@@ -1,4 +1,5 @@
-﻿using System;
+﻿using cmArt.Reece.ShopifyConnector;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -120,6 +121,69 @@ namespace cmArt.WebJaguar.Data
                     tmpIds.Add(tmp);
                 }
                 _WJ.catIds = tmpIds;
+            }
+        }
+
+        public decimal WholesaleCost
+        { 
+            get
+            {
+                return (decimal)_WJ.cost;
+            }
+            set
+            {
+                _WJ.cost = (double)value;
+            }
+        }
+        public IEnumerable<S5PricePair> Prices
+        {
+            get
+            {
+                List<S5PricePair> tmpPrices = new List<S5PricePair>();
+                tmpPrices.Add(new S5PricePair(0, (decimal)_WJ.priceTable1));
+                tmpPrices.Add(new S5PricePair(1, (decimal)_WJ.priceTable2));
+                tmpPrices.Add(new S5PricePair(2, (decimal)_WJ.priceTable3));
+                tmpPrices.Add(new S5PricePair(3, (decimal)_WJ.priceTable4));
+                tmpPrices.Add(new S5PricePair(4, (decimal)_WJ.priceTable5));
+                tmpPrices.Add(new S5PricePair(5, (decimal)_WJ.priceTable6));
+                tmpPrices.Add(new S5PricePair(6, (decimal)_WJ.priceTable7));
+                tmpPrices.Add(new S5PricePair(7, (decimal)_WJ.priceTable8));
+                tmpPrices.Add(new S5PricePair(8, (decimal)_WJ.priceTable9));
+                tmpPrices.Add(new S5PricePair(9, (decimal)_WJ.priceTable10));
+                return tmpPrices;
+            }
+            set
+            {
+                IEnumerable<S5PricePair> tmpPairs = value ?? new List<S5PricePair>();
+
+                double P0 = (double)((tmpPairs.Where(x => x.Level == 0).FirstOrDefault()) ?? new S5PricePair()).Price;
+                double P1 = (double)((tmpPairs.Where(x => x.Level == 1).FirstOrDefault()) ?? new S5PricePair()).Price;
+                double P2 = (double)((tmpPairs.Where(x => x.Level == 2).FirstOrDefault()) ?? new S5PricePair()).Price;
+                double P3 = (double)((tmpPairs.Where(x => x.Level == 3).FirstOrDefault()) ?? new S5PricePair()).Price;
+                double P4 = (double)((tmpPairs.Where(x => x.Level == 4).FirstOrDefault()) ?? new S5PricePair()).Price;
+                double P5 = (double)((tmpPairs.Where(x => x.Level == 5).FirstOrDefault()) ?? new S5PricePair()).Price;
+                double P6 = (double)((tmpPairs.Where(x => x.Level == 6).FirstOrDefault()) ?? new S5PricePair()).Price;
+                double P7 = (double)((tmpPairs.Where(x => x.Level == 7).FirstOrDefault()) ?? new S5PricePair()).Price;
+                double P8 = (double)((tmpPairs.Where(x => x.Level == 8).FirstOrDefault()) ?? new S5PricePair()).Price;
+                double P9 = (double)((tmpPairs.Where(x => x.Level == 9).FirstOrDefault()) ?? new S5PricePair()).Price;
+                double P10 = (double)((tmpPairs.Where(x => x.Level == 10).FirstOrDefault()) ?? new S5PricePair()).Price;
+
+            }
+        }
+        public IEnumerable<S5QtyPair> Quantities
+        {
+            get
+            {
+                List<S5QtyPair> tmpQuantities = new List<S5QtyPair>();
+                tmpQuantities.Add(new S5QtyPair(0, _WJ.inventoryAFS));
+                return tmpQuantities;
+            }
+            set
+            {
+                IEnumerable<S5QtyPair> tmpQuantities = value ?? new List<S5QtyPair>();
+                decimal total = tmpQuantities.Sum(x => x.Qty);
+                _WJ.inventoryAFS = total;
+                _WJ.inventory = total;
             }
         }
     }

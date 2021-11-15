@@ -6,6 +6,8 @@ namespace cmArt.WebJaguar.Data
 {
     public class Product_Root : IProduct_Root
     {
+        public decimal inventory { get; set; }
+        public decimal inventoryAFS { get; set; }
         public List<int> supplierIds { get; set; }
         public Product_PrimaryLocation primaryLocation { get; set; }
         public List<int> catIds { get; set; }
@@ -30,6 +32,18 @@ namespace cmArt.WebJaguar.Data
                 _sku = result.ToString();
             }
         }
+        public string categoryIds { get; set; }
+        public double cost { get; set; }
+        public double priceTable1 { get; set; }
+        public double priceTable2 { get; set; }
+        public double priceTable3 { get; set; }
+        public double priceTable4 { get; set; }
+        public double priceTable5 { get; set; }
+        public double priceTable6 { get; set; }
+        public double priceTable7 { get; set; }
+        public double priceTable8 { get; set; }
+        public double priceTable9 { get; set; }
+        public double priceTable10 { get; set; }
         public string note { get; set; }
         public string masterSku { get; set; }
         public int slaveCount { get; set; }
@@ -43,7 +57,6 @@ namespace cmArt.WebJaguar.Data
         public bool hideMsrp { get; set; }
         public double unitPrice { get; set; }
         public bool priceByCustomer { get; set; }
-        public string categoryIds { get; set; }
         public double catalogPrice { get; set; }
         public double price1 { get; set; }
         public double price2 { get; set; }
@@ -114,16 +127,6 @@ namespace cmArt.WebJaguar.Data
         public int qtyBreak7 { get; set; }
         public int qtyBreak8 { get; set; }
         public int qtyBreak9 { get; set; }
-        public double priceTable1 { get; set; }
-        public double priceTable2 { get; set; }
-        public double priceTable3 { get; set; }
-        public double priceTable4 { get; set; }
-        public double priceTable5 { get; set; }
-        public double priceTable6 { get; set; }
-        public double priceTable7 { get; set; }
-        public double priceTable8 { get; set; }
-        public double priceTable9 { get; set; }
-        public double priceTable10 { get; set; }
         public bool priceCasePack { get; set; }
         public int priceCasePackQty { get; set; }
         public double priceCasePack1 { get; set; }
@@ -325,7 +328,6 @@ namespace cmArt.WebJaguar.Data
         public bool retainOnCart { get; set; }
         public double siteMapPriority { get; set; }
         public int defaultSupplierId { get; set; }
-        public double cost { get; set; }
         public bool costPercent { get; set; }
         public string defaultSupplierSku { get; set; }
         public string defaultSupplierName { get; set; }

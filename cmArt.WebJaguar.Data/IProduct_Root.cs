@@ -6,9 +6,28 @@ namespace cmArt.WebJaguar.Data
 {
     public interface IProduct_Root : IWJ_CommonFields_In_S5
     {
+        new string field12 { get; set; }
+        new decimal inventory { get; set; }
+        new decimal inventoryAFS { get; set; }
         string categoryIds { get; set; }
-        List<int> catIds { get; set; }
+        new List<int> catIds { get; set; }
         bool active { get; set; }
+        new string longDesc { get; set; }
+        new string name { get; set; }
+        new double priceTable1 { get; set; }
+        new double priceTable10 { get; set; }
+        new double priceTable2 { get; set; }
+        new double priceTable3 { get; set; }
+        new double priceTable4 { get; set; }
+        new double priceTable5 { get; set; }
+        new double priceTable6 { get; set; }
+        new double priceTable7 { get; set; }
+        new double priceTable8 { get; set; }
+        new double priceTable9 { get; set; }
+        new string shortDesc { get; set; }
+        new string sku { get; set; }
+        new string upc { get; set; }
+        new float weight { get; set; }
         bool addToList { get; set; }
         bool addToPresentation { get; set; }
         string aliasSku { get; set; }
@@ -27,7 +46,7 @@ namespace cmArt.WebJaguar.Data
         bool commissionable { get; set; }
         bool compare { get; set; }
         string configLabel { get; set; }
-        double cost { get; set; }
+        new double cost { get; set; }
         double cost1 { get; set; }
         double cost10 { get; set; }
         double cost2 { get; set; }
@@ -82,7 +101,6 @@ namespace cmArt.WebJaguar.Data
         string field10 { get; set; }
         string field100 { get; set; }
         string field11 { get; set; }
-        string field12 { get; set; }
         string field13 { get; set; }
         string field14 { get; set; }
         string field15 { get; set; }
@@ -201,7 +219,6 @@ namespace cmArt.WebJaguar.Data
         int locationDesiredAmount { get; set; }
         int locationMinAmount { get; set; }
         bool loginRequire { get; set; }
-        string longDesc { get; set; }
         int lowInventory { get; set; }
         double loyaltyPoint { get; set; }
         string manufactureName { get; set; }
@@ -228,7 +245,6 @@ namespace cmArt.WebJaguar.Data
         string masterSku { get; set; }
         int minimumQty { get; set; }
         double msrp { get; set; }
-        string name { get; set; }
         bool negInventory { get; set; }
         string note { get; set; }
         int numCustomLines { get; set; }
@@ -263,16 +279,6 @@ namespace cmArt.WebJaguar.Data
         double priceCasePack8 { get; set; }
         double priceCasePack9 { get; set; }
         int priceCasePackQty { get; set; }
-        double priceTable1 { get; set; }
-        double priceTable10 { get; set; }
-        double priceTable2 { get; set; }
-        double priceTable3 { get; set; }
-        double priceTable4 { get; set; }
-        double priceTable5 { get; set; }
-        double priceTable6 { get; set; }
-        double priceTable7 { get; set; }
-        double priceTable8 { get; set; }
-        double priceTable9 { get; set; }
         Product_PrimaryLocation primaryLocation { get; set; }
         string productCustomerMarkupTitle { get; set; }
         string productLayout { get; set; }
@@ -307,10 +313,8 @@ namespace cmArt.WebJaguar.Data
         bool searchable { get; set; }
         int searchRank { get; set; }
         int selectedFieldGroupIndex { get; set; }
-        string shortDesc { get; set; }
         bool showNegInventory { get; set; }
         double siteMapPriority { get; set; }
-        string sku { get; set; }
         int slaveCount { get; set; }
         double slaveHighestPrice { get; set; }
         double slaveLowestPrice { get; set; }
@@ -339,9 +343,7 @@ namespace cmArt.WebJaguar.Data
         int temperature { get; set; }
         string type { get; set; }
         double unitPrice { get; set; }
-        string upc { get; set; }
         int upsMaxItemsInPackage { get; set; }
         int uspsMaxItemsInPackage { get; set; }
-        float weight { get; set; }
     }
 }

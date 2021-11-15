@@ -1,4 +1,5 @@
 ﻿using cmArt.LibIntegrations.GenericJoinsService;
+using cmArt.LibIntegrations.ReportService;
 using System;
 using System.Collections.Generic;
 using System.Linq;

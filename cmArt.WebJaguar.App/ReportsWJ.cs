@@ -1,4 +1,76 @@
-﻿//using System;
+﻿using cmArt.LibIntegrations.ReportService;
+using cmArt.WebJaguar.App.ReportViews;
+using cmArt.WebJaguar.Data;
+using FileHelpers;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace cmArt.WebJaguar.App
+{
+    public class ReportsWJ
+    {
+        //public static void SaveReport
+        //(
+        //    IEnumerable<Tuple<S5_CommonFields, S5_CommonFields>> data
+        //    , string TableName
+        //    , StaticSettings settings
+        //    , ILogger logger
+        //)
+        //{
+        //    IEnumerable<Tuple<IShopify_Product, IShopify_Product>> _data = data ?? new List<Tuple<IShopify_Product, IShopify_Product>>();
+
+        //    Func<Tuple<IShopify_Product, IShopify_Product>, Shopify_Product_Pair_Flat> Transform =
+        //    (IShopProd) =>
+        //    {
+        //        Shopify_Product tmp = IShopProd.Item2.AsShopify_Product();
+        //        Shopify_Product tmp1 = IShopProd.Item1.AsShopify_Product();
+        //        Generic_Pair<Shopify_Product> tmpSP = new Generic_Pair<Shopify_Product>(tmp1, tmp);
+        //        Shopify_Product_Pair_Adapter tmpFlatAdapter = new Shopify_Product_Pair_Adapter(tmpSP);
+        //        return tmpFlatAdapter.AsShopify_Product_Pair_Flat();
+        //    };
+
+        //    IEnumerable<Shopify_Product_Pair_Flat> flatData = _data.Select(d =>
+        //    {
+        //        return Transform(d);
+        //    });
+        //    SaveReport(flatData, TableName, settings, logger);
+        //}
+        public static void SaveReport(IEnumerable<Changes_View> data, string TableName, String OutputDirectory, ILogger logger)
+        {
+            IEnumerable<Changes_View> _data = data ?? new List<Changes_View>();
+            var engine = new FileHelperAsyncEngine<Changes_View>();
+            engine.HeaderText = "InvUnique, Cat, PartNumber, FieldName, S5ValueToSendToShopify, ShopifyValueBeforeUpdate";
+
+            using (engine.BeginWriteFile(OutputDirectory + $"\\{TableName}.csv"))
+            {
+                foreach (var record in _data)
+                {
+                    engine.WriteNext(record);
+                }
+            }
+        }
+        public static void SaveReport(IEnumerable<S5_CommonFields_Pairs_Flat> data, string TableName, string OutputDirectory, ILogger logger)
+        {
+            IEnumerable<S5_CommonFields_Pairs_Flat> _data = data ?? new List<S5_CommonFields_Pairs_Flat>();
+            var engine = new FileHelperAsyncEngine<S5_CommonFields_Pairs_Flat>();
+            engine.HeaderText = "LeftInvUnique, LeftCat, LeftPartNumber, LeftPrices, LeftQuantities, RightInvUnique, RightCat, " +
+                "RightPartNumber, RightPrices, RightQuantities";
+            using (engine.BeginWriteFile(OutputDirectory + $"\\{TableName}.csv"))
+            {
+                foreach (var record in _data)
+                {
+                    engine.WriteNext(record);
+                }
+            }
+        }
+    }
+
+}
+//using System;
 //using System.Collections.Generic;
 //using System.Linq;
 //using System.Text;
