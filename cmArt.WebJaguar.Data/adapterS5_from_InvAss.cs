@@ -130,7 +130,95 @@ namespace cmArt.WebJaguar.Data
             }
         }
 
-        public IEnumerable<S5QtyPair> Quantities { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public decimal InStock
+        {
+            get
+            {
+                _InvAss = _InvAss ?? new S5InvAssembled();
+                decimal tmpQty = (decimal)0;
+                double dblQty = 0;
+                try
+                {
+                    dblQty =
+                    (
+                        _InvAss.StokLines_PerInventry_27.Select(stok => stok.CostQuantity).Sum()
+                        - _InvAss.StokLines_PerInventry_27.Where(stok => stok.StockStatus == 39 || stok.StockStatus == 40
+                        || stok.StockStatus == 16 || stok.StockStatus == 17).Select(stok => stok.PriceQty).Sum()
+                    );
+
+                }
+                catch
+                {
+                    dblQty = 0;
+                }
+
+                try
+                {
+                    tmpQty = (decimal)dblQty;
+                }
+                catch
+                {
+                    tmpQty = 0;
+                }
+
+                return tmpQty;
+            }
+
+
+            set => throw new NotImplementedException("You can't really load a qty into the records that make the quantity up. Possible, but does it really make sense?");
+        }
+
+        public IEnumerable<S5QtyPair> Quantities
+        {
+            get
+            {
+                // build quantities for each department. Consider an All Department Quantities as well
+                if (_InvAss.StokLines_PerInventry_27 is null) { return new List<S5QtyPair>(); }
+                IEnumerable<short> StokDepts = _InvAss.StokLines_PerInventry_27.Select(inv => inv.Department).GroupBy(x => x).Select(y => y.Key);
+                List<S5QtyPair> pairs = new List<S5QtyPair>();
+                foreach (var dept in StokDepts)
+                {
+                    S5QtyPair tmp = GetInStock(dept);
+                    pairs.Add(tmp);
+                }
+                return pairs;
+            }
+            set => throw new NotImplementedException("You can't really load a qty into the records that make the quantity up. Possible, but does it really make sense?");
+        }
+        private S5QtyPair GetInStock(short Dept)
+        {
+            _InvAss = _InvAss ?? new S5InvAssembled();
+            decimal tmpQty = (decimal)0;
+            double dblQty = 0;
+            IEnumerable<IStok> StokForDept = _InvAss.StokLines_PerInventry_27.Where(stk => stk.Department == Dept);
+            try
+            {
+                dblQty =
+                (
+                    StokForDept.Select(stok => stok.CostQuantity).Sum()
+                    - StokForDept.Where(stok => stok.StockStatus == 39 || stok.StockStatus == 40 || stok.StockStatus == 16 || stok.StockStatus == 17)
+                        .Select(stok => stok.PriceQty)
+                        .Sum()
+                );
+
+            }
+            catch
+            {
+                dblQty = 0;
+            }
+
+            try
+            {
+                tmpQty = (decimal)dblQty;
+            }
+            catch
+            {
+                tmpQty = 0;
+            }
+
+            S5QtyPair pair = new S5QtyPair(Dept, tmpQty);
+            return pair;
+        }
 
         public void init(IS5InvAssembled data)
         {

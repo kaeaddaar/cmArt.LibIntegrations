@@ -67,9 +67,9 @@ namespace cmArt.WebJaguar.Data
             set { _FF22 = value ?? string.Empty; }
         }
 
-        public decimal WholesaleCost { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public IEnumerable<S5PricePair> Prices { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public IEnumerable<S5QtyPair> Quantities { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public decimal WholesaleCost { get; set; }
+        public IEnumerable<S5PricePair> Prices { get; set; }
+        public IEnumerable<S5QtyPair> Quantities { get; set; }
 
         public IShopifyDataLoadFormat CopyFrom(IS5_CommonFields_In_WJ IFrom)
         {

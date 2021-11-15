@@ -11,7 +11,7 @@ namespace cmArt.WebJaguar.Data
     {
         protected IS5_CommonFields_In_WJ _CommonFields { get; set; }
         public string upc { get => string.Join(",", _CommonFields.barcodes); set => _CommonFields.barcodes = value.Split(',').AsEnumerable(); }
-        public string shortDesc { get => _CommonFields.Description; set => _CommonFields.Description = value; }
+        public string shortDesc { get => _CommonFields.PartNumber; set => _CommonFields.PartNumber = value ?? string.Empty; }
         public string sku 
         {
             get
@@ -25,8 +25,8 @@ namespace cmArt.WebJaguar.Data
                 _CommonFields.InvUnique = result;
             }
         }
-        public string name { get => _CommonFields.PartNumber; set => _CommonFields.PartNumber = value; }
-        public string longDesc { get => _CommonFields.WebDescription; set => _CommonFields.WebDescription = value; }
+        public string name { get => _CommonFields.Description; set => _CommonFields.Description = value ?? string.Empty; }
+        public string longDesc { get => _CommonFields.WebDescription; set => _CommonFields.WebDescription = value ?? string.Empty; }
         public float weight { get => _CommonFields.weight; set => _CommonFields.weight = value; }
         public List<int> catIds//Inventory Free Form field 22 (22 is Marked For Deletion)
         {
