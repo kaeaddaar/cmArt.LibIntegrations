@@ -248,7 +248,16 @@ namespace cmArt.WebJaguar.App
             logger.LogInformation("Begin Performing Edits");
             changedProducts = new List<S5_CommonFields>();
             // Get original Product Records from Shopify with Changes
-            WJ_WithChanges = ChangedRecords_Product.Select(p => p.AsProduct_Root());
+            //WJ_WithChanges = ChangedRecords_Product.Select(p => p.AsProduct_Root());
+            //foreach (var record in WJ_WithChanges)
+            //{
+            //    record.catIds.Clear();
+            //    IEnumerable<int> tmp = IWJ_CommonFields_In_S5Extensions_for_Transformation.MapWJ_IDs_Instead_of_Copying_From_FF(record.field12).ToList();
+            //    foreach(var rs in tmp)
+            //    {
+            //        record.catIds.Add(rs);
+            //    }
+            //}
             WebJaguarConnector apiWJ = new WebJaguarConnector();
             if (!PreventApiAddsNEdits)
             {

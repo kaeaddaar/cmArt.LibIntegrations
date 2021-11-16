@@ -37,6 +37,7 @@ namespace cmArt.WebJaguar.Connector
                 IWJ_CommonFields_In_S5 iCF = tmpAdapter;
                 WJ_CommonFields CF = new WJ_CommonFields();
                 CF.CopyFrom(iCF);
+                CF.catIds = IWJ_CommonFields_In_S5Extensions_for_Transformation.MapWJ_IDs_Instead_of_Copying_From_FF(iCF.field12).ToList();
                 return CF;
             });
 
@@ -102,7 +103,7 @@ namespace cmArt.WebJaguar.Connector
                     page++;
                     Console.Write($"{page} ");
                     ThereAreMorePages = pageSize * page <= count;
-                    if (page > 5) { ThereAreMorePages = false; } // remove on release
+                    //if (page > 5) { ThereAreMorePages = false; } // remove on release
 
                     data.UrlCommand = $"/api/v1/productSearch.jhtm?page={page}&noKeywords=true&q=keyword&searchIndexedCatId=&last_modified=7/22/2019";
                     data.Body = String.Empty;
