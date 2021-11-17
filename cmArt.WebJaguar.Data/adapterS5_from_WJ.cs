@@ -35,11 +35,11 @@ namespace cmArt.WebJaguar.Data
         {
             get
             {
-                return _WJ.shortDesc;
+                return _WJ.name;
             }
             set
             {
-                _WJ.shortDesc = value ?? string.Empty;
+                _WJ.name = value ?? string.Empty;
             }
         }
         public int InvUnique
@@ -59,11 +59,11 @@ namespace cmArt.WebJaguar.Data
         {
             get
             {
-                return _WJ.name;
+                return _WJ.shortDesc;
             }
             set
             {
-                _WJ.name = value ?? string.Empty;
+                _WJ.shortDesc = value ?? string.Empty;
             }
         }
         public string WebDescription

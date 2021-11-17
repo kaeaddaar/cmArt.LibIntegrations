@@ -26,7 +26,8 @@ using Microsoft.Extensions.DependencyInjection;
 using cmArt.WebJaguar.Data;
 using cmArt.WebJaguar.App.Services;
 using cmArt.WebJaguar.Connector;
-
+using cmArt.WebJaguar.App.ReportViews;
+using cmArt.LibIntegrations.VennMapService;
 
 namespace cmArt.WebJaguar.App
 {
@@ -81,6 +82,10 @@ namespace cmArt.WebJaguar.App
         private static Func<IProduct_Root, string> fGetProductPartNumber;
         //GetChangedRecords()
         private static IEnumerable<IS5_CommonFields_In_WJ> ChangedRecords_Product;
+        //BuildReports()
+        private static VennMap<S5_CommonFields, adapterS5_from_InvAss, int> map;
+        //ProduceVennMap()
+
         //PerformEdits()
         private static IEnumerable<S5_CommonFields> changedProducts;
         private static IEnumerable<Product_Root> WJ_WithChanges;
@@ -243,6 +248,58 @@ namespace cmArt.WebJaguar.App
             ChangedRecords_Product = UpdateProcessPattern<IS5_CommonFields_In_WJ, S5_CommonFields, int>
                 .GetChangedRecords(IS5_CommonFields_In_WJ_Indexes.UniqueId, fEquals, adaptersS5, API_Products);
         }
+        private static void BuildReports()
+        {
+            var ChangedRecords_Product_Pairs = UpdateProcessPattern<IS5_CommonFields_In_WJ, S5_CommonFields, int>
+                .GetChangedRecordPairs(IS5_CommonFields_In_WJ_Indexes.UniqueId, fEquals, adaptersS5, API_Products);
+            var changes = ChangedRecords_Product_Pairs.Select(x => x.Item1.Diff(x.Item2)).SelectMany(x => x);
+            ReportsWJ.SaveReport(changes, "ChangesView", settings.OutputDirectory, logger);
+
+            Func<(S5_CommonFields, adapterS5_from_InvAss), S5_CommonFields_Pairs_Flat> Transform =
+                 (m =>
+                 {
+                     Generic_Pair<S5_CommonFields> tmpSP = new Generic_Pair<S5_CommonFields>(m.Item1, m.Item2.AsS5_CommonFields());
+                     Inventory_Pair_Adapter tmpFlatAdapter = new Inventory_Pair_Adapter(tmpSP);
+                     return tmpFlatAdapter.AsS5_CommonFields_Pairs_Flat();
+                 });
+
+            ProduceVennMap();
+
+            IEnumerable<S5_CommonFields_Pairs_Flat> Both_Ecomm_Pairs = map.Both_Ecomm.Select(x => Transform(x));
+            ReportsWJ.SaveReport(Both_Ecomm_Pairs, "Both_Ecomm", settings.OutputDirectory, logger);
+
+            IEnumerable<S5_CommonFields_Pairs_Flat> InvOnly_Ecomm_Pairs = map.InvOnly_Ecomm.Select(x => Transform(x));
+            ReportsWJ.SaveReport(InvOnly_Ecomm_Pairs, "InvOnly_Ecomm", settings.OutputDirectory, logger);
+
+            IEnumerable<S5_CommonFields_Pairs_Flat> TOnly = map.TOnly.Select(x => Transform(x));
+            ReportsWJ.SaveReport(TOnly, "WebJaguar_Only", settings.OutputDirectory, logger);
+
+        }
+        private static void ProduceVennMap()
+        {
+            Func<IS5InvAssembled, IS5InvAssembled> As_S5InvAssembled = (x) =>
+            {
+                return new S5InvAssembled
+                (
+                    x.Inv
+                    , x.InvPrices_PerInventry_27 ?? new List<IInvPrice>()
+                    , x.StokLines_PerInventry_27 ?? new List<IStok>()
+                    , x.CommentsLines_PerInventry_27 ?? new List<IComments>()
+                    , x.AltSuplies_PerInventry_27 ?? new List<IAltSuply>()
+                );
+            };
+            
+            Func<adapterS5_from_InvAss, bool> EcommEqualsY = (x) => x.IsEcomm;
+            map = new VennMap<S5_CommonFields, adapterS5_from_InvAss, int>
+            (
+                API_Products
+                , adaptersS5
+                , IS5_CommonFields_In_WJ_Indexes.UniqueId
+                , IS5_CommonFields_In_WJ_Indexes.UniqueId
+                , EcommEqualsY
+            );
+        }
+
         private static void PerformEdits()
         {
             logger.LogInformation("Begin Performing Edits");
@@ -339,6 +396,7 @@ namespace cmArt.WebJaguar.App
                 GetWebJaguarData_Product_Root();
             }
             GetChangedRecords();
+            BuildReports();
             PerformEdits();
             GetNewRecords();
             PerformAdds();

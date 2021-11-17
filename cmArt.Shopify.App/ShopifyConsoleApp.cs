@@ -96,9 +96,9 @@ namespace cmArt.Shopify.App
         private static IEnumerable<IShopify_Prices> ChangedRecords_Prices;
         private static IEnumerable<IShopify_Quantities> ChangedRecords_Quantities;
         //ProduceVennMap()
-        private static VennMap<Shopify_Product, int> map_Product;
-        private static VennMap<Shopify_Prices, int> map_Prices;
-        private static VennMap<Shopify_Quantities, int> map_Quantities;
+        private static VennMap_InvAss<Shopify_Product, int> map_Product;
+        private static VennMap_InvAss<Shopify_Prices, int> map_Prices;
+        private static VennMap_InvAss<Shopify_Quantities, int> map_Quantities;
 
         #endregion variables
 
@@ -426,7 +426,7 @@ namespace cmArt.Shopify.App
             Reports.SaveReport(ChangedRecords_Prices_Pairs, "Changed_Prices", settings, logger);
             Reports.SaveReport(ChangedRecords_Quantities_Pairs, "Changed_Quantities", settings, logger);
         }
-        private static VennMap<Shopify_Product, int> ProduceVennMap(VennMap<Shopify_Product, int> map)
+        private static VennMap_InvAss<Shopify_Product, int> ProduceVennMap(VennMap_InvAss<Shopify_Product, int> map)
         {
             Func<IS5InvAssembled, IS5InvAssembled> As_S5InvAssembled = (x) =>
             {
@@ -440,7 +440,7 @@ namespace cmArt.Shopify.App
                 );
             };
 
-            map = new VennMap<Shopify_Product, int>
+            map = new VennMap_InvAss<Shopify_Product, int>
             (
                 API_Products
                 , InvAss.Select(x => As_S5InvAssembled(x))
@@ -449,7 +449,7 @@ namespace cmArt.Shopify.App
             );
             return map;
         }
-        private static VennMap<Shopify_Prices, int> ProduceVennMap(VennMap<Shopify_Prices, int> map)
+        private static VennMap_InvAss<Shopify_Prices, int> ProduceVennMap(VennMap_InvAss<Shopify_Prices, int> map)
         {
             Func<IS5InvAssembled, IS5InvAssembled> As_S5InvAssembled = (x) =>
             {
@@ -463,7 +463,7 @@ namespace cmArt.Shopify.App
                 );
             };
 
-            map = new VennMap<Shopify_Prices, int>
+            map = new VennMap_InvAss<Shopify_Prices, int>
             (
                 API_Prices
                 , InvAss.Select(x => As_S5InvAssembled(x))
@@ -472,7 +472,7 @@ namespace cmArt.Shopify.App
             );
             return map;
         }
-        private static VennMap<Shopify_Quantities, int> ProduceVennMap(VennMap<Shopify_Quantities, int> map)
+        private static VennMap_InvAss<Shopify_Quantities, int> ProduceVennMap(VennMap_InvAss<Shopify_Quantities, int> map)
         {
             Func<IS5InvAssembled, IS5InvAssembled> As_S5InvAssembled = (x) =>
             {
@@ -486,7 +486,7 @@ namespace cmArt.Shopify.App
                 );
             };
 
-            map = new VennMap<Shopify_Quantities, int>
+            map = new VennMap_InvAss<Shopify_Quantities, int>
             (
                 API_Quantities
                 , InvAss.Select(x => As_S5InvAssembled(x))

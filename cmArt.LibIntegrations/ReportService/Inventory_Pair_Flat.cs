@@ -7,7 +7,7 @@ using FileHelpers;
 namespace cmArt.LibIntegrations.ReportService
 {
     [DelimitedRecord(",")]
-    public class Inventory_Product_Pair_Flat : IInventory_Pair_Flat
+    public class Inventory_Pair_Flat : IInventory_Pair_Flat
     {
         public int LeftInvUnique { get; set; }
 
@@ -30,6 +30,14 @@ namespace cmArt.LibIntegrations.ReportService
         [FieldQuoted]
         [FieldNullValue(typeof(string), "")]
         public string LeftQuantities { get; set; }
+        public string LeftBarcodes { get; set; }
+        [FieldQuoted]
+        [FieldNullValue(typeof(string), "")]
+        public string LeftFF22 { get; set; }
+        [FieldQuoted]
+        [FieldNullValue(typeof(string), "")]
+        public string LeftWebDescription { get; set; }
+        public float LeftWeight { get; set; }
 
         public int RightInvUnique { get; set; }
 
@@ -52,6 +60,14 @@ namespace cmArt.LibIntegrations.ReportService
         [FieldQuoted]
         [FieldNullValue(typeof(string), "")]
         public string RightQuantities { get; set; }
+        public string RightBarcodes { get; set; }
+        [FieldQuoted]
+        [FieldNullValue(typeof(string), "")]
+        public string RightFF22 { get; set; }
+        [FieldQuoted]
+        [FieldNullValue(typeof(string), "")]
+        public string RightWebDescription { get; set; }
+        public float RightWeight { get; set; }
     }
 
 }

@@ -19,6 +19,25 @@ namespace cmArt.WebJaguar.Data
             _InvAss = _InvAss ?? new S5InvAssembled();
         }
 
+        public bool IsEcomm
+        {
+            get
+            {
+                return (_InvAss.Inv ?? new Inventry_27()).Ecommerce == "Y";
+            }
+            set
+            {
+                if (value)
+                {
+                    (_InvAss.Inv ?? new Inventry_27()).Ecommerce = "Y";
+                }
+                else
+                {
+                    (_InvAss.Inv ?? new Inventry_27()).Ecommerce = "N";
+                }
+            }
+        }
+
         public IEnumerable<string> barcodes
         {
             get
@@ -36,11 +55,11 @@ namespace cmArt.WebJaguar.Data
         {
             get
             {
-                return _InvAss.Inv.Description;
+                return (_InvAss.Inv.Description ?? string.Empty).TrimEnd();
             }
             set
             {
-                _InvAss.Inv.Description = value ?? string.Empty;
+                _InvAss.Inv.Description = (value ?? string.Empty).TrimEnd();
             }
         }
         public int InvUnique
@@ -84,8 +103,8 @@ namespace cmArt.WebJaguar.Data
 
         public string Cat
         {
-            get { return _InvAss.Inv.Cat ?? "000"; }
-            set { _InvAss.Inv.Cat = value ?? "000"; }
+            get { return _InvAss.Inv.Cat.TrimEnd() ?? "000"; }
+            set { _InvAss.Inv.Cat = (value ?? "000").TrimEnd(); }
         }
         public string FF22
         {

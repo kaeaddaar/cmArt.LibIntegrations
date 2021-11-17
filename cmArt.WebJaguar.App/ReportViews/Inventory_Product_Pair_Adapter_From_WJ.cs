@@ -19,15 +19,51 @@ namespace cmArt.WebJaguar.App.ReportViews
         public string LeftCat { get => ((IS5_CommonFields_In_WJ)_S5).Cat; set => ((IS5_CommonFields_In_WJ)_S5).Cat = value; }
         public int LeftInvUnique { get => ((IS5_CommonFields_In_WJ)_S5).InvUnique; set => ((IS5_CommonFields_In_WJ)_S5).InvUnique = value; }
         public string LeftPartNumber { get => ((IS5_CommonFields_In_WJ)_S5).PartNumber; set => ((IS5_CommonFields_In_WJ)_S5).PartNumber = value; }
-        public string LeftPrices { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string LeftQuantities { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string LeftPrices { get; set; }
+        public string LeftQuantities { get; set; }
+        public string LeftBarcodes { get; set; }
+        public string LeftFF22 { get; set; }
+        public string LeftWebDescription { get; set; }
+        public float LeftWeight { get; set; }
 
         public string RightDescription { get => ((IS5_CommonFields_In_WJ)_Shopify).Description; set => ((IS5_CommonFields_In_WJ)_Shopify).Description = value; }
         public string RightCat { get => ((IS5_CommonFields_In_WJ)_Shopify).Cat; set => ((IS5_CommonFields_In_WJ)_Shopify).Cat = value; }
         public int RightInvUnique { get => ((IS5_CommonFields_In_WJ)_Shopify).InvUnique; set => ((IS5_CommonFields_In_WJ)_Shopify).InvUnique = value; }
         public string RightPartNumber { get => ((IS5_CommonFields_In_WJ)_Shopify).PartNumber; set => ((IS5_CommonFields_In_WJ)_Shopify).PartNumber = value; }
-        public string RightPrices { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string RightQuantities { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string RightPrices { get; set; }
+        public string RightQuantities { get; set; }
+        public string RightBarcodes { get; set; }
+        public string RightFF22 { get; set; }
+        public string RightWebDescription { get; set; }
+        public float RightWeight { get; set; }
+
+        public S5_CommonFields_Pairs_Flat AsS5_CommonFields_Pairs_Flat()
+        {
+            S5_CommonFields_Pairs_Flat result = new S5_CommonFields_Pairs_Flat();
+            result.Leftbarcodes = this.LeftBarcodes;
+            result.LeftCat = this.LeftCat;
+            result.LeftDescription = this.LeftDescription;
+            result.LeftFF22 = this.LeftFF22;
+            result.LeftInvUnique = this.LeftInvUnique;
+            result.LeftPartNumber = this.LeftPartNumber;
+            result.LeftPrices = this.LeftPrices;
+            result.LeftQuantities = this.LeftQuantities;
+            result.LeftWebDescription = this.LeftWebDescription;
+            result.Leftweight = this.LeftWeight;
+
+            result.Rightbarcodes = this.RightBarcodes;
+            result.RightCat = this.RightCat;
+            result.RightDescription = this.RightDescription;
+            result.RightFF22 = this.RightFF22;
+            result.RightInvUnique = this.RightInvUnique;
+            result.RightPartNumber = this.RightPartNumber;
+            result.RightPrices = this.RightPrices;
+            result.RightQuantities = this.RightQuantities;
+            result.RightWebDescription = this.RightWebDescription;
+            result.Rightweight = this.RightWeight;
+
+            return result;
+        }
 
         public Inventory_Pair_Adapter()
         {

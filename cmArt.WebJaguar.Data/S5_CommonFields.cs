@@ -43,8 +43,8 @@ namespace cmArt.WebJaguar.Data
         }
         public string Description
         {
-            get { return _Description; }
-            set { _Description = value ?? string.Empty; }
+            get { return (_Description ?? string.Empty).TrimEnd(); }
+            set { _Description = (value ?? string.Empty).TrimEnd(); }
         }
         public IEnumerable<string> barcodes
         {
@@ -58,13 +58,13 @@ namespace cmArt.WebJaguar.Data
         }
         public string PartNumber
         {
-            get { return _PartNumber; }
-            set { _PartNumber = value ?? string.Empty; }
+            get { return (_PartNumber ?? string.Empty).TrimEnd(); }
+            set { _PartNumber = (value ?? string.Empty).TrimEnd(); }
         }
         public string FF22
         {
-            get { return _FF22 ?? string.Empty; }
-            set { _FF22 = value ?? string.Empty; }
+            get { return (_FF22 ?? string.Empty).TrimEnd(); }
+            set { _FF22 = (value ?? string.Empty).TrimEnd(); }
         }
 
         public decimal WholesaleCost { get; set; }

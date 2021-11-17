@@ -26,7 +26,7 @@ namespace UnitTest_cmArt.LibIntegrations
             IEnumerable<IS5InvAssembled> S5Records = GetSampleS5InvAssembledRecords();
             Func<InfoType, int> fInfoIndex = (info) => info.UniqueId;
             Func<IS5InvAssembled, int> fS5Index = (S5) => S5.Inv.InvUnique;
-            VennMap<InfoType, int> map = new VennMap<InfoType, int>(infoRecords, S5Records, fInfoIndex, fS5Index);
+            VennMap_InvAss<InfoType, int> map = new VennMap_InvAss<InfoType, int>(infoRecords, S5Records, fInfoIndex, fS5Index);
 
             Assert.AreEqual(1, map.Both_Ecomm.First().Item1.UniqueId);
             Assert.AreEqual(1, map.Both_Ecomm.First().Item2.Inv.InvUnique);

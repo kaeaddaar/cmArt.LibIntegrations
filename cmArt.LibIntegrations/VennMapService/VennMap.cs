@@ -4,41 +4,45 @@ using System.Text;
 using System.Linq;
 using cmArt.System5.Inventory;
 
+
 namespace cmArt.LibIntegrations.VennMapService
 {
-    public class VennMap<T,IndexOfT>
+    public class VennMap<T, TWithCondition, IndexOfT>
     {
         private IEnumerable<T> _infoRecords { get; set; }
-        private IEnumerable<IS5InvAssembled> _InvAssRecords { get; set; }
+        private IEnumerable<TWithCondition> _InvAssRecords { get; set; }
         private Func<T, IndexOfT> _Info_Index;
-        private Func<IS5InvAssembled, IndexOfT> _S5InvAssembled_Index;
+        private Func<TWithCondition, IndexOfT> _S5_Index;
+        //private Func<IS5InvAssembled, IndexOfT> _S5InvAssembled_Index;
+        private Func<TWithCondition, bool> _VennCondition;
 
         // build zenn filter
-        public IEnumerable<ValueTuple<T, IS5InvAssembled>> TOnly { get; set; }
-        public IEnumerable<ValueTuple<T, IS5InvAssembled>> Both_Ecomm { get; set; }
-        public IEnumerable<ValueTuple<T, IS5InvAssembled>> Both_NoEcomm { get; set; }
-        public IEnumerable<ValueTuple<T, IS5InvAssembled>> InvOnly_Ecomm { get; set; }
-        public IEnumerable<ValueTuple<T, IS5InvAssembled>> InvOnly_NoEcomm { get; set; }
+        public IEnumerable<ValueTuple<T, TWithCondition>> TOnly { get; set; }
+        public IEnumerable<ValueTuple<T, TWithCondition>> Both_Ecomm { get; set; }
+        public IEnumerable<ValueTuple<T, TWithCondition>> Both_NoEcomm { get; set; }
+        public IEnumerable<ValueTuple<T, TWithCondition>> InvOnly_Ecomm { get; set; }
+        public IEnumerable<ValueTuple<T, TWithCondition>> InvOnly_NoEcomm { get; set; }
 
-        public List<ValueTuple<T, IS5InvAssembled>> Both { get; set; } // combination of two from above
+        public List<ValueTuple<T, TWithCondition>> Both { get; set; } // combination of two from above
 
         public VennMap
         (
             IEnumerable<T> InfoIn_Records
-            , IEnumerable<IS5InvAssembled> S5InvAssembledIn_Records
+            , IEnumerable<TWithCondition> S5_Records
             , Func<T, IndexOfT> Info_Index
-            , Func<IS5InvAssembled, IndexOfT> S5InvAssembled_Index
+            , Func<TWithCondition, IndexOfT> S5_Index
+            , Func<TWithCondition, bool> VennCondition_EcommEqualsY
         )
         {
             _infoRecords = InfoIn_Records;
-            _InvAssRecords = S5InvAssembledIn_Records;
-            _Info_Index = Info_Index;
-            _S5InvAssembled_Index = S5InvAssembled_Index;
+            _InvAssRecords = S5_Records;
 
             if (Info_Index == null) { throw new ArgumentNullException("the Info_Index must not be null"); }
             _Info_Index = Info_Index;
-            if (_S5InvAssembled_Index == null) { throw new ArgumentNullException("the S5InvAssembled_Index must not be null"); }
-            _S5InvAssembled_Index = S5InvAssembled_Index;
+            if (S5_Index == null) { throw new ArgumentNullException("the Info_Index must not be null"); }
+            _S5_Index = S5_Index;
+            if (VennCondition_EcommEqualsY == null) { throw new ArgumentNullException("the Info_Index must not be null"); }
+            _VennCondition = VennCondition_EcommEqualsY;
 
             // check for null, or empty
             //if (_InvAss == null)
@@ -51,34 +55,34 @@ namespace cmArt.LibIntegrations.VennMapService
             }
 
             IEnumerable<T> InfoRecords = InfoIn_Records;
-            IEnumerable<IS5InvAssembled> InvAssRecords = S5InvAssembledIn_Records;
+            IEnumerable<TWithCondition> InvAssRecords = S5_Records;
 
             var ABC =
                 from infoRecord in InfoRecords
                 join invRecord in InvAssRecords
-                on _Info_Index(infoRecord) equals _S5InvAssembled_Index(invRecord)
+                on _Info_Index(infoRecord) equals _S5_Index(invRecord)
                 into invNullRecords
                 from invNullRecord in invNullRecords.DefaultIfEmpty()
-                select new ValueTuple<T, IS5InvAssembled>(infoRecord, invNullRecord);
+                select new ValueTuple<T, TWithCondition>(infoRecord, invNullRecord);
 
             var DE =
                 from invRecord in InvAssRecords
                 join infoRecord in InfoRecords
-                on _S5InvAssembled_Index(invRecord) equals _Info_Index(infoRecord)
+                on _S5_Index(invRecord) equals _Info_Index(infoRecord)
                 into infoNullRecords
                 from infoNullRecord in infoNullRecords.DefaultIfEmpty()
                 where infoNullRecord == null
 
-                select new ValueTuple<T, IS5InvAssembled>(infoNullRecord, invRecord);
+                select new ValueTuple<T, TWithCondition>(infoNullRecord, invRecord);
 
             TOnly = ABC.Where(x => x.Item2 == null).ToList();
-            Both_Ecomm = ABC.Where(x => x.Item2 != null && x.Item2.Inv.Ecommerce == "Y").ToList();
-            Both_NoEcomm = ABC.Where(x => x.Item2 != null && x.Item2.Inv.Ecommerce == "N").ToList();
-            InvOnly_Ecomm = DE.Where(x => x.Item1 == null && x.Item2.Inv.Ecommerce == "Y").ToList();
-            InvOnly_NoEcomm = DE.Where(x => x.Item1 == null && x.Item2.Inv.Ecommerce == "N").ToList();
+            Both_Ecomm = ABC.Where(x => x.Item2 != null && VennCondition_EcommEqualsY(x.Item2)).ToList();
+            Both_NoEcomm = ABC.Where(x => x.Item2 != null && !VennCondition_EcommEqualsY(x.Item2)).ToList();
+            InvOnly_Ecomm = DE.Where(x => x.Item1 == null && VennCondition_EcommEqualsY(x.Item2)).ToList();
+            InvOnly_NoEcomm = DE.Where(x => x.Item1 == null && !VennCondition_EcommEqualsY(x.Item2)).ToList();
 
-            Both = new List<ValueTuple<T, IS5InvAssembled>>(Both_Ecomm);
-            foreach ((T, IS5InvAssembled) rs in Both_NoEcomm)
+            Both = new List<ValueTuple<T, TWithCondition>>(Both_Ecomm);
+            foreach ((T, TWithCondition) rs in Both_NoEcomm)
             {
                 Both.Add(rs);
             }
