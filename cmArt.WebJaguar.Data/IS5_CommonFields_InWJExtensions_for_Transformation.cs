@@ -24,7 +24,14 @@ namespace cmArt.WebJaguar.Data
                 if (pair.Item1 != pair.Item2) { return false; }
             }
 
-            if (data.Description.TrimEnd() != compareTo.Description.TrimEnd()) { return false; }
+            if (data.Description.Length > 0 && compareTo.Description.TrimEnd().Length > data.Description.TrimEnd().Length)
+            {
+                if (data.Description.TrimEnd() != compareTo.Description.Substring(0, data.Description.Length)) { return false; }
+            }
+            else
+            {
+                if (data.Description.TrimEnd() != compareTo.Description.TrimEnd()) { return false; }
+            }
             if (data.InvUnique != compareTo.InvUnique) { return false; }
             if (data.PartNumber.TrimEnd() != compareTo.PartNumber.TrimEnd()) { return false; }
             if (data.WebDescription.TrimEnd() != compareTo.WebDescription.TrimEnd()) { return false; }

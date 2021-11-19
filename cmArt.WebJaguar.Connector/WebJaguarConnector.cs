@@ -125,7 +125,17 @@ namespace cmArt.WebJaguar.Connector
         public string Product_Get(int ProductId)
         {
             ApiCallData data = new ApiCallData();
-            data.UrlCommand = "/api/v1/product.jhtm?id="+ ProductId;
+            data.UrlCommand = "/api/v1/product.jhtm?id=" + ProductId;
+            data.Body = "";
+            Func<string, int> logStub = (x) => { Console.WriteLine("Logging not yet implemented"); return 0; };
+            //string results = this.MakeApiPostCall(data, logStub);
+            string results = this.MakeApiGetCall(data.UrlCommand);
+            return results;
+        }
+        public string Product_Get(string ProductSku)
+        {
+            ApiCallData data = new ApiCallData();
+            data.UrlCommand = "/api/v1/product.jhtm?sku=" + ProductSku;
             data.Body = "";
             Func<string, int> logStub = (x) => { Console.WriteLine("Logging not yet implemented"); return 0; };
             //string results = this.MakeApiPostCall(data, logStub);

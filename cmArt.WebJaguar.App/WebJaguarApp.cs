@@ -177,8 +177,6 @@ namespace cmArt.WebJaguar.App
         {
             logger.LogInformation("Filtering for Ecommerce equals Y");
             ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y");
-            //string strECommInvAss = SerializeForExport(ECommInvAss);
-            //File.WriteAllText(settings.OutputDirectory + "\\strEcommInvAss.txt", strECommInvAss);
         }
         private static void CreateDataLoadLists()
         {
@@ -248,6 +246,49 @@ namespace cmArt.WebJaguar.App
             ChangedRecords_Product = UpdateProcessPattern<IS5_CommonFields_In_WJ, S5_CommonFields, int>
                 .GetChangedRecords(IS5_CommonFields_In_WJ_Indexes.UniqueId, fEquals, adaptersS5, API_Products);
         }
+        private static void GetNewRecords()
+        {
+            NewProductsPairs = new List<Tuple<IS5_CommonFields_In_WJ, IS5_CommonFields_In_WJ>>();
+
+            NewProductsPairs = GenericJoins<IS5_CommonFields_In_WJ, IS5_CommonFields_In_WJ, int>
+            .LeftJoin(adaptersS5, API_Products, IS5_CommonFields_In_WJ_Indexes.UniqueId, IS5_CommonFields_In_WJ_Indexes.UniqueId);
+            NewProducts = NewProductsPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsS5_CommonFields());
+            // convert CommonFields to Product_Root filling using default content
+
+        }
+        private static void SeeIfNewRecordsExistByS5InvUnique_and_append_do_API_Products()//works around bug in WJ productSearch missing items
+        {
+            IEnumerable<int> NewProductIDs = NewProducts.Select(x => x.InvUnique);
+            WebJaguarConnector apiWJ = new WebJaguarConnector();
+            List<string> WJProductsFound = new List<string>();
+            int count = 0;
+            foreach (int id in NewProductIDs)
+            {
+                count++;
+                string strProd = apiWJ.Product_Get(id.ToString());
+                if (!strProd.Contains("No product found for given Id"))
+                {
+                    WJProductsFound.Add(strProd);
+                }
+            }
+            IEnumerable<Product_Root> WJProdsFound = WJProductsFound.Select(x => (Product_Root)System.Text.Json.JsonSerializer.Deserialize(x, typeof(Product_Root)));
+
+            //IEnumerable<Product_Root> API_Products_WJ = api.GetAll_Product_Root_Records();
+            IEnumerable<WJ_CommonFields> wJ_CommonFields = WJProdsFound.Select(prod => prod.AsWJ_CommonFields());
+            //List<WJ_CommonFields> test = WJProdsFound.Select(prod => prod.AsWJ_CommonFields()).ToList();
+            IEnumerable<S5_CommonFields> API_ProductsMissing = wJ_CommonFields.Select(cf =>
+            {
+                adapterS5_from_WJ tmp = new adapterS5_from_WJ();
+                tmp.init(cf);
+                return tmp.AsS5_CommonFields();
+            });
+            List<S5_CommonFields> lstAPI_Products = API_Products.ToList();
+            foreach (var prod in API_ProductsMissing)
+            {
+                lstAPI_Products.Add(prod);
+            }
+            API_Products = lstAPI_Products;
+        }
         private static void BuildReports()
         {
             var ChangedRecords_Product_Pairs = UpdateProcessPattern<IS5_CommonFields_In_WJ, S5_CommonFields, int>
@@ -288,7 +329,7 @@ namespace cmArt.WebJaguar.App
                     , x.AltSuplies_PerInventry_27 ?? new List<IAltSuply>()
                 );
             };
-            
+
             Func<adapterS5_from_InvAss, bool> EcommEqualsY = (x) => x.IsEcomm;
             map = new VennMap<S5_CommonFields, adapterS5_from_InvAss, int>
             (
@@ -336,16 +377,6 @@ namespace cmArt.WebJaguar.App
             {
                 logger.LogInformation("All Perform Edits Supressed due to Settings");
             }
-        }
-        private static void GetNewRecords()
-        {
-            NewProductsPairs = new List<Tuple<IS5_CommonFields_In_WJ, IS5_CommonFields_In_WJ>>();
-
-            NewProductsPairs = GenericJoins<IS5_CommonFields_In_WJ, IS5_CommonFields_In_WJ, int>
-            .LeftJoin(adaptersS5, API_Products, IS5_CommonFields_In_WJ_Indexes.UniqueId, IS5_CommonFields_In_WJ_Indexes.UniqueId);
-            NewProducts = NewProductsPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsS5_CommonFields());
-            // convert CommonFields to Product_Root filling using default content
-
         }
         private static void PerformAdds()
         {
@@ -396,9 +427,10 @@ namespace cmArt.WebJaguar.App
                 GetWebJaguarData_Product_Root();
             }
             GetChangedRecords();
+            GetNewRecords();
+            SeeIfNewRecordsExistByS5InvUnique_and_append_do_API_Products();
             BuildReports();
             PerformEdits();
-            GetNewRecords();
             PerformAdds();
 
             #region considering paging the processing of groups of records

@@ -24,7 +24,14 @@ namespace cmArt.WebJaguar.Data
             to.upc = _from.upc;
             to.weight = _from.weight;
 
-            to.catIds = new List<int>(_from.catIds);
+            if (from.catIds != null)
+            {
+                to.catIds = new List<int>(_from.catIds);
+            }
+            else
+            {
+                to.catIds = new List<int>();
+            }
 
             to.cost = _from.cost;
             to.field12 = from.field12;//S5 Sub Cat
