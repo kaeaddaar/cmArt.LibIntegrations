@@ -35,6 +35,8 @@ namespace cmArt.WebJaguar.Data
 
             to.cost = _from.cost;
             to.field12 = from.field12;//S5 Sub Cat
+            to.field9 = from.field9;//Part Number
+            to.field13 = from.field13;//Unique ID
             to.inventory = from.inventory;
             to.inventoryAFS = from.inventoryAFS;
             to.priceTable1 = from.priceTable1;
@@ -52,8 +54,6 @@ namespace cmArt.WebJaguar.Data
         }
         public static IEnumerable<int> MapWJ_IDs_Instead_of_Copying_From_FF(string S5Cat)
         {
-            //int _S5Cat;
-            //int.TryParse(S5Cat, out _S5Cat);
             IEnumerable<CatMap> CatMaps = new List<CatMap>();
             try
             {

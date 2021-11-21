@@ -30,7 +30,9 @@ namespace cmArt.WebJaguar.Data
                 _catIds = value ?? _catIds ?? new List<int>();
             }
         }
-        public string field12 { get; set; }//Sub Category
+        public string field9 { get; set; }//System Five Part Number
+        public string field12 { get; set; }//System Five Sub Category
+        public string field13 { get; set; }//System Five Unique ID
         public decimal inventory { get; set; }//inventory in stock qty
         public decimal inventoryAFS { get; set; }//inventory available qty
         public double cost { get; set; }//WholesaleCost

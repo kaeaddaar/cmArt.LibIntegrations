@@ -51,6 +51,30 @@ namespace cmArt.WebJaguar.Data
                 _CommonFields.FF22 = results;
             }
         }
+        public string field9//Part Number
+        {
+            get { return (_CommonFields.PartNumber ?? string.Empty).TrimEnd(); }
+            set { _CommonFields.PartNumber = (value ?? string.Empty).TrimEnd(); }
+        }
+        public string field13//Unique ID
+        {
+            get { return _CommonFields.InvUnique.ToString() ?? string.Empty; }
+            set 
+            {
+                int tmp;
+                int.TryParse(value ?? string.Empty, out tmp);
+                bool WeHaveAUniqueToAssign = tmp > 0;
+                if (WeHaveAUniqueToAssign)
+                {
+                    _CommonFields.InvUnique = tmp;
+                }
+                bool WeAreTryingToResetInvUnique = (value == "0");
+                if (WeAreTryingToResetInvUnique)
+                {
+                    _CommonFields.InvUnique = 0;
+                }
+            }
+        }
         public string field12//Sub Category
         {
             get { return _CommonFields.Cat ?? string.Empty; }

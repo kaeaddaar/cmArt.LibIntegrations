@@ -15,7 +15,9 @@ namespace cmArt.WebJaguar.Data
         string longDesc { get; set; }//WebDescription
         float weight { get; set; }//weight
         List<int> catIds { get; set; }//FF for CatIds
+        string field9 { get; set; }//Part Number
         string field12 { get; set; }//Sub Category
+        string field13 { get; set; }//Unique ID
         double cost { get; set; }//WholsaleCost
         double priceTable1 { get; set; }//schedule 0 price
         double priceTable2 { get; set; }//schedule 1 price
