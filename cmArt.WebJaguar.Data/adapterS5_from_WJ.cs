@@ -186,5 +186,31 @@ namespace cmArt.WebJaguar.Data
                 _WJ.inventory = total;
             }
         }
+
+        public string Units
+        {
+            get { return (_WJ.field2 ?? string.Empty).TrimEnd(); }
+            set { _WJ.field2 = (value ?? string.Empty).TrimEnd(); }
+        }
+        public string Size_1
+        {
+            get { return (_WJ.field8 ?? string.Empty).TrimEnd(); }
+            set { _WJ.field8 = (value ?? string.Empty).TrimEnd(); }
+        }
+        public string Size_2
+        {
+            get { return (_WJ.field7 ?? string.Empty).TrimEnd(); }
+            set { _WJ.field7 = (value ?? string.Empty).TrimEnd(); }
+        }
+        public string Size_3
+        {
+            get { return (_WJ.field5 ?? string.Empty).TrimEnd(); }
+            set { _WJ.field5 = (value ?? string.Empty).TrimEnd(); }
+        }
+        public string PackSize
+        {
+            get { return (_WJ.field1 ?? string.Empty).TrimEnd(); }
+            set { _WJ.field1 = (value ?? string.Empty).TrimEnd(); }
+        }
     }
 }

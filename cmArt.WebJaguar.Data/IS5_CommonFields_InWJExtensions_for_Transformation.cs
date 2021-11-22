@@ -37,6 +37,11 @@ namespace cmArt.WebJaguar.Data
             if (data.WebDescription.TrimEnd() != compareTo.WebDescription.TrimEnd()) { return false; }
             if (data.weight != compareTo.weight) { return false; }
             if (data.Cat != compareTo.Cat) { return false; }
+            if (data.PackSize != compareTo.PackSize) { return false; }
+            if (data.Size_1 != compareTo.Size_1) { return false; }
+            if (data.Size_2 != compareTo.Size_2) { return false; }
+            if (data.Size_3 != compareTo.Size_3) { return false; }
+            if (data.Units != compareTo.Units) { return false; }
 
             if (data.FF22 == compareTo.FF22) { return false; }
             if (data.PartNumber == compareTo.PartNumber) { return false; }
@@ -71,18 +76,22 @@ namespace cmArt.WebJaguar.Data
             S5_CommonFields result = new S5_CommonFields();
 
             result.barcodes = new List<string>(_data.barcodes);
+            result.Cat = _data.Cat;
             result.Description = _data.Description;
+            result.FF22 = _data.FF22;
             result.InvUnique = _data.InvUnique;
+            result.PackSize = _data.PackSize;
             result.PartNumber = _data.PartNumber;
+            result.Prices = _data.Prices;
+            result.Quantities = _data.Quantities;
+            result.Size_1 = _data.Size_1;
+            result.Size_2 = _data.Size_2;
+            result.Size_3 = _data.Size_3;
+            result.Units = _data.Units;
             result.WebDescription = _data.WebDescription;
             result.weight = _data.weight;
-            result.Cat = _data.Cat;
-
-            result.Prices = _data.Prices;
-            result.FF22 = _data.FF22;
-            result.PartNumber = _data.PartNumber;
-            result.Quantities = _data.Quantities;
             result.WholesaleCost = _data.WholesaleCost;
+
 
             return result;
         }
@@ -91,15 +100,18 @@ namespace cmArt.WebJaguar.Data
             to.barcodes = new List<string>(from.barcodes);
             to.Cat = from.Cat;
             to.Description = from.Description;
+            to.FF22 = from.FF22;
             to.InvUnique = from.InvUnique;
+            to.PackSize = from.PackSize;
             to.PartNumber = from.PartNumber;
+            to.Prices = from.Prices;
+            to.Quantities = from.Quantities;
+            to.Size_1 = from.Size_1;
+            to.Size_2 = from.Size_2;
+            to.Size_3 = from.Size_3;
+            to.Units = from.Units;
             to.WebDescription = from.WebDescription;
             to.weight = from.weight;
-
-            to.Prices = from.Prices;
-            to.FF22 = from.FF22;
-            to.PartNumber = from.PartNumber;
-            to.Quantities = from.Quantities;
             to.WholesaleCost = from.WholesaleCost;
 
             return to;

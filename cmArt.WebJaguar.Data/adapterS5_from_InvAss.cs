@@ -204,6 +204,33 @@ namespace cmArt.WebJaguar.Data
             }
             set => throw new NotImplementedException("You can't really load a qty into the records that make the quantity up. Possible, but does it really make sense?");
         }
+
+        public string Units
+        {
+            get { return (_InvAss.Inv.Units ?? string.Empty).TrimEnd(); }
+            set { _InvAss.Inv.Units = (value ?? string.Empty).TrimEnd(); }
+        }
+        public string Size_1
+        {
+            get { return (_InvAss.Inv.Size_1 ?? string.Empty).TrimEnd(); }
+            set { _InvAss.Inv.Size_1 = (value ?? string.Empty).TrimEnd(); }
+        }
+        public string Size_2
+        {
+            get { return (_InvAss.Inv.Size_2 ?? string.Empty).TrimEnd(); }
+            set { _InvAss.Inv.Size_2 = (value ?? string.Empty).TrimEnd(); }
+        }
+        public string Size_3
+        {
+            get { return (_InvAss.Inv.Size_3 ?? string.Empty).TrimEnd(); }
+            set { _InvAss.Inv.Size_3 = (value ?? string.Empty).TrimEnd(); }
+        }
+        public string PackSize
+        {
+            get { return (_InvAss.Inv.PackSize ?? string.Empty).TrimEnd(); }
+            set { _InvAss.Inv.PackSize = (value ?? string.Empty).TrimEnd(); }
+        }
+
         private S5QtyPair GetInStock(short Dept)
         {
             _InvAss = _InvAss ?? new S5InvAssembled();
@@ -243,7 +270,6 @@ namespace cmArt.WebJaguar.Data
         {
             _InvAss = data ?? new S5InvAssembled();
         }
-
 
         protected PriceScheduleView GetPriceSchedule(short ScheduleNum)
         {

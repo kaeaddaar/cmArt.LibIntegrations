@@ -15,7 +15,17 @@ namespace cmArt.WebJaguar.Data
         string longDesc { get; set; }//WebDescription
         float weight { get; set; }//weight
         List<int> catIds { get; set; }//FF for CatIds
+        string field1 { get; set; }//Units Per Case
+        string field2 { get; set; }//Unit
+        //string field3 { get; set; }//Weight
+        //string field4 { get; set; }//Volume
+        string field5 { get; set; }//Count
+        //string field6 { get; set; }//Flavor
+        string field7 { get; set; }//Size
+        string field8 { get; set; }//Promo
         string field9 { get; set; }//Part Number
+        //string field10 { get; set; }//Short Description-DNU
+        //string field11 { get; set; }//UPC-DNU
         string field12 { get; set; }//Sub Category
         string field13 { get; set; }//Unique ID
         double cost { get; set; }//WholsaleCost

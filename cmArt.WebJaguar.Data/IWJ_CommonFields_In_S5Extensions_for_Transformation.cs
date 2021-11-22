@@ -17,13 +17,6 @@ namespace cmArt.WebJaguar.Data
         {
             IWJ_CommonFields_In_S5 _from = from ?? new WJ_CommonFields();
 
-            to.longDesc = _from.longDesc;
-            to.name = _from.name;
-            to.shortDesc = _from.shortDesc;
-            to.sku = _from.sku;
-            to.upc = _from.upc;
-            to.weight = _from.weight;
-
             if (from.catIds != null)
             {
                 to.catIds = new List<int>(_from.catIds);
@@ -34,11 +27,18 @@ namespace cmArt.WebJaguar.Data
             }
 
             to.cost = _from.cost;
-            to.field12 = from.field12;//S5 Sub Cat
+            to.field1 = _from.field1;
+            to.field5 = _from.field5;
+            to.field7 = _from.field7;
+            to.field8 = _from.field8;
             to.field9 = from.field9;//Part Number
+            to.field12 = from.field12;//S5 Sub Cat
             to.field13 = from.field13;//Unique ID
             to.inventory = from.inventory;
             to.inventoryAFS = from.inventoryAFS;
+
+            to.longDesc = _from.longDesc;
+            to.name = _from.name;
             to.priceTable1 = from.priceTable1;
             to.priceTable2 = from.priceTable2;
             to.priceTable3 = from.priceTable3;
@@ -49,6 +49,10 @@ namespace cmArt.WebJaguar.Data
             to.priceTable8 = from.priceTable8;
             to.priceTable9 = from.priceTable9;
             to.priceTable10 = from.priceTable10;
+            to.shortDesc = _from.shortDesc;
+            to.sku = _from.sku;
+            to.upc = _from.upc;
+            to.weight = _from.weight;
 
             return to;
         }

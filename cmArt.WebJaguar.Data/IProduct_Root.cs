@@ -7,7 +7,14 @@ namespace cmArt.WebJaguar.Data
     public interface IProduct_Root : IWJ_CommonFields_In_S5
     {
         int id { get; set; }
+        new string field1 { get; set; }
+        new string field2 { get; set; }
+        new string field5 { get; set; }
+        new string field7 { get; set; }
+        new string field8 { get; set; }
+        new string field9 { get; set; }
         new string field12 { get; set; }
+        new string field13 { get; set; }
         new decimal inventory { get; set; }
         new decimal inventoryAFS { get; set; }
         string categoryIds { get; set; }
@@ -98,18 +105,15 @@ namespace cmArt.WebJaguar.Data
         int eventProtection { get; set; }
         string feed { get; set; }
         bool feedFreeze { get; set; }
-        string field1 { get; set; }
         string field10 { get; set; }
         string field100 { get; set; }
         string field11 { get; set; }
-        string field13 { get; set; }
         string field14 { get; set; }
         string field15 { get; set; }
         string field16 { get; set; }
         string field17 { get; set; }
         string field18 { get; set; }
         string field19 { get; set; }
-        string field2 { get; set; }
         string field20 { get; set; }
         string field21 { get; set; }
         string field22 { get; set; }
@@ -142,7 +146,6 @@ namespace cmArt.WebJaguar.Data
         string field47 { get; set; }
         string field48 { get; set; }
         string field49 { get; set; }
-        string field5 { get; set; }
         string field50 { get; set; }
         string field51 { get; set; }
         string field52 { get; set; }
@@ -164,7 +167,6 @@ namespace cmArt.WebJaguar.Data
         string field67 { get; set; }
         string field68 { get; set; }
         string field69 { get; set; }
-        string field7 { get; set; }
         string field70 { get; set; }
         string field71 { get; set; }
         string field72 { get; set; }
@@ -175,7 +177,6 @@ namespace cmArt.WebJaguar.Data
         string field77 { get; set; }
         string field78 { get; set; }
         string field79 { get; set; }
-        string field8 { get; set; }
         string field80 { get; set; }
         string field81 { get; set; }
         string field82 { get; set; }
@@ -186,7 +187,6 @@ namespace cmArt.WebJaguar.Data
         string field87 { get; set; }
         string field88 { get; set; }
         string field89 { get; set; }
-        string field9 { get; set; }
         string field90 { get; set; }
         string field91 { get; set; }
         string field92 { get; set; }

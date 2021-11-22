@@ -30,6 +30,11 @@ namespace cmArt.WebJaguar.Data
                 _catIds = value ?? _catIds ?? new List<int>();
             }
         }
+        public string field1 { get; set; }//Units Per Case
+        public string field2 { get; set; }//Unit
+        public string field5 { get; set; }//Count
+        public string field7 { get; set; }//Size
+        public string field8 { get; set; }//Promo
         public string field9 { get; set; }//System Five Part Number
         public string field12 { get; set; }//System Five Sub Category
         public string field13 { get; set; }//System Five Unique ID

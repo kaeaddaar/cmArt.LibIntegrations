@@ -268,6 +268,62 @@ namespace cmArt.WebJaguar.Data
             }
         }
 
+        public string field1//WJ Units Per Case - S5 PackSize
+        {
+            get
+            {
+                return (_CommonFields.PackSize ?? string.Empty).TrimEnd();
+            }
+            set
+            {
+                _CommonFields.PackSize = (value ?? string.Empty).TrimEnd();
+            }
+        }
+        public string field2//WJ Unit - S5 Units
+        {
+            get
+            {
+                return (_CommonFields.Units ?? string.Empty).TrimEnd();
+            }
+            set
+            {
+                _CommonFields.Units = (value ?? string.Empty).TrimEnd();
+            }
+        }
+        public string field5//WJ Count - S5 Inventry.Size_3
+        {
+            get
+            {
+                return (_CommonFields.Size_3 ?? string.Empty).TrimEnd();
+            }
+            set
+            {
+                _CommonFields.Size_3 = (value ?? string.Empty).TrimEnd();
+            }
+        }
+        public string field7//WJ Size - S5 Inventry.Size_2
+        {
+            get
+            {
+                return (_CommonFields.Size_2 ?? string.Empty).TrimEnd();
+            }
+            set
+            {
+                _CommonFields.Size_2 = (value ?? string.Empty).TrimEnd();
+            }
+        }
+        public string field8//WJ Promo - S5 Inventry.Size_1
+        {
+            get
+            {
+                return (_CommonFields.Size_1 ?? string.Empty).TrimEnd();
+            }
+            set
+            {
+                _CommonFields.Size_1 = (value ?? string.Empty).TrimEnd();
+            }
+        }
+
         public adapterWJ_from_S5()
         {
             _CommonFields = new S5_CommonFields();

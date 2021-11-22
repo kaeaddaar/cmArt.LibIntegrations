@@ -21,6 +21,13 @@ namespace cmArt.WebJaguar.Data
         private int _InvUnique; //sku
         private string _Cat; // needs to map to list of category Ids in WebJaguar
         private string _FF22;
+        private string _Units;
+        private string _Weight;
+        private string _Size_1;
+        private string _Size_2;
+        private string _Size_3;
+        private string _PackSize;
+
         public string Cat
         {
             get { return (_Cat ?? string.Empty).TrimEnd(); }
@@ -70,6 +77,31 @@ namespace cmArt.WebJaguar.Data
         public decimal WholesaleCost { get; set; }
         public IEnumerable<S5PricePair> Prices { get; set; }
         public IEnumerable<S5QtyPair> Quantities { get; set; }
+        public string Units
+        {
+            get { return (_Units ?? string.Empty).TrimEnd(); }
+            set { _Units = (value ?? string.Empty).TrimEnd(); }
+        }
+        public string Size_1
+        {
+            get { return (_Size_1 ?? string.Empty).TrimEnd(); }
+            set { _Size_1 = (value ?? string.Empty).TrimEnd(); }
+        }
+        public string Size_2
+        {
+            get { return (_Size_2 ?? string.Empty).TrimEnd(); }
+            set { _Size_2 = (value ?? string.Empty).TrimEnd(); }
+        }
+        public string Size_3
+        {
+            get { return (_Size_3 ?? string.Empty).TrimEnd(); }
+            set { _Size_3 = (value ?? string.Empty).TrimEnd(); }
+        }
+        public string PackSize
+        {
+            get { return (_PackSize ?? string.Empty).TrimEnd(); }
+            set { _PackSize = (value ?? string.Empty).TrimEnd(); }
+        }
 
         public IShopifyDataLoadFormat CopyFrom(IS5_CommonFields_In_WJ IFrom)
         {
