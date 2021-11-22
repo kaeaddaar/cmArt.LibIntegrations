@@ -206,12 +206,16 @@ namespace cmArt.WebJaguar.App
         }
         private static void GetWebJaguarData_Product_Root()
         {
-            logger.LogInformation("Get Products using Reece's API");
+            logger.LogInformation("Get Products using the WebJaguar API");
             API_Products = new List<S5_CommonFields>();
             try
             {
                 WebJaguarConnector api = new WebJaguarConnector();
-                IEnumerable<Product_Root> API_Products_WJ = api.GetAll_Product_Root_Records();
+                List<Product_Root> API_Products_WJ = new List<Product_Root>();
+                List<Product_Root> API_Products_WJ_Less_Than_10 = api.GetAll_Product_Root_Records((decimal)0.00, (decimal)9.99);
+                List<Product_Root> API_Products_WJ_10_to_100000 = api.GetAll_Product_Root_Records((decimal)10.00, (decimal)100000);
+                API_Products_WJ_Less_Than_10.ForEach(x => API_Products_WJ.Add(x));
+                API_Products_WJ_10_to_100000.ForEach(x => API_Products_WJ.Add(x));
                 ExportWebJaguarData(API_Products_WJ);
 
                 IEnumerable<WJ_CommonFields> wJ_CommonFields = API_Products_WJ.Select(prod => prod.AsWJ_CommonFields());
@@ -222,7 +226,7 @@ namespace cmArt.WebJaguar.App
                     tmp.init(cf);
                     return tmp.AsS5_CommonFields();
                 });
-                logger.LogInformation($"Saving Shopify Products for API_Products");
+                logger.LogInformation($"Saving WebJaguar Products for API_Products");
                 try
                 {
                     GenericSerialization<S5_CommonFields>.RemoveCachedFileNamesFromDirectory(settings.OutputDirectory, "API_Products");
@@ -283,9 +287,7 @@ namespace cmArt.WebJaguar.App
             IEnumerable<WJ_Data_Export> WJProdsFound_Export = WJProdsFound.Select(x => x.AsWJ_Data_Export());
             ReportsWJ.SaveReport(WJProdsFound_Export, "WJ_Data_Export_MissingProductsFound", settings.OutputDirectory, logger);
 
-            //IEnumerable<Product_Root> API_Products_WJ = api.GetAll_Product_Root_Records();
             IEnumerable<WJ_CommonFields> wJ_CommonFields = WJProdsFound.Select(prod => prod.AsWJ_CommonFields());
-            //List<WJ_CommonFields> test = WJProdsFound.Select(prod => prod.AsWJ_CommonFields()).ToList();
             IEnumerable<S5_CommonFields> API_ProductsMissing = wJ_CommonFields.Select(cf =>
             {
                 adapterS5_from_WJ tmp = new adapterS5_from_WJ();

@@ -74,11 +74,11 @@ namespace cmArt.WebJaguar.Connector
 
             return results;
         }
-        public IEnumerable<Product_Root> GetAll_Product_Root_Records()
+        public List<Product_Root> GetAll_Product_Root_Records(decimal fromPrice, decimal toPrice)
         {
             //this.init(_ApiConnectorData);
             ApiCallData data = new ApiCallData();
-            data.UrlCommand = "/api/v1/productSearch.jhtm?noKeywords=true&q=keyword&searchIndexedCatId=&last_modified=7/22/2019";
+            data.UrlCommand = $"/api/v1/productSearch.jhtm?active=true&noKeywords=true&q=&minPrice={fromPrice}&maxPrice={toPrice}"; ;
             data.Body = String.Empty;
             Func<string, int> logStub = (x) => { Console.WriteLine("Logging not yet implemented"); return 0; };
             string results = this.MakeApiGetCall(data.UrlCommand);
@@ -97,7 +97,7 @@ namespace cmArt.WebJaguar.Connector
             bool ThereAreMorePages = pageSize * page <= count;
             if (ThereAreMorePages)
             {
-                Console.WriteLine($"There are approximately {count / pageSize + 1} pages to process with GetAll_Product_Root_Records()");
+                Console.WriteLine($"There are approximately {count / pageSize + 1} pages to process with GetAll_Product_Root_Records() from {fromPrice} to {toPrice}");
                 while (ThereAreMorePages)
                 {
                     page++;
@@ -105,7 +105,9 @@ namespace cmArt.WebJaguar.Connector
                     ThereAreMorePages = pageSize * page <= count;
                     //if (page > 5) { ThereAreMorePages = false; } // remove on release
 
-                    data.UrlCommand = $"/api/v1/productSearch.jhtm?page={page}&noKeywords=true&q=keyword&searchIndexedCatId=&last_modified=7/22/2019";
+                    //data.UrlCommand = $"/api/v1/productSearch.jhtm?page={page}&noKeywords=true&q=keyword&searchIndexedCatId=&last_modified=7/22/2019";
+                    data.UrlCommand = $"/api/v1/productSearch.jhtm?page={page}&active=true&noKeywords=true&q=" +
+                        $"&minPrice={fromPrice}&maxPrice={toPrice}";
                     data.Body = String.Empty;
                     results = this.MakeApiGetCall(data.UrlCommand);
 
