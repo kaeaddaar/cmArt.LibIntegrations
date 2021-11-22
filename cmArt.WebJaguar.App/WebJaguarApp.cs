@@ -212,6 +212,8 @@ namespace cmArt.WebJaguar.App
             {
                 WebJaguarConnector api = new WebJaguarConnector();
                 IEnumerable<Product_Root> API_Products_WJ = api.GetAll_Product_Root_Records();
+                ExportWebJaguarData(API_Products_WJ);
+
                 IEnumerable<WJ_CommonFields> wJ_CommonFields = API_Products_WJ.Select(prod => prod.AsWJ_CommonFields());
                 List<WJ_CommonFields> test = API_Products_WJ.Select(prod => prod.AsWJ_CommonFields()).ToList();
                 API_Products = wJ_CommonFields.Select(cf =>
@@ -237,6 +239,11 @@ namespace cmArt.WebJaguar.App
                 Console.ReadKey();
             }
         }
+        private static void ExportWebJaguarData(IEnumerable<Product_Root> API_Products_WJ)
+        {
+            IEnumerable<WJ_Data_Export> report = API_Products_WJ.Select(x => x.AsWJ_Data_Export());
+            ReportsWJ.SaveReport(report, "WJ_Data_Export", settings.OutputDirectory, logger);
+        }
         private static void GetEqualityFunctions()
         {
             fEquals = (from, to) => { return from.Equals(to); };
@@ -256,7 +263,7 @@ namespace cmArt.WebJaguar.App
             // convert CommonFields to Product_Root filling using default content
 
         }
-        private static void SeeIfNewRecordsExistByS5InvUnique_and_append_do_API_Products()//works around bug in WJ productSearch missing items
+        private static void SeeIfNewRecordsExistByS5InvUnique_and_append_to_API_Products()//works around bug in WJ productSearch missing items
         {
             IEnumerable<int> NewProductIDs = NewProducts.Select(x => x.InvUnique);
             WebJaguarConnector apiWJ = new WebJaguarConnector();
@@ -271,7 +278,10 @@ namespace cmArt.WebJaguar.App
                     WJProductsFound.Add(strProd);
                 }
             }
-            IEnumerable<Product_Root> WJProdsFound = WJProductsFound.Select(x => (Product_Root)System.Text.Json.JsonSerializer.Deserialize(x, typeof(Product_Root)));
+            IEnumerable<Product_Response> WJProdResponseFound = WJProductsFound.Select(x => (Product_Response)System.Text.Json.JsonSerializer.Deserialize(x, typeof(Product_Response)));
+            IEnumerable<Product_Root> WJProdsFound = WJProdResponseFound.Select(x => x.product ?? new Product_Root());
+            IEnumerable<WJ_Data_Export> WJProdsFound_Export = WJProdsFound.Select(x => x.AsWJ_Data_Export());
+            ReportsWJ.SaveReport(WJProdsFound_Export, "WJ_Data_Export_MissingProductsFound", settings.OutputDirectory, logger);
 
             //IEnumerable<Product_Root> API_Products_WJ = api.GetAll_Product_Root_Records();
             IEnumerable<WJ_CommonFields> wJ_CommonFields = WJProdsFound.Select(prod => prod.AsWJ_CommonFields());
@@ -428,7 +438,7 @@ namespace cmArt.WebJaguar.App
             }
             GetChangedRecords();
             GetNewRecords();
-            SeeIfNewRecordsExistByS5InvUnique_and_append_do_API_Products();
+            SeeIfNewRecordsExistByS5InvUnique_and_append_to_API_Products();
             BuildReports();
             PerformEdits();
             PerformAdds();

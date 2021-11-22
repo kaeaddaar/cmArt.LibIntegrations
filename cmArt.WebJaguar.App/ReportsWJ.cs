@@ -45,6 +45,23 @@ namespace cmArt.WebJaguar.App
                 }
             }
         }
+        public static void SaveReport(IEnumerable<WJ_Data_Export> data, string TableName, String OutputDirectory, ILogger logger)
+        {
+            IEnumerable<WJ_Data_Export> _data = data ?? new List<WJ_Data_Export>();
+            var engine = new FileHelperAsyncEngine<WJ_Data_Export>();
+            engine.HeaderText = "id, inventory(qty), inventoryAFS, msrp, name, sku, categoryIds, cost, priceTable1, priceTable2" +
+                ", priceTable3, priceTable4, priceTable5, priceTable6, priceTable7, priceTable8, priceTable9, priceTable10, note" +
+                ", field1(Units Per Case), field2(Unit), field3(Weight), field4(Volume), field5(Count), field6(Flavor), field7(Size)" +
+                ", field8(Promo), field9(S5PartNum), field10(ShortDesc-DNU), field11(UPC-DNU), field12(S5Cat), field13(S5UniqueID)";
+
+            using (engine.BeginWriteFile(OutputDirectory + $"\\{TableName}.csv"))
+            {
+                foreach (var record in _data)
+                {
+                    engine.WriteNext(record);
+                }
+            }
+        }
     }
 
 }

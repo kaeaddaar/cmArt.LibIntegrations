@@ -6,6 +6,7 @@ namespace cmArt.WebJaguar.Data
 {
     public interface IProduct_Root : IWJ_CommonFields_In_S5
     {
+        int id { get; set; }
         new string field12 { get; set; }
         new decimal inventory { get; set; }
         new decimal inventoryAFS { get; set; }

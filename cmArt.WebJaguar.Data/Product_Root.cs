@@ -6,6 +6,7 @@ namespace cmArt.WebJaguar.Data
 {
     public class Product_Root : IProduct_Root
     {
+        public int id { get; set; }
         public decimal inventory { get; set; }
         public decimal inventoryAFS { get; set; }
         public List<int> supplierIds { get; set; }
