@@ -10,6 +10,22 @@ namespace cmArt.WebJaguar.Data
 {
     public static class IS5_CommonFields_InWJExtensions_for_Transformation
     {
+        public static bool cmQtyEquals(this IS5_CommonFields_In_WJ data, IS5_CommonFields_In_WJ compareTo)
+        {
+
+            if (data == null || compareTo == null) { return false; }
+
+            if (data.InvUnique != compareTo.InvUnique) { return false; }
+
+            decimal dataQty;
+            decimal compareToQty;
+            dataQty = data.Quantities.Sum(x => x.Qty);
+            compareToQty = compareTo.Quantities.Sum(x => x.Qty);
+            if (dataQty != compareToQty) { return false; }
+
+            return true;
+        }
+
         public static bool cmEquals(this IS5_CommonFields_In_WJ data, IS5_CommonFields_In_WJ compareTo)
         {
 
@@ -45,10 +61,6 @@ namespace cmArt.WebJaguar.Data
 
             if (data.FF22 == compareTo.FF22) { return false; }
             if (data.PartNumber == compareTo.PartNumber) { return false; }
-            //if (data.WholesaleCost == compareTo.WholesaleCost) { return false; }
-
-            throw new NotImplementedException("The Two Collections Below Aren't Implemented correctly yet as the S5QtyPair comparison needs " +
-                "to happen based on level. Might have it right now but need to test with a fresh mind.");
 
             Func<S5PricePair, short> keyPrices = (x) => x.Level;
             var PricesPairs = GenericJoins<S5PricePair, S5PricePair, short>

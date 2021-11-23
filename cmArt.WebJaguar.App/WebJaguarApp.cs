@@ -72,8 +72,13 @@ namespace cmArt.WebJaguar.App
         private static IEnumerable<adapterWJ_from_S5> adaptersWJ;
         private static IEnumerable<S5_CommonFields> S5CommonFieldsAdapted;
         private static IEnumerable<IS5_CommonFields_In_WJ> S5CommonFields;
-        //GetPrevDataLoadLists()
+        //GetPrevDataLoadListsAndOverwrite()
         private static IEnumerable<S5_CommonFields> PrevDataLoad_Product;
+        private static CachingPattern cacheShopify_Product;
+        //Get_ChangedQuantities()
+        private static IEnumerable<IS5_CommonFields_In_WJ> ChangedRecords_Product_QtyOnly;
+        //ReportOn_ChangedQuantities()
+        //PerformEditsOn_ChangedQuantities()
         //GetShopifyData()
         private static Func<IS5_CommonFields_In_WJ, IS5_CommonFields_In_WJ, bool> fEquals = (from, to) => { return from.cmEquals(to); };
         //GetShopifyData_Reece_Products()
@@ -195,15 +200,39 @@ namespace cmArt.WebJaguar.App
             S5CommonFieldsAdapted = adaptersS5.Select(x => x.AsS5_CommonFields());
             S5CommonFields = S5CommonFieldsAdapted;
         }
-        private static void GetPrevDataLoadListsAndOverwrite()
+        private static void GetPrevDataLoadLists()
         {
-            CachingPattern cacheShopify_Product = new CachingPattern("PocoProductsAdapted", settings);
+            cacheShopify_Product = new CachingPattern("PocoProductsAdapted", settings);
             PrevDataLoad_Product = cacheShopify_Product._01_GetPrev();
-            cacheShopify_Product._02_SaveNewestToCache(S5CommonFieldsAdapted);
-
+            //cacheShopify_Product._02_SaveNewestToCache(S5CommonFieldsAdapted);
 
             API_Products = PrevDataLoad_Product;
         }
+        private static void Get_ChangedQuantities()
+        {
+            Func<IS5_CommonFields_In_WJ, IS5_CommonFields_In_WJ, bool> fQtyEquals = (from, to) => { return from.cmQtyEquals(to); };
+
+            ChangedRecords_Product_QtyOnly = UpdateProcessPattern<IS5_CommonFields_In_WJ, S5_CommonFields, int>
+                .GetChangedRecords(IS5_CommonFields_In_WJ_Indexes.UniqueId, fQtyEquals, adaptersS5, API_Products);
+        }
+        private static void ReportOn_ChangedQuantities()
+        {
+            // skipping
+        }
+        private static void PerformEditsOn_ChangedQuantities_AndOverwriteCache()
+        {
+            WebJaguarConnector api = new WebJaguarConnector();
+            IEnumerable<S5_CommonFields> cf = ChangedRecords_Product_QtyOnly.Select(x => x.AsS5_CommonFields());
+            api.Quantities_Edit(cf);
+
+            cacheShopify_Product._02_SaveNewestToCache(S5CommonFieldsAdapted);
+        }
+        private static void CleanUpMemory_ChangedQuantities()
+        {
+            ChangedRecords_Product_QtyOnly = null;
+            GC.Collect(); // if this really slows things down then we can remove it. Might save us from overdoing the memory allocation though
+        }
+
         private static void GetWebJaguarData_Product_Root()
         {
             logger.LogInformation("Get Products using the WebJaguar API");
@@ -420,7 +449,12 @@ namespace cmArt.WebJaguar.App
             GetEqualityFunctions();
             if (RunAsSelfCompare)
             {
-                GetPrevDataLoadListsAndOverwrite();
+                GetPrevDataLoadLists();
+
+                Get_ChangedQuantities();
+                ReportOn_ChangedQuantities();
+                PerformEditsOn_ChangedQuantities_AndOverwriteCache();
+                CleanUpMemory_ChangedQuantities();
             }
             else
             {

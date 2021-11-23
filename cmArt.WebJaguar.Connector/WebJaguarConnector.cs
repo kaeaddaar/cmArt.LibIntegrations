@@ -27,6 +27,35 @@ namespace cmArt.WebJaguar.Connector
             
             this.init(_ApiConnectorData);
         }
+        public string Quantities_Edit(IEnumerable<S5_CommonFields> ChangedRecords)
+        {
+            IEnumerable<S5_CommonFields> _ChangedRecords = ChangedRecords ?? new List<S5_CommonFields>();
+            IEnumerable<inventoryActivity> WJ_ChangedQuantities = _ChangedRecords.Select(x =>
+            {
+                inventoryActivity tmp = new inventoryActivity();
+                tmp.adjustAvForSaleOnly = false;
+                tmp.sku = x.InvUnique.ToString();
+                decimal qty = x.Quantities.Sum(y => y.Qty);
+                tmp.inventory = qty;
+                tmp.inventoryAFS = qty;
+                tmp.quantity = qty;
+
+                return tmp;
+            }
+            );
+
+            Func<string, int> logStub = (x) => { Console.WriteLine(x); return 0; };
+
+            ApiCallData data = new ApiCallData();
+            data.UrlCommand = "/api/v1/overrideInventory.jhtm";
+
+            overrideInventory_Root PostData = new overrideInventory_Root();
+            PostData.inventoryActivityList = WJ_ChangedQuantities.ToList();
+            data.Body = JsonSerializer.Serialize(PostData, typeof(overrideInventory_Root));
+            string results = this.MakeApiPostCall(data, logStub);
+
+            return results;
+        }
         public string Products_Edit(IEnumerable<S5_CommonFields> ChangedRecords)
         {
             IEnumerable<S5_CommonFields> _ChangedRecords = ChangedRecords ?? new List<S5_CommonFields>();
