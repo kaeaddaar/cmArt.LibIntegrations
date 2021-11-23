@@ -28,6 +28,7 @@ namespace cmArt.WebJaguar.Data
 
             to.cost = _from.cost;
             to.field1 = _from.field1;
+            to.field2 = _from.field2;
             to.field5 = _from.field5;
             to.field7 = _from.field7;
             to.field8 = _from.field8;

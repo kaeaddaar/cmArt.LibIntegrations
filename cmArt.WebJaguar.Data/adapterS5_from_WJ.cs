@@ -47,23 +47,23 @@ namespace cmArt.WebJaguar.Data
             get
             {
                 int result;
-                int.TryParse(_WJ.sku, out result);
+                int.TryParse(_WJ.field13, out result);
                 return result;
             }
             set
             {
-                _WJ.sku = value.ToString();
+                _WJ.field13 = value.ToString();
             }
         }
         public string PartNumber
         {
             get
             {
-                return _WJ.shortDesc;
+                return _WJ.field9;
             }
             set
             {
-                _WJ.shortDesc = value ?? string.Empty;
+                _WJ.field9 = value ?? string.Empty;
             }
         }
         public string WebDescription

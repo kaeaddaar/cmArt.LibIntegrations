@@ -45,7 +45,7 @@ namespace cmArt.WebJaguar.Data
 
             if (data.FF22 == compareTo.FF22) { return false; }
             if (data.PartNumber == compareTo.PartNumber) { return false; }
-            if (data.WholesaleCost == compareTo.WholesaleCost) { return false; }
+            //if (data.WholesaleCost == compareTo.WholesaleCost) { return false; }
 
             throw new NotImplementedException("The Two Collections Below Aren't Implemented correctly yet as the S5QtyPair comparison needs " +
                 "to happen based on level. Might have it right now but need to test with a fresh mind.");

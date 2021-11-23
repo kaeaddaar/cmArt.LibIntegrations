@@ -71,6 +71,18 @@ namespace cmArt.WebJaguar.App.ReportViews
                 changes.Add(tmp);
             }
 
+            if (compareTo.PackSize != compareFrom.PackSize)
+            {
+                Changes_View tmp = new Changes_View();
+                tmp.InvUnique = compareFrom.InvUnique;
+                tmp.Cat = compareFrom.Cat;
+                tmp.PartNumber = compareFrom.PartNumber;
+                tmp.FieldName = "PackSize";
+                tmp.S5ValueToSendToExternal = compareFrom.PackSize;
+                tmp.ExternalValueBeforeUpdate = compareTo.PackSize;
+                changes.Add(tmp);
+            }
+
             if (compareTo.PartNumber != compareFrom.PartNumber)
             {
                 Changes_View tmp = new Changes_View();
@@ -117,6 +129,54 @@ namespace cmArt.WebJaguar.App.ReportViews
                 }
             }
 
+            if (compareTo.Size_1 != compareFrom.Size_1)
+            {
+                Changes_View tmp = new Changes_View();
+                tmp.InvUnique = compareFrom.InvUnique;
+                tmp.Cat = compareFrom.Cat;
+                tmp.PartNumber = compareFrom.PartNumber;
+                tmp.FieldName = "Size_1";
+                tmp.S5ValueToSendToExternal = compareFrom.Size_1;
+                tmp.ExternalValueBeforeUpdate = compareTo.Size_1;
+                changes.Add(tmp);
+            }
+
+            if (compareTo.Size_2 != compareFrom.Size_2)
+            {
+                Changes_View tmp = new Changes_View();
+                tmp.InvUnique = compareFrom.InvUnique;
+                tmp.Cat = compareFrom.Cat;
+                tmp.PartNumber = compareFrom.PartNumber;
+                tmp.FieldName = "Size_2";
+                tmp.S5ValueToSendToExternal = compareFrom.Size_2;
+                tmp.ExternalValueBeforeUpdate = compareTo.Size_2;
+                changes.Add(tmp);
+            }
+
+            if (compareTo.Size_3 != compareFrom.Size_3)
+            {
+                Changes_View tmp = new Changes_View();
+                tmp.InvUnique = compareFrom.InvUnique;
+                tmp.Cat = compareFrom.Cat;
+                tmp.PartNumber = compareFrom.PartNumber;
+                tmp.FieldName = "Size_3";
+                tmp.S5ValueToSendToExternal = compareFrom.Size_3;
+                tmp.ExternalValueBeforeUpdate = compareTo.Size_3;
+                changes.Add(tmp);
+            }
+
+            if (compareTo.Units != compareFrom.Units)
+            {
+                Changes_View tmp = new Changes_View();
+                tmp.InvUnique = compareFrom.InvUnique;
+                tmp.Cat = compareFrom.Cat;
+                tmp.PartNumber = compareFrom.PartNumber;
+                tmp.FieldName = "Units";
+                tmp.S5ValueToSendToExternal = compareFrom.Units;
+                tmp.ExternalValueBeforeUpdate = compareTo.Units;
+                changes.Add(tmp);
+            }
+
             if (compareTo.WebDescription != compareFrom.WebDescription)
             {
                 Changes_View tmp = new Changes_View();
@@ -141,17 +201,17 @@ namespace cmArt.WebJaguar.App.ReportViews
                 changes.Add(tmp);
             }
 
-            if (compareTo.WholesaleCost != compareFrom.WholesaleCost)
-            {
-                Changes_View tmp = new Changes_View();
-                tmp.InvUnique = compareFrom.InvUnique;
-                tmp.Cat = compareFrom.Cat;
-                tmp.PartNumber = compareFrom.PartNumber;
-                tmp.FieldName = "WholesaleCost";
-                tmp.S5ValueToSendToExternal = compareFrom.WholesaleCost.ToString();
-                tmp.ExternalValueBeforeUpdate = compareTo.WholesaleCost.ToString();
-                changes.Add(tmp);
-            }
+            //if (compareTo.WholesaleCost != compareFrom.WholesaleCost)
+            //{
+            //    Changes_View tmp = new Changes_View();
+            //    tmp.InvUnique = compareFrom.InvUnique;
+            //    tmp.Cat = compareFrom.Cat;
+            //    tmp.PartNumber = compareFrom.PartNumber;
+            //    tmp.FieldName = "WholesaleCost";
+            //    tmp.S5ValueToSendToExternal = compareFrom.WholesaleCost.ToString();
+            //    tmp.ExternalValueBeforeUpdate = compareTo.WholesaleCost.ToString();
+            //    changes.Add(tmp);
+            //}
 
             return changes;
         }
