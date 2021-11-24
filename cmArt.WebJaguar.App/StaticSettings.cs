@@ -28,6 +28,7 @@ namespace cmArt.WebJaguar.App
             fromemailaddress = config[$"{prefix}fromemailaddress"] ?? string.Empty;
             fromemailpassword = config[$"{prefix}fromemailpassword"] ?? string.Empty;
             RunAs = config[$"{prefix}RunAs"] ?? string.Empty;
+            PreventAddsAndEdits = config[$"{prefix}PREVENTADDSANDEDITS"] ?? string.Empty;
         }
         public string RunAs { get; } // SYNC, or SELFCOMPARE
         public string CachedFiles { get; }
@@ -46,7 +47,7 @@ namespace cmArt.WebJaguar.App
         public string enableSSL { get; }
         public string fromemailaddress { get; }
         public string fromemailpassword { get; }
-
+        public string PreventAddsAndEdits { get; }
     }
 
 }
