@@ -116,7 +116,9 @@ namespace cmArt.WebJaguar.App.ReportViews
                 .FullOuterJoin(LeftRecords: compareTo.Quantities, RightRecords: compareTo.Quantities, LeftKey: S5QtyPairIndexes.Department, RightKey: S5QtyPairIndexes.Department);
             foreach (var QtyPair in QtyPairs)
             {
-                if (QtyPair.Item1.Qty != QtyPair.Item2.Qty)
+                S5QtyPair LeftQty = QtyPair.Item1 ?? new S5QtyPair(0,0);
+                S5QtyPair RightQty = QtyPair.Item2 ?? new S5QtyPair(0, 0);
+                if (LeftQty.Qty != RightQty.Qty)
                 {
                     Changes_View tmp = new Changes_View();
                     tmp.InvUnique = compareFrom.InvUnique;
