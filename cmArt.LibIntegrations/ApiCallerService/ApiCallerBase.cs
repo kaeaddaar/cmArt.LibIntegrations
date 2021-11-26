@@ -20,6 +20,31 @@ namespace cmArt.LibIntegrations.ApiCallerService
         {
             _ApiConnectorData = data ?? new ApiConnectorData();
         }
+        private string MakeApiCall(HttpClient client, HttpRequestMessage requestMessage, int maxAttempts)
+        {
+            int attempts = 0;
+            int _maxAttempts = maxAttempts;
+            string messages = string.Empty;
+            while (attempts < _maxAttempts)
+            {
+                try
+                {
+                    attempts++;
+                    var task = client.SendAsync(requestMessage);
+                    var response = task.Result;
+                    //response.EnsureSuccessStatusCode();
+                    string responseBody = response.Content.ReadAsStringAsync().Result ?? string.Empty;
+                    return responseBody;
+                }
+                catch (Exception e)
+                {
+                    System.Threading.Thread.Sleep(100 * attempts);
+                    // try again. but maybe do some logging
+                    messages += e.Message + Environment.NewLine;
+                }
+            }
+            return $"Quitting after {_maxAttempts} tries to get MakeApiCall. Messages: {messages}";
+        }
         protected string MakeApiPostCall(ApiCallData data, Func<string, int> MakeLogEntry)
         {
             string urlCommand = data.UrlCommand;
@@ -47,15 +72,16 @@ namespace cmArt.LibIntegrations.ApiCallerService
             var authenticationString = $"{clientId}:{clientSecret}";
             var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, baseUri);
+            HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, baseUri);
             requestMessage.Content = new StringContent(content);
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
 
-            //make the request
-            var task = client.SendAsync(requestMessage);
-            var response = task.Result;
-            //response.EnsureSuccessStatusCode();
-            string responseBody = response.Content.ReadAsStringAsync().Result ?? string.Empty;
+            string responseBody = MakeApiCall(client, requestMessage, 5);
+            ////make the request
+            //var task = client.SendAsync(requestMessage);
+            //var response = task.Result;
+            ////response.EnsureSuccessStatusCode();
+            //string responseBody = response.Content.ReadAsStringAsync().Result ?? string.Empty;
 
             return responseBody;
         }
@@ -97,11 +123,12 @@ namespace cmArt.LibIntegrations.ApiCallerService
             //requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
             requestMessage.Content = new StringContent(content);
 
-            //make the request
-            var task = client.SendAsync(requestMessage);
-            var response = task.Result;
-            //response.EnsureSuccessStatusCode();
-            string responseBody = response.Content.ReadAsStringAsync().Result;
+            string responseBody = MakeApiCall(client, requestMessage, 5);
+            ////make the request
+            //var task = client.SendAsync(requestMessage);
+            //var response = task.Result;
+            ////response.EnsureSuccessStatusCode();
+            //string responseBody = response.Content.ReadAsStringAsync().Result;
 
             Console.WriteLine("responseBody: " + responseBody);
             return responseBody;
@@ -127,11 +154,12 @@ namespace cmArt.LibIntegrations.ApiCallerService
             //requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
             ////requestMessage.Content = content;
 
-            //make the request
-            var task = client.SendAsync(requestMessage);
-            var response = task.Result;
-            //response.EnsureSuccessStatusCode();
-            string responseBody = response.Content.ReadAsStringAsync().Result;
+            string responseBody = MakeApiCall(client, requestMessage, 5);
+            ////make the request
+            //var task = client.SendAsync(requestMessage);
+            //var response = task.Result;
+            ////response.EnsureSuccessStatusCode();
+            //string responseBody = response.Content.ReadAsStringAsync().Result;
 
             return responseBody;
         }
@@ -155,11 +183,12 @@ namespace cmArt.LibIntegrations.ApiCallerService
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
             //requestMessage.Content = content;
 
-            //make the request
-            var task = client.SendAsync(requestMessage);
-            var response = task.Result;
-            //response.EnsureSuccessStatusCode();
-            string responseBody = response.Content.ReadAsStringAsync().Result;
+            string responseBody = MakeApiCall(client, requestMessage, 5);
+            ////make the request
+            //var task = client.SendAsync(requestMessage);
+            //var response = task.Result;
+            ////response.EnsureSuccessStatusCode();
+            //string responseBody = response.Content.ReadAsStringAsync().Result;
 
             return responseBody;
         }
