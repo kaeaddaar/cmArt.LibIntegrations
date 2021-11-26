@@ -43,7 +43,8 @@ namespace cmArt.LibIntegrations.ApiCallerService
                     messages += e.Message + Environment.NewLine;
                 }
             }
-            return $"Quitting after {_maxAttempts} tries to get MakeApiCall. Messages: {messages}";
+            return $"Quitting after {_maxAttempts} tries to get MakeApiCall. Messages: {messages}. " +
+                $"RequestUri: {requestMessage.RequestUri}. Content: {requestMessage.Content}. Method: {requestMessage.Method}";
         }
         protected string MakeApiPostCall(ApiCallData data, Func<string, int> MakeLogEntry)
         {

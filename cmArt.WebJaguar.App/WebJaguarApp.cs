@@ -187,7 +187,7 @@ namespace cmArt.WebJaguar.App
         private static void CreateDataLoadLists()
         {
             // Use facade to create data load format from Assembled Inventory Data
-            logger.LogInformation("Begin converting Assembled Inventory Records to the Shopify Data Load Format via an adapter.");
+            logger.LogInformation("Begin converting Assembled Inventory Records to the External Data Load Format via an adapter.");
             adaptersS5 = ECommInvAss.Select(Inv =>
             {
                 adapterS5_from_InvAss tmpS5 = new adapterS5_from_InvAss();
@@ -312,7 +312,9 @@ namespace cmArt.WebJaguar.App
                     WJProductsFound.Add(strProd);
                 }
             }
-            IEnumerable<Product_Response> WJProdResponseFound = WJProductsFound.Select(x => (Product_Response)System.Text.Json.JsonSerializer.Deserialize(x, typeof(Product_Response)));
+            IEnumerable<Product_Response> WJProdResponseFound = WJProductsFound
+                .Where(x => x.Substring(0,8) != "Quitting")
+                .Select(x => (Product_Response)System.Text.Json.JsonSerializer.Deserialize(x, typeof(Product_Response)));
             IEnumerable<Product_Root> WJProdsFound = WJProdResponseFound.Select(x => x.product ?? new Product_Root());
             IEnumerable<WJ_Data_Export> WJProdsFound_Export = WJProdsFound.Select(x => x.AsWJ_Data_Export());
             ReportsWJ.SaveReport(WJProdsFound_Export, "WJ_Data_Export_MissingProductsFound", settings.OutputDirectory, logger);
