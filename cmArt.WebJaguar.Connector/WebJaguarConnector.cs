@@ -139,7 +139,11 @@ namespace cmArt.WebJaguar.Connector
                         $"&minPrice={fromPrice}&maxPrice={toPrice}";
                     data.Body = String.Empty;
                     results = this.MakeApiGetCall(data.UrlCommand);
-
+                    if(results.Substring(0,1)=="Q")
+                    {
+                        System.Threading.Thread.Sleep(2000);
+                        results = this.MakeApiGetCall(data.UrlCommand);
+                    }
                     doc = JsonDocument.Parse(results);
                     root = doc.RootElement;
                     prod = root.GetProperty("productList");
