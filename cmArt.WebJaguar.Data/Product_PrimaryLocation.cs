@@ -6,6 +6,14 @@ namespace cmArt.WebJaguar.Data
 {
     public class Product_PrimaryLocation
     {
+        public Product_PrimaryLocation()
+        {
+            locationName = string.Empty;
+            warehouseZone = string.Empty;
+            aisle = string.Empty;
+            bin = string.Empty;
+            level = string.Empty;
+        }
         public string locationName { get; set; }
         public int warehouse_id { get; set; }
         public string warehouseZone { get; set; }

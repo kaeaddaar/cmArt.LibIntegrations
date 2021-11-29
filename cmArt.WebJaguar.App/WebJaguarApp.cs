@@ -269,7 +269,7 @@ namespace cmArt.WebJaguar.App
             }
             catch (Exception e)
             {
-                logger.LogInformation($"Failed to get All shopify products from Custom API. Message = \"{e.Message}\"");
+                logger.LogInformation($"Failed to get All external products from Custom API. Message = \"{e.Message}\"");
                 Console.ReadKey();
             }
         }
@@ -465,7 +465,7 @@ namespace cmArt.WebJaguar.App
             }
             GetChangedRecords();
             GetNewRecords();
-            SeeIfNewRecordsExistByS5InvUnique_and_append_to_API_Products();
+            //SeeIfNewRecordsExistByS5InvUnique_and_append_to_API_Products();
             BuildReports();
             PerformEdits();
             PerformAdds();

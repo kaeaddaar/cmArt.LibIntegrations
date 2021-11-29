@@ -134,10 +134,10 @@ namespace cmArt.WebJaguar.Data
             Product_Root_Common result = new Product_Root_Common();
             result.SetNotEditableDefaults();
 
-            IWJ_CommonFields_In_S5 result_updater = (IWJ_CommonFields_In_S5)result;
-            adapterS5_from_WJ adapter = new adapterS5_from_WJ();
-            adapter.init(result_updater);
-            adapter.CopyFrom(_data);
+            adapterWJ_from_S5 adapter = new adapterWJ_from_S5();
+            adapter.Init(_data);
+            result.CopyFrom(adapter);
+
             Product_Root finalResult = (Product_Root)result;
             return finalResult;
         }

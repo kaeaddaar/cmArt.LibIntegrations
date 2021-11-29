@@ -95,9 +95,9 @@ namespace cmArt.WebJaguar.Connector
             foreach (var newRecord in _ChangedRecords)
             {
                 string strNewRecord = System.Text.Json.JsonSerializer.Serialize
-                    (newRecord, typeof(Product_Root));
+                    (newRecord, typeof(Product_Root_Common));
                 data.Body = strNewRecord;
-                Func<string, int> logStub = (x) => { Console.WriteLine("Logging not yet implemented"); return 0; };
+                Func<string, int> logStub = (x) => { Console.WriteLine("Products_Add - Adding: " + strNewRecord); return 0; };
                 results += this.MakeApiPostCall(data, logStub);
             }
 
