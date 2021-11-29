@@ -77,7 +77,7 @@ namespace cmArt.LibIntegrations.ApiCallerService
             requestMessage.Content = new StringContent(content);
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
 
-            string responseBody = MakeApiCall(client, requestMessage, 5);
+            string responseBody = MakeApiCall(client, requestMessage, 10);
             ////make the request
             //var task = client.SendAsync(requestMessage);
             //var response = task.Result;
@@ -124,7 +124,7 @@ namespace cmArt.LibIntegrations.ApiCallerService
             //requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
             requestMessage.Content = new StringContent(content);
 
-            string responseBody = MakeApiCall(client, requestMessage, 5);
+            string responseBody = MakeApiCall(client, requestMessage, 10);
             ////make the request
             //var task = client.SendAsync(requestMessage);
             //var response = task.Result;
@@ -155,7 +155,7 @@ namespace cmArt.LibIntegrations.ApiCallerService
             //requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
             ////requestMessage.Content = content;
 
-            string responseBody = MakeApiCall(client, requestMessage, 5);
+            string responseBody = MakeApiCall(client, requestMessage, 10);
             ////make the request
             //var task = client.SendAsync(requestMessage);
             //var response = task.Result;
@@ -184,7 +184,7 @@ namespace cmArt.LibIntegrations.ApiCallerService
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
             //requestMessage.Content = content;
 
-            string responseBody = MakeApiCall(client, requestMessage, 5);
+            string responseBody = MakeApiCall(client, requestMessage, 10);
             ////make the request
             //var task = client.SendAsync(requestMessage);
             //var response = task.Result;
