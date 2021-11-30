@@ -7,6 +7,7 @@ using FileHelpers;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,29 +22,45 @@ namespace cmArt.WebJaguar.App
             var engine = new FileHelperAsyncEngine<Changes_View>();
             engine.HeaderText = "InvUnique, Cat, PartNumber, FieldName, S5ValueToSendToExternal, ExternalValueBeforeUpdate";
 
-            using (engine.BeginWriteFile(OutputDirectory + $"\\{TableName}.csv"))
+            try
             {
-                foreach (var record in _data)
+                using (engine.BeginWriteFile(OutputDirectory + $"\\{TableName}.csv"))
                 {
-                    engine.WriteNext(record);
+                    foreach (var record in _data)
+                    {
+                        engine.WriteNext(record);
+                    }
                 }
+            }
+            catch (IOException e)
+            {
+                logger.LogError("Error opening or writting to file: " + OutputDirectory + $"\\{TableName}.csv");
             }
         }
         public static void SaveReport(IEnumerable<S5_CommonFields_Pairs_Flat> data, string TableName, string OutputDirectory, ILogger logger)
         {
             IEnumerable<S5_CommonFields_Pairs_Flat> _data = data ?? new List<S5_CommonFields_Pairs_Flat>();
             var engine = new FileHelperAsyncEngine<S5_CommonFields_Pairs_Flat>();
-            engine.HeaderText = "LeftInvUnique, LeftCat, LeftPartNumber, LeftPrices, LeftQuantities, LeftBarcodes, LeftDescription, " +
+            engine.HeaderText = "LeftInvUnique, LeftCat, LeftPartNumber, LeftPrices, LeftQuantities, LeftBarcodes, LeftDescription" +
                 ", LeftWebDescription, LeftWeight, LeftFF22" +
-                "RightInvUnique, RightCat, RightPartNumber, RightPrices, RightQuantities, RightBarcodes, RightDescription, " +
+                "RightInvUnique, RightCat, RightPartNumber, RightPrices, RightQuantities, RightBarcodes, RightDescription" +
                 ", RightWebDescription, RightWeight, RightFF22";
-            using (engine.BeginWriteFile(OutputDirectory + $"\\{TableName}.csv"))
+
+            try
             {
-                foreach (var record in _data)
+                using (engine.BeginWriteFile(OutputDirectory + $"\\{TableName}.csv"))
                 {
-                    engine.WriteNext(record);
+                    foreach (var record in _data)
+                    {
+                        engine.WriteNext(record);
+                    }
                 }
             }
+            catch (IOException e)
+            {
+                logger.LogError("Error opening or writting to file: " + OutputDirectory + $"\\{TableName}.csv");
+            }
+
         }
         public static void SaveReport(IEnumerable<WJ_Data_Export> data, string TableName, String OutputDirectory, ILogger logger)
         {
@@ -54,13 +71,21 @@ namespace cmArt.WebJaguar.App
                 ", field1(Units Per Case), field2(Unit), field3(Weight), field4(Volume), field5(Count), field6(Flavor), field7(Size)" +
                 ", field8(Promo), field9(S5PartNum), field10(ShortDesc-DNU), field11(UPC-DNU), field12(S5Cat), field13(S5UniqueID)";
 
-            using (engine.BeginWriteFile(OutputDirectory + $"\\{TableName}.csv"))
+            try
             {
-                foreach (var record in _data)
+                using (engine.BeginWriteFile(OutputDirectory + $"\\{TableName}.csv"))
                 {
-                    engine.WriteNext(record);
+                    foreach (var record in _data)
+                    {
+                        engine.WriteNext(record);
+                    }
                 }
             }
+            catch (IOException e)
+            {
+                logger.LogError("Error opening or writting to file: " + OutputDirectory + $"\\{TableName}.csv");
+            }
+
         }
     }
 
