@@ -9,5 +9,6 @@ namespace cmArt.Reece.ShopifyConnector
     {
         string Description { get; set; }
         decimal WholesaleCost { get; set; }
+        string WebCategory { get; set; }
     }
 }

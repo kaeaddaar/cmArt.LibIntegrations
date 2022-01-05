@@ -23,7 +23,8 @@ namespace cmArt.Reece.ShopifyConnector
         public decimal WholesaleCost { get; set; }
         public string Cat { get; set; }
         public string InvUnique { get; set; }
-        
+        public string WebCategory { get; set; }
+
         private string _PartNumber = string.Empty;
         public string PartNumber 
         {
@@ -54,6 +55,8 @@ namespace cmArt.Reece.ShopifyConnector
 
             shopify_Product.PartNumber = this.PartNumber;
             shopify_Product.WholesaleCost = this.WholesaleCost;
+            shopify_Product.WebCategory = this.WebCategory;
+
             return shopify_Product;
         }
     }

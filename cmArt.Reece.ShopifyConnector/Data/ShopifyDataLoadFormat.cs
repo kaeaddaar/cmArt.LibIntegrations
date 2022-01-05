@@ -27,6 +27,7 @@ namespace cmArt.Reece.ShopifyConnector
             this.PartNumber = IFrom.PartNumber;
             this.Description = IFrom.Description;
             //this.WholesaleCost = IFrom.WholesaleCost;
+            this.WebCategory = IFrom.WebCategory;
             foreach (var p in IFrom.Prices)
             {
                 this.prices.Add(p);
@@ -104,6 +105,10 @@ namespace cmArt.Reece.ShopifyConnector
                 }
             }
         }
+
+        [FieldQuoted]
+        [FieldNullValue(typeof(string), "")]
+        public string WebCategory { get; set; }
     }
 
 }

@@ -105,6 +105,19 @@ namespace cmArt.Shopify.App.Data
             }
             set => throw new NotImplementedException("You can't really load a qty into the records that make the quantity up. Possible, but does it really make sense?");
         }
+
+        public string WebCategory 
+        { 
+            get
+            {
+                IComments? tmp = _InvAss.CommentsLines_PerInventry_27.Where(x => x.LineNo == 2).FirstOrDefault();
+                bool IsEmpty = tmp == null;
+                if (IsEmpty) { tmp = new Comments(); }
+                return tmp.Comment ?? string.Empty;
+            }
+            set => throw new NotImplementedException(); 
+        }
+
         private S5QtyPair GetInStock(short Dept)
         {
             _InvAss = _InvAss ?? new S5InvAssembled();

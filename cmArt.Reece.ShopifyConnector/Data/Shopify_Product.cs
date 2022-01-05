@@ -12,6 +12,7 @@ namespace cmArt.Reece.ShopifyConnector
         public string Cat { get; set; }
         public int InvUnique { get; set; }
         public string PartNumber { get; set; }
+        public string WebCategory { get; set; }
 
         public IShopify_Product CopyFrom(IShopify_Product IFrom)
         {

@@ -9,16 +9,58 @@ namespace cmArt.Reece.ShopifyConnector
 {
     public static class IShopifyDataLoadFormatExtensions
     {
+        private static Changes_View GetNewChanges_View_WithDefaults(IShopifyDataLoadFormat compareFrom)
+        {
+            Changes_View tmp = new Changes_View();
+            tmp.InvUnique = compareFrom.InvUnique;
+            tmp.Cat = compareFrom.Cat;
+            tmp.PartNumber = compareFrom.PartNumber;
+
+            return tmp;
+        }
+        private static Changes_View GetNewChanges_View_WithDefaults(IShopify_Product compareFrom)
+        {
+            Changes_View tmp = new Changes_View();
+            tmp.InvUnique = compareFrom.InvUnique;
+            tmp.Cat = compareFrom.Cat;
+            tmp.PartNumber = compareFrom.PartNumber;
+
+            return tmp;
+        }
+        private static Changes_View GetNewChanges_View_WithDefaults(IShopify_Prices compareFrom)
+        {
+            Changes_View tmp = new Changes_View();
+            tmp.InvUnique = compareFrom.InvUnique;
+            tmp.Cat = compareFrom.Cat;
+            tmp.PartNumber = compareFrom.PartNumber;
+
+            return tmp;
+        }
+        private static Changes_View GetNewChanges_View_WithDefaults(IShopify_Quantities compareFrom)
+        {
+            Changes_View tmp = new Changes_View();
+            tmp.InvUnique = compareFrom.InvUnique;
+            tmp.Cat = compareFrom.Cat;
+            tmp.PartNumber = compareFrom.PartNumber;
+
+            return tmp;
+        }
+        private static Changes_View GetNewChanges_View_WithDefaults(IShopify_Identity compareFrom)
+        {
+            Changes_View tmp = new Changes_View();
+            tmp.InvUnique = compareFrom.InvUnique;
+            tmp.Cat = compareFrom.Cat;
+            tmp.PartNumber = compareFrom.PartNumber;
+
+            return tmp;
+        }
         // Need Product, Prices, and Quantities separate so breaking it out into 3 methods plus the identity (avoids duplication)
         public static IEnumerable<Changes_View> Diff(this IShopifyDataLoadFormat compareFrom, IShopifyDataLoadFormat compareTo)
         {
             List<Changes_View> changes = new List<Changes_View>();
             if (compareTo.Cat != compareFrom.Cat)
             {
-                Changes_View tmp = new Changes_View();
-                tmp.InvUnique = compareFrom.InvUnique;
-                tmp.Cat = compareFrom.Cat;
-                tmp.PartNumber = compareFrom.PartNumber;
+                Changes_View tmp = GetNewChanges_View_WithDefaults(compareFrom);
                 tmp.FieldName = "Cat";
                 tmp.S5ValueToSendToExternal = compareFrom.Cat;
                 tmp.ExternalValueBeforeUpdate = compareTo.Cat;
@@ -26,10 +68,7 @@ namespace cmArt.Reece.ShopifyConnector
             }
             if (compareTo.Description != compareFrom.Description)
             {
-                Changes_View tmp = new Changes_View();
-                tmp.InvUnique = compareFrom.InvUnique;
-                tmp.Cat = compareFrom.Cat;
-                tmp.PartNumber = compareFrom.PartNumber;
+                Changes_View tmp = GetNewChanges_View_WithDefaults(compareFrom);
                 tmp.FieldName = "Description";
                 tmp.S5ValueToSendToExternal = compareFrom.Description;
                 tmp.ExternalValueBeforeUpdate = compareTo.Description;
@@ -37,10 +76,7 @@ namespace cmArt.Reece.ShopifyConnector
             }
             if (compareTo.PartNumber != compareFrom.PartNumber)
             {
-                Changes_View tmp = new Changes_View();
-                tmp.InvUnique = compareFrom.InvUnique;
-                tmp.Cat = compareFrom.Cat;
-                tmp.PartNumber = compareFrom.PartNumber;
+                Changes_View tmp = GetNewChanges_View_WithDefaults(compareFrom);
                 tmp.FieldName = "PartNumber";
                 tmp.S5ValueToSendToExternal = compareFrom.PartNumber;
                 tmp.ExternalValueBeforeUpdate = compareTo.PartNumber;
@@ -53,10 +89,7 @@ namespace cmArt.Reece.ShopifyConnector
             {
                 if (PricePair.Item1.Price != PricePair.Item2.Price)
                 {
-                    Changes_View tmp = new Changes_View();
-                    tmp.InvUnique = compareFrom.InvUnique;
-                    tmp.Cat = compareFrom.Cat;
-                    tmp.PartNumber = compareFrom.PartNumber;
+                    Changes_View tmp = GetNewChanges_View_WithDefaults(compareFrom);
                     tmp.FieldName = "Prices(Level " + PricePair.Item1.Level.ToString() + ")";
                     tmp.S5ValueToSendToExternal = PricePair.Item2.Price.ToString();
                     tmp.ExternalValueBeforeUpdate = PricePair.Item1.Price.ToString();
@@ -70,10 +103,7 @@ namespace cmArt.Reece.ShopifyConnector
             {
                 if (QtyPair.Item1.Qty != QtyPair.Item2.Qty)
                 {
-                    Changes_View tmp = new Changes_View();
-                    tmp.InvUnique = compareFrom.InvUnique;
-                    tmp.Cat = compareFrom.Cat;
-                    tmp.PartNumber = compareFrom.PartNumber;
+                    Changes_View tmp = GetNewChanges_View_WithDefaults(compareFrom);
                     tmp.FieldName = "Quantities(Dept " + QtyPair.Item1.Location.ToString() + ")";
                     tmp.S5ValueToSendToExternal = QtyPair.Item2.Location.ToString();
                     tmp.ExternalValueBeforeUpdate = QtyPair.Item1.Location.ToString();
@@ -83,13 +113,19 @@ namespace cmArt.Reece.ShopifyConnector
 
             if (compareTo.WholesaleCost != compareFrom.WholesaleCost)
             {
-                Changes_View tmp = new Changes_View();
-                tmp.InvUnique = compareFrom.InvUnique;
-                tmp.Cat = compareFrom.Cat;
-                tmp.PartNumber = compareFrom.PartNumber;
+                Changes_View tmp = GetNewChanges_View_WithDefaults(compareFrom);
                 tmp.FieldName = "WholesaleCost";
                 tmp.S5ValueToSendToExternal = compareFrom.WholesaleCost.ToString();
                 tmp.ExternalValueBeforeUpdate = compareTo.WholesaleCost.ToString();
+                changes.Add(tmp);
+            }
+
+            if (compareTo.WebCategory != compareFrom.WebCategory)
+            {
+                Changes_View tmp = GetNewChanges_View_WithDefaults(compareFrom);
+                tmp.FieldName = "WebCategory";
+                tmp.S5ValueToSendToExternal = compareFrom.WebCategory;
+                tmp.ExternalValueBeforeUpdate = compareTo.WebCategory;
                 changes.Add(tmp);
             }
 
@@ -128,10 +164,7 @@ namespace cmArt.Reece.ShopifyConnector
             {
                 if (PricePair.Item1 == null || PricePair.Item2 == null)
                 {
-                    Changes_View tmp = new Changes_View();
-                    tmp.InvUnique = compareFrom.InvUnique;
-                    tmp.Cat = compareFrom.Cat;
-                    tmp.PartNumber = compareFrom.PartNumber;
+                    Changes_View tmp = GetNewChanges_View_WithDefaults(compareFrom);
 
                     if (PricePair.Item1 == null)
                     {
@@ -159,10 +192,7 @@ namespace cmArt.Reece.ShopifyConnector
                 {
                     if (PricePair.Item1.Price != PricePair.Item2.Price)
                     {
-                        Changes_View tmp = new Changes_View();
-                        tmp.InvUnique = compareFrom.InvUnique;
-                        tmp.Cat = compareFrom.Cat;
-                        tmp.PartNumber = compareFrom.PartNumber;
+                        Changes_View tmp = GetNewChanges_View_WithDefaults(compareFrom);
                         tmp.FieldName = "Prices(Level " + PricePair.Item1.Level.ToString() + ")";
                         tmp.S5ValueToSendToExternal = PricePair.Item2.Price.ToString();
                         tmp.ExternalValueBeforeUpdate = PricePair.Item1.Price.ToString();
@@ -190,13 +220,19 @@ namespace cmArt.Reece.ShopifyConnector
 
             if (compareTo.Description != compareFrom.Description)
             {
-                Changes_View tmp = new Changes_View();
-                tmp.InvUnique = compareFrom.InvUnique;
-                tmp.Cat = compareFrom.Cat;
-                tmp.PartNumber = compareFrom.PartNumber;
+                Changes_View tmp = GetNewChanges_View_WithDefaults(compareFrom);
                 tmp.FieldName = "Description";
                 tmp.S5ValueToSendToExternal = compareFrom.Description;
                 tmp.ExternalValueBeforeUpdate = compareTo.Description;
+                changes.Add(tmp);
+            }
+
+            if (compareTo.WebCategory != compareFrom.WebCategory)
+            {
+                Changes_View tmp = GetNewChanges_View_WithDefaults(compareFrom);
+                tmp.FieldName = "WebCategory";
+                tmp.S5ValueToSendToExternal = compareFrom.WebCategory;
+                tmp.ExternalValueBeforeUpdate = compareTo.WebCategory;
                 changes.Add(tmp);
             }
 
@@ -207,10 +243,7 @@ namespace cmArt.Reece.ShopifyConnector
             List<Changes_View> changes = new List<Changes_View>();
             if (compareTo.InvUnique != compareFrom.InvUnique)
             {
-                Changes_View tmp = new Changes_View();
-                tmp.InvUnique = compareFrom.InvUnique;
-                tmp.Cat = compareFrom.Cat;
-                tmp.PartNumber = compareFrom.PartNumber;
+                Changes_View tmp = GetNewChanges_View_WithDefaults(compareFrom);
                 tmp.FieldName = "InvUnique";
                 tmp.S5ValueToSendToExternal = compareFrom.InvUnique.ToString();
                 tmp.ExternalValueBeforeUpdate = compareTo.InvUnique.ToString();
@@ -218,10 +251,7 @@ namespace cmArt.Reece.ShopifyConnector
             }
             if (compareTo.Cat != compareFrom.Cat)
             {
-                Changes_View tmp = new Changes_View();
-                tmp.InvUnique = compareFrom.InvUnique;
-                tmp.Cat = compareFrom.Cat;
-                tmp.PartNumber = compareFrom.PartNumber;
+                Changes_View tmp = GetNewChanges_View_WithDefaults(compareFrom);
                 tmp.FieldName = "Cat";
                 tmp.S5ValueToSendToExternal = compareFrom.Cat;
                 tmp.ExternalValueBeforeUpdate = compareTo.Cat;
@@ -229,10 +259,7 @@ namespace cmArt.Reece.ShopifyConnector
             }
             if (compareTo.PartNumber != compareFrom.PartNumber)
             {
-                Changes_View tmp = new Changes_View();
-                tmp.InvUnique = compareFrom.InvUnique;
-                tmp.Cat = compareFrom.Cat;
-                tmp.PartNumber = compareFrom.PartNumber;
+                Changes_View tmp = GetNewChanges_View_WithDefaults(compareFrom);
                 tmp.FieldName = "PartNumber";
                 tmp.S5ValueToSendToExternal = compareFrom.PartNumber;
                 tmp.ExternalValueBeforeUpdate = compareTo.PartNumber;
@@ -251,6 +278,7 @@ namespace cmArt.Reece.ShopifyConnector
                     && compareTo.Description == compareFrom.Description
                     && compareTo.InvUnique == compareFrom.InvUnique
                     && compareTo.PartNumber == compareFrom.PartNumber
+                    && compareTo.WebCategory == compareFrom.WebCategory
                     //&& compareTo.WholesaleCost == compareFrom.WholesaleCost
                 )
                 {

@@ -98,6 +98,12 @@ namespace cmArt.Shopify.App.Data
             }
         }
 
+        public string WebCategory 
+        { 
+            get => string.Empty; 
+            set => throw new NotImplementedException(); 
+        }
+
         public IShopify_Product CopyFrom(IShopify_Product IFrom)
         {
             return IShopify_ProductExtensions.CopyFrom(this, IFrom);
