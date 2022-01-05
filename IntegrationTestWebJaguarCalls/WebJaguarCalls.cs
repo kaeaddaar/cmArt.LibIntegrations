@@ -21,9 +21,9 @@ namespace IntegrationTestWebJaguarCalls
             //    " can't clean up the added record afterwards.");
 
             WebJaguarConnector wj = new WebJaguarConnector();
-            List<Product_Root> newRecords = new List<Product_Root>();
+            List<IWJ_CommonFields_In_S5> newRecords = new List<IWJ_CommonFields_In_S5>();
             Product_Root ToAdd = GetSampleProduct();
-            newRecords.Add(ToAdd);
+            newRecords.Add(((IWJ_CommonFields_In_S5)ToAdd));
             string results = wj.Products_Add(newRecords);
             ResponseMessage msg = (ResponseMessage)System.Text.Json.JsonSerializer.Deserialize(results, typeof(ResponseMessage));
             string strNum = string.Empty;

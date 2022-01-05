@@ -128,18 +128,17 @@ namespace cmArt.WebJaguar.Data
 
             return to;
         }
-        public static Product_Root AsProduct_Root(this IS5_CommonFields_In_WJ data)
+        public static Product_Root_Common AsProduct_Root_Common(this IS5_CommonFields_In_WJ data)
         {
             IS5_CommonFields_In_WJ _data = data ?? new S5_CommonFields();
             Product_Root_Common result = new Product_Root_Common();
-            result.SetNotEditableDefaults();
+            //result.SetNotEditableDefaults();
 
             adapterWJ_from_S5 adapter = new adapterWJ_from_S5();
             adapter.Init(_data);
             result.CopyFrom(adapter);
 
-            Product_Root finalResult = (Product_Root)result;
-            return finalResult;
+            return result;
         }
     }
 }

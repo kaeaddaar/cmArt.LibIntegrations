@@ -99,6 +99,43 @@ namespace cmArt.WebJaguar.App
         private static IEnumerable<S5_CommonFields> NewProducts;
 
         #endregion variables
+        public static void Main_Console(string[] args)
+        {
+            SetupLogging();
+            logger.LogInformation("Begin");
+            SetupAndDisplaySettings();
+            SetupArgs(args);
+            logger.LogInformation("Loading Inventory From System Five");
+            GetSystem5Data();
+
+            FilterForECommAndSave();
+            CreateDataLoadLists();
+            GetEqualityFunctions();
+            if (RunAsSelfCompare)
+            {
+                GetPrevDataLoadLists();
+
+                Get_ChangedQuantities();
+                ReportOn_ChangedQuantities();
+                PerformEditsOn_ChangedQuantities_AndOverwriteCache();
+                CleanUpMemory_ChangedQuantities();
+            }
+            else
+            {
+                GetWebJaguarData_Product_Root();
+            }
+            GetChangedRecords();
+            GetNewRecords();
+            //SeeIfNewRecordsExistByS5InvUnique_and_append_to_API_Products();
+            BuildReports();
+            LogStatistics();
+            PerformEdits();
+            PerformAdds();
+
+            Console.WriteLine("Done");
+            Console.ReadKey();
+        }
+
 
         private static void SetupLogging()
         {
@@ -295,7 +332,6 @@ namespace cmArt.WebJaguar.App
             .LeftJoin(adaptersS5, API_Products, IS5_CommonFields_In_WJ_Indexes.UniqueId, IS5_CommonFields_In_WJ_Indexes.UniqueId);
             NewProducts = NewProductsPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsS5_CommonFields());
             // convert CommonFields to Product_Root filling using default content
-
         }
         private static void SeeIfNewRecordsExistByS5InvUnique_and_append_to_API_Products()//works around bug in WJ productSearch missing items
         {
@@ -360,6 +396,16 @@ namespace cmArt.WebJaguar.App
             ReportsWJ.SaveReport(TOnly, "WebJaguar_Only", settings.OutputDirectory, logger);
 
         }
+        private static void LogStatistics()
+        {
+            logger.LogInformation($"# of S5 Inventory Records: \"{InvAss.Count()}\"");
+            logger.LogInformation($"# of S5 Inventory Records with Ecomm and not Default: \"{ECommInvAss.Count()}\"");
+            logger.LogInformation($"# of WJ Product Records: \"{API_Products.Count()}\"");
+            logger.LogInformation($"# of Changed Records: \"{ChangedRecords_Product.Count()}\"");
+            logger.LogInformation($"# of New Records: \"{NewProducts.Count()}\"");
+
+            //logger.LogInformation($": \"{}\"");
+        }
         private static void ProduceVennMap()
         {
             Func<IS5InvAssembled, IS5InvAssembled> As_S5InvAssembled = (x) =>
@@ -419,9 +465,9 @@ namespace cmArt.WebJaguar.App
                 if (!PreventProduct)
                 {
                     logger.LogInformation("Performing Products_Add on NewProducts");
-                    logger.LogInformation($"Number of records in NewProducts: {NewProducts.Count()}");
+                    //logger.LogInformation($"Number of records in NewProducts: {NewProducts.Count()}");
                     WebJaguarConnector apiWJ = new WebJaguarConnector();
-                    IEnumerable<Product_Root> NewProduct_Root = NewProducts.Select(p => p.AsProduct_Root());
+                    IEnumerable<Product_Root_Common> NewProduct_Root = NewProducts.Select(p => p.AsProduct_Root_Common());
                     string Product_Add_Results = apiWJ.Products_Add(NewProduct_Root);
                 }
                 else { logger.LogInformation("Prevented adding of NewProducts"); }
@@ -438,42 +484,6 @@ namespace cmArt.WebJaguar.App
                 logger.LogInformation("Error serializing and saving new products to file. Message: " + e.Message);
             }
         }
-        public static void Main_Console(string[] args)
-        {
-            SetupLogging();
-            logger.LogInformation("Begin");
-            SetupAndDisplaySettings();
-            SetupArgs(args);
-            logger.LogInformation("Loading Inventory From System Five");
-            GetSystem5Data();
-
-            FilterForECommAndSave();
-            CreateDataLoadLists();
-            GetEqualityFunctions();
-            if (RunAsSelfCompare)
-            {
-                GetPrevDataLoadLists();
-
-                Get_ChangedQuantities();
-                ReportOn_ChangedQuantities();
-                PerformEditsOn_ChangedQuantities_AndOverwriteCache();
-                CleanUpMemory_ChangedQuantities();
-            }
-            else
-            {
-                GetWebJaguarData_Product_Root();
-            }
-            GetChangedRecords();
-            GetNewRecords();
-            //SeeIfNewRecordsExistByS5InvUnique_and_append_to_API_Products();
-            BuildReports();
-            PerformEdits();
-            PerformAdds();
-
-            Console.WriteLine("Done");
-            Console.ReadKey();
-        }
-
         private static string SerializeForExport(IEnumerable<IS5InvAssembled> ListToSerialize)
         {
             // serialize the results to prep them for sending

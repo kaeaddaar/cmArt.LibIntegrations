@@ -86,9 +86,9 @@ namespace cmArt.WebJaguar.Connector
 
             return results;
         }
-        public string Products_Add(IEnumerable<Product_Root> NewRecords)
+        public string Products_Add(IEnumerable<IWJ_CommonFields_In_S5> NewRecords)
         {
-            IEnumerable<Product_Root> _ChangedRecords = NewRecords ?? new List<Product_Root>();
+            IEnumerable<IWJ_CommonFields_In_S5> _ChangedRecords = NewRecords ?? new List<IWJ_CommonFields_In_S5>();
             ApiCallData data = new ApiCallData();
             data.UrlCommand = "/api/v1/createProduct.jhtm";
             string results = string.Empty;
