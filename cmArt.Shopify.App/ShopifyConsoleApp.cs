@@ -101,6 +101,225 @@ namespace cmArt.Shopify.App
         private static VennMap_InvAss<Shopify_Quantities, int> map_Quantities;
 
         #endregion variables
+        public static void Main_Console(string[] args)
+        {
+            SetupLogging();
+            logger.LogInformation("Begin");
+
+            SetupAndDisplaySettings();
+
+            SetupArgs(args);
+
+            logger.LogInformation("Loading Inventory From System Five");
+
+            GetSystem5Data();
+
+            DemoPrep_TurnOnEcommFlagForTop3InventoryItemsOfEachCategory();
+
+            FilterForECommAndSave();
+
+            Transform_Assembled_Inventory_To_Products_Prices_And_Quantities();
+
+
+            GetEqualityFunctions();
+
+            if (RunAsSelfCompare)
+            {
+                Cache_And_Overwrite_Products_Prices_And_Quantities();
+            }
+            else
+            {
+                GetShopifyData();
+                map_Product = ProduceVennMap(map_Product);
+                map_Prices = ProduceVennMap(map_Prices);
+                map_Quantities = ProduceVennMap(map_Quantities);
+                CheckForDuplicates();
+            }
+
+            GetChangedRecords();
+
+            GetDetailedDifferences_And_Create_Reports();
+
+            ProduceReportsBeforeProcessing();
+
+            // Direct from Shopify
+            if (false)
+            {
+                logger.LogInformation("Get Products directly from Shopify");
+                List<Product_Product> all = cmShopify.GetAllShopifyRecords().ToList();
+                string strProducts = System.Text.Json.JsonSerializer.Serialize(all, typeof(List<Product_Product>));
+                IEnumerable<ProductAdapter> AllProduct = all.Select(prod => { ProductAdapter pa = new ProductAdapter(); pa.Init(prod); return pa; });
+            }
+
+            #region Perform Edits
+            logger.LogInformation("Begin Performing Edits");
+            IEnumerable<Shopify_Product> changedProducts = new List<Shopify_Product>();
+            IEnumerable<Shopify_Prices> changedPrices = new List<Shopify_Prices>();
+            IEnumerable<Shopify_Quantities> changedQuantities = new List<Shopify_Quantities>();
+            if (!PreventApiAddsNEdits)
+            {
+                changedProducts = ChangedRecords_Product.Select(p => p.AsShopify_Product());
+                string Product_Edit_Results = string.Empty;
+                if (!PreventProduct)
+                {
+                    logger.LogInformation("Performing Edits on Changed Products");
+                    logger.LogInformation($"Number of Changed Products: {changedProducts.Count()}");
+                    Product_Edit_Results = ReeceShopify.Products_Edit(changedProducts);
+
+                    string FileNameChangedProducts = settings.OutputDirectory + "\\changedProducts.json.txt";
+                    string content = System.Text.Json.JsonSerializer.Serialize(changedProducts.ToList(), typeof(List<Shopify_Product>));
+                    System.IO.File.WriteAllText(FileNameChangedProducts, content);
+
+                    var iNotUn = changedProducts.Where(x => x.WebCategory != "Uncategorized" && x.WebCategory != string.Empty).Count();
+                    var NotUn = changedProducts.Where(x => x.WebCategory != "Uncategorized" && x.WebCategory != string.Empty);
+                    content = System.Text.Json.JsonSerializer.Serialize(NotUn.ToList(), typeof(List<Shopify_Product>));
+                    System.IO.File.WriteAllText(FileNameChangedProducts, content);
+                }
+                else { logger.LogInformation("Preventing edits on changed products"); }
+
+                changedPrices = ChangedRecords_Prices.Select(p => p.AsShopify_Prices());
+                string Prices_Edit_Results = string.Empty;
+                if (!PreventPrices)
+                {
+                    logger.LogInformation("Performing Edits on Changed Prices");
+                    logger.LogInformation($"Number of Changed Prices {changedPrices.Count()}");
+                    Prices_Edit_Results = ReeceShopify.Prices_Edit(changedPrices);
+                    string FileNameChangedPrices = settings.OutputDirectory + "\\changedPrices.json.txt";
+                    string content = System.Text.Json.JsonSerializer.Serialize(changedPrices.ToList(), typeof(List<Shopify_Prices>));
+                    System.IO.File.WriteAllText(FileNameChangedPrices, content);
+                }
+                else { logger.LogInformation("Preventing edits on changed prices"); }
+
+                changedQuantities = ChangedRecords_Quantities.Select(p => p.AsShopify_Quantities());
+                string Quantities_Edit_Results = string.Empty;
+                if (!PreventQuantities)
+                {
+                    logger.LogInformation("Performing Edits on Changed Quantities");
+                    logger.LogInformation($"Number of Changed Quantities: {changedQuantities.Count()}");
+                    Quantities_Edit_Results = ReeceShopify.Quantities_Edit(changedQuantities);
+                    string FileNameChangedQuantities = settings.OutputDirectory + "\\changedQuantities.json.txt";
+                    string content = System.Text.Json.JsonSerializer.Serialize(changedQuantities.ToList(), typeof(List<Shopify_Quantities>));
+                    System.IO.File.WriteAllText(FileNameChangedQuantities, content);
+                }
+                else { logger.LogInformation("Preventing edits on changed quantities"); }
+
+            }
+            else
+            {
+                logger.LogInformation("All Perform Edits Supressed due to Settings");
+            }
+            #endregion Perform Edits
+
+            #region Perform Adds
+            logger.LogInformation("Begin Perform Adds");
+            IEnumerable<Tuple<IShopify_Product, IShopify_Product>> NewProductsPairs = new List<Tuple<IShopify_Product, IShopify_Product>>();
+            IEnumerable<Tuple<IShopify_Prices, IShopify_Prices>> NewPricesPairs = new List<Tuple<IShopify_Prices, IShopify_Prices>>();
+            IEnumerable<Tuple<IShopify_Quantities, IShopify_Quantities>> NewQuantitiesPairs = new List<Tuple<IShopify_Quantities, IShopify_Quantities>>();
+
+            //API_Products, jp, jq
+            NewProductsPairs = GenericJoins<IShopify_Product, IShopify_Product, int>
+            .LeftJoin(adapters, API_Products, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
+            IEnumerable<Shopify_Product> NewProducts = NewProductsPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsShopify_Product());
+            if (!PreventApiAddsNEdits)
+            {
+                if (!PreventProduct)
+                {
+                    logger.LogInformation("Performing Products_Add on NewProducts");
+                    logger.LogInformation($"Number of records in NewProducts: {NewProducts.Count()}");
+                    string Product_Add_Results = ReeceShopify.Products_Add(NewProducts);
+                }
+                else { logger.LogInformation("Prevented adding of NewProducts"); }
+            }
+            try
+            {
+                string FileNameNewProducts = settings.OutputDirectory + "\\NewProducts.json.txt";
+                logger.LogInformation($"Saving NewProducts to file: {FileNameNewProducts}");
+                string content = System.Text.Json.JsonSerializer.Serialize(NewProducts.ToList(), typeof(List<Shopify_Product>));
+                System.IO.File.WriteAllText(FileNameNewProducts, content);
+            }
+            catch (Exception e)
+            {
+                logger.LogInformation("Error serializing and saving new products to file. Message: " + e.Message);
+            }
+
+            PauseToGiveSomeTimeForNewProductsToLoad(NewProducts.Count());
+
+            NewPricesPairs = GenericJoins<IShopify_Prices, IShopify_Prices, int>
+                .LeftJoin(adapters, API_Prices, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
+            IEnumerable<Shopify_Prices> NewPrices = NewPricesPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsShopify_Prices());
+            if (!PreventApiAddsNEdits)
+            {
+                if (!PreventPrices)
+                {
+                    logger.LogInformation("Performing Prices_Add on NewPrices");
+                    logger.LogInformation($"Number of records in NewPrices: {NewPrices.Count()}");
+                    string Prices_Add_Results = ReeceShopify.Prices_Add(NewPrices);
+                }
+                else { logger.LogInformation("Prevented adding of NewPrices"); }
+            }
+            try
+            {
+                string FileNameNewPrices = settings.OutputDirectory + "\\NewPrices.json.txt";
+                logger.LogInformation($"Saving NewPrices to file: {FileNameNewPrices}");
+                string content = System.Text.Json.JsonSerializer.Serialize(NewPrices.ToList(), typeof(List<Shopify_Prices>));
+                System.IO.File.WriteAllText(FileNameNewPrices, content);
+            }
+            catch (Exception e)
+            {
+                logger.LogInformation("Error serializing and saving new prices to file. Message: " + e.Message);
+            }
+
+            NewQuantitiesPairs = GenericJoins<IShopify_Quantities, IShopify_Quantities, int>
+                .LeftJoin(adapters, API_Quantities, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
+            IEnumerable<Shopify_Quantities> NewQuantities = NewQuantitiesPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsShopify_Quantities());
+            if (!PreventApiAddsNEdits)
+            {
+                if (!PreventQuantities)
+                {
+                    logger.LogInformation("Performing Quantities_Add on NewQuantities");
+                    logger.LogInformation($"Number of records in NewQuantities: {NewQuantities.Count()}");
+                    string Quantities_Add_Results = ReeceShopify.Quantities_Add(NewQuantities);
+                }
+                else { logger.LogInformation("Prevented addinf of NewQuantities"); }
+            }
+            try
+            {
+                string FileNameNewQuantities = settings.OutputDirectory + "\\NewQuantities.json.txt";
+                logger.LogInformation($"Saving NewQuantities to file: {FileNameNewQuantities}");
+                string content = System.Text.Json.JsonSerializer.Serialize(NewQuantities.ToList(), typeof(List<Shopify_Quantities>));
+                System.IO.File.WriteAllText(FileNameNewQuantities, content);
+            }
+            catch (Exception e)
+            {
+                logger.LogInformation("Error serializing and saving new quantities to file. Message: " + e.Message);
+            }
+            #endregion Perform Adds
+
+            // ----- Reporting goes here -----
+
+            string result2 = SerializeForExport(adapters);
+            string result = string.Empty;
+
+            try
+            {
+                logger.LogInformation("Attempting to serialize ChangedRecords_Product");
+                IEnumerable<Shopify_Product> _ChangedRecords_Product = ChangedRecords_Product.Select(rec => (Shopify_Product)(new Shopify_Product().CopyFrom(rec)));
+                result = JsonSerializer.Serialize(_ChangedRecords_Product, typeof(IEnumerable<Shopify_Product>));
+            }
+            catch
+            {
+                logger.LogInformation("Serialize of ChangedRecordPairs_Product falied");
+            }
+            IEnumerable<Shopify_Product> _AllRecords_Product = adapters.Select(rec => (Shopify_Product)(new Shopify_Product().CopyFrom(rec)));
+            string result3 = JsonSerializer.Serialize(_AllRecords_Product, typeof(IEnumerable<Shopify_Product>));
+
+            string FileName = settings.OutputDirectory + "\\_ChangedRecords_Product.json.txt";
+            logger.LogInformation($"Saving ChangedRecords_Product to file: {FileName}");
+            File.WriteAllText(FileName, result);
+
+            Console.WriteLine("Done");
+            Console.ReadKey();
+        }
 
         private static void SetupLogging()
         {
@@ -179,6 +398,18 @@ namespace cmArt.Shopify.App
                 throw new Exception_WhileGettingData("An error occured Getting Data From System Five.", e);
             }
             logger.LogInformation("Finished - Loading Inventory From Real Windward");
+        }
+        private static void DemoPrep_TurnOnEcommFlagForTop3InventoryItemsOfEachCategory()
+        {
+            IEnumerable<IGrouping<string, IS5InvAssembled>> grouped = InvAss.OrderBy(x => x.Inv.Cat).GroupBy(x => x.Inv.Cat);
+            foreach(var group in grouped)
+            {
+                IEnumerable<IS5InvAssembled> tmpGroup = group.Take(3);
+                foreach(var item in tmpGroup)
+                {
+                    item.Inv.Ecommerce = "Y";
+                }
+            }
         }
         private static void FilterForECommAndSave()
         {
@@ -613,226 +844,16 @@ namespace cmArt.Shopify.App
             int ticsToWait = ticsPerMinute * 5 + numNewProducts * ticsPerMinute / 4;
             int tics = 0;
             int count = 0;
+            int minutesToWait = ticsToWait / ticsPerMinute;
+            logger.LogInformation($"Begining {minutesToWait} minute wait cycle to give Shopify time to finish the work.");
             while (tics < ticsToWait)
             {
                 System.Threading.Thread.Sleep(ticsPerMinute);
                 count++;
                 tics = ticsPerMinute * count;
-                logger.LogInformation((tics / ticsPerMinute).ToString() + " passed, " 
-                    + ((ticsToWait - tics) / ticsPerMinute).ToString() + " to go.");
+                logger.LogInformation((tics / ticsPerMinute).ToString() + " minutes passed, " 
+                    + ((ticsToWait - tics) / ticsPerMinute).ToString() + " minutes to go.");
             }
-        }
-        public static void Main_Console(string[] args)
-        {
-            SetupLogging();
-            logger.LogInformation("Begin");
-
-            SetupAndDisplaySettings();
-
-            SetupArgs(args);
-
-            logger.LogInformation("Loading Inventory From System Five");
-
-            GetSystem5Data();
-
-            FilterForECommAndSave();
-
-            Transform_Assembled_Inventory_To_Products_Prices_And_Quantities();
-
-
-            GetEqualityFunctions();
-
-            if (RunAsSelfCompare)
-            {
-                Cache_And_Overwrite_Products_Prices_And_Quantities();
-            }
-            else
-            {
-                GetShopifyData();
-                map_Product = ProduceVennMap(map_Product);
-                map_Prices = ProduceVennMap(map_Prices);
-                map_Quantities = ProduceVennMap(map_Quantities);
-                CheckForDuplicates();
-            }
-
-            GetChangedRecords();
-
-            GetDetailedDifferences_And_Create_Reports();
-
-            ProduceReportsBeforeProcessing();
-
-            // Direct from Shopify
-            if (false)
-            {
-                logger.LogInformation("Get Products directly from Shopify");
-                List<Product_Product> all = cmShopify.GetAllShopifyRecords().ToList();
-                string strProducts = System.Text.Json.JsonSerializer.Serialize(all, typeof(List<Product_Product>));
-                IEnumerable<ProductAdapter> AllProduct = all.Select(prod => { ProductAdapter pa = new ProductAdapter(); pa.Init(prod); return pa; });
-            }
-
-
-            #region Perform Edits
-            logger.LogInformation("Begin Performing Edits");
-            IEnumerable<Shopify_Product> changedProducts = new List<Shopify_Product>();
-            IEnumerable<Shopify_Prices> changedPrices = new List<Shopify_Prices>();
-            IEnumerable<Shopify_Quantities> changedQuantities = new List<Shopify_Quantities>();
-            if (!PreventApiAddsNEdits)
-            {
-                changedProducts = ChangedRecords_Product.Select(p => p.AsShopify_Product());
-                string Product_Edit_Results = string.Empty;
-                if (!PreventProduct)
-                {
-                    logger.LogInformation("Performing Edits on Changed Products");
-                    logger.LogInformation($"Number of Changed Products: {changedProducts.Count()}");
-                    Product_Edit_Results = ReeceShopify.Products_Edit(changedProducts);
-                    string FileNameChangedProducts = settings.OutputDirectory + "\\changedProducts.json.txt";
-                    string content = System.Text.Json.JsonSerializer.Serialize(changedProducts.ToList(), typeof(List<Shopify_Product>));
-                    System.IO.File.WriteAllText(FileNameChangedProducts, content);
-                }
-                else { logger.LogInformation("Preventing edits on changed products"); }
-
-                changedPrices = ChangedRecords_Prices.Select(p => p.AsShopify_Prices());
-                string Prices_Edit_Results = string.Empty;
-                if (!PreventPrices)
-                {
-                    logger.LogInformation("Performing Edits on Changed Prices");
-                    logger.LogInformation($"Number of Changed Prices {changedPrices.Count()}");
-                    Prices_Edit_Results = ReeceShopify.Prices_Edit(changedPrices);
-                    string FileNameChangedPrices = settings.OutputDirectory + "\\changedPrices.json.txt";
-                    string content = System.Text.Json.JsonSerializer.Serialize(changedPrices.ToList(), typeof(List<Shopify_Prices>));
-                    System.IO.File.WriteAllText(FileNameChangedPrices, content);
-                }
-                else { logger.LogInformation("Preventing edits on changed prices"); }
-
-                changedQuantities = ChangedRecords_Quantities.Select(p => p.AsShopify_Quantities());
-                string Quantities_Edit_Results = string.Empty;
-                if (!PreventQuantities)
-                {
-                    logger.LogInformation("Performing Edits on Changed Quantities");
-                    logger.LogInformation($"Number of Changed Quantities: {changedQuantities.Count()}");
-                    Quantities_Edit_Results = ReeceShopify.Quantities_Edit(changedQuantities);
-                    string FileNameChangedQuantities = settings.OutputDirectory + "\\changedQuantities.json.txt";
-                    string content = System.Text.Json.JsonSerializer.Serialize(changedQuantities.ToList(), typeof(List<Shopify_Quantities>));
-                    System.IO.File.WriteAllText(FileNameChangedQuantities, content);
-                }
-                else { logger.LogInformation("Preventing edits on changed quantities"); }
-
-            }
-            else
-            {
-                logger.LogInformation("All Perform Edits Supressed due to Settings");
-            }
-            #endregion Perform Edits
-
-            #region Perform Adds
-            logger.LogInformation("Begin Perform Adds");
-            IEnumerable<Tuple<IShopify_Product, IShopify_Product>> NewProductsPairs = new List<Tuple<IShopify_Product, IShopify_Product>>();
-            IEnumerable<Tuple<IShopify_Prices, IShopify_Prices>> NewPricesPairs = new List<Tuple<IShopify_Prices, IShopify_Prices>>();
-            IEnumerable<Tuple<IShopify_Quantities, IShopify_Quantities>> NewQuantitiesPairs = new List<Tuple<IShopify_Quantities, IShopify_Quantities>>();
-
-            //API_Products, jp, jq
-            NewProductsPairs = GenericJoins<IShopify_Product, IShopify_Product, int>
-            .LeftJoin(adapters, API_Products, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
-            IEnumerable<Shopify_Product> NewProducts = NewProductsPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsShopify_Product());
-            if (!PreventApiAddsNEdits)
-            {
-                if (!PreventProduct)
-                {
-                    logger.LogInformation("Performing Products_Add on NewProducts");
-                    logger.LogInformation($"Number of records in NewProducts: {NewProducts.Count()}");
-                    string Product_Add_Results = ReeceShopify.Products_Add(NewProducts);
-                }
-                else { logger.LogInformation("Prevented adding of NewProducts"); }
-            }
-            try
-            {
-                string FileNameNewProducts = settings.OutputDirectory + "\\NewProducts.json.txt";
-                logger.LogInformation($"Saving NewProducts to file: {FileNameNewProducts}");
-                string content = System.Text.Json.JsonSerializer.Serialize(NewProducts.ToList(), typeof(List<Shopify_Product>));
-                System.IO.File.WriteAllText(FileNameNewProducts, content);
-            }
-            catch (Exception e)
-            {
-                logger.LogInformation("Error serializing and saving new products to file. Message: " + e.Message);
-            }
-
-            PauseToGiveSomeTimeForNewProductsToLoad(NewProducts.Count());
-
-            NewPricesPairs = GenericJoins<IShopify_Prices, IShopify_Prices, int>
-                .LeftJoin(adapters, API_Prices, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
-            IEnumerable<Shopify_Prices> NewPrices = NewPricesPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsShopify_Prices());
-            if (!PreventApiAddsNEdits)
-            {
-                if (!PreventPrices)
-                {
-                    logger.LogInformation("Performing Prices_Add on NewPrices");
-                    logger.LogInformation($"Number of records in NewPrices: {NewPrices.Count()}");
-                    string Prices_Add_Results = ReeceShopify.Prices_Add(NewPrices);
-                }
-                else { logger.LogInformation("Prevented adding of NewPrices"); }
-            }
-            try
-            {
-                string FileNameNewPrices = settings.OutputDirectory + "\\NewPrices.json.txt";
-                logger.LogInformation($"Saving NewPrices to file: {FileNameNewPrices}");
-                string content = System.Text.Json.JsonSerializer.Serialize(NewPrices.ToList(), typeof(List<Shopify_Prices>));
-                System.IO.File.WriteAllText(FileNameNewPrices, content);
-            }
-            catch (Exception e)
-            {
-                logger.LogInformation("Error serializing and saving new prices to file. Message: " + e.Message);
-            }
-
-            NewQuantitiesPairs = GenericJoins<IShopify_Quantities, IShopify_Quantities, int>
-                .LeftJoin(adapters, API_Quantities, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
-            IEnumerable<Shopify_Quantities> NewQuantities = NewQuantitiesPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsShopify_Quantities());
-            if (!PreventApiAddsNEdits)
-            {
-                if (!PreventQuantities)
-                {
-                    logger.LogInformation("Performing Quantities_Add on NewQuantities");
-                    logger.LogInformation($"Number of records in NewQuantities: {NewQuantities.Count()}");
-                    string Quantities_Add_Results = ReeceShopify.Quantities_Add(NewQuantities);
-                }
-                else { logger.LogInformation("Prevented addinf of NewQuantities"); }
-            }
-            try
-            {
-                string FileNameNewQuantities = settings.OutputDirectory + "\\NewQuantities.json.txt";
-                logger.LogInformation($"Saving NewQuantities to file: {FileNameNewQuantities}");
-                string content = System.Text.Json.JsonSerializer.Serialize(NewQuantities.ToList(), typeof(List<Shopify_Quantities>));
-                System.IO.File.WriteAllText(FileNameNewQuantities, content);
-            }
-            catch (Exception e)
-            {
-                logger.LogInformation("Error serializing and saving new quantities to file. Message: " + e.Message);
-            }
-            #endregion Perform Adds
-
-            // ----- Reporting goes here -----
-
-            string result2 = SerializeForExport(adapters);
-            string result = string.Empty;
-
-            try
-            {
-                logger.LogInformation("Attempting to serialize ChangedRecords_Product");
-                IEnumerable<Shopify_Product> _ChangedRecords_Product = ChangedRecords_Product.Select(rec => (Shopify_Product)(new Shopify_Product().CopyFrom(rec)));
-                result = JsonSerializer.Serialize(_ChangedRecords_Product, typeof(IEnumerable<Shopify_Product>));
-            }
-            catch
-            {
-                logger.LogInformation("Serialize of ChangedRecordPairs_Product falied");
-            }
-            IEnumerable<Shopify_Product> _AllRecords_Product = adapters.Select(rec => (Shopify_Product)(new Shopify_Product().CopyFrom(rec)));
-            string result3 = JsonSerializer.Serialize(_AllRecords_Product, typeof(IEnumerable<Shopify_Product>));
-
-            string FileName = settings.OutputDirectory + "\\_ChangedRecords_Product.json.txt";
-            logger.LogInformation($"Saving ChangedRecords_Product to file: {FileName}");
-            File.WriteAllText(FileName, result);
-
-            Console.WriteLine("Done");
-            Console.ReadKey();
         }
 
         private static string SerializeForExport(IEnumerable<IS5InvAssembled> ListToSerialize)
