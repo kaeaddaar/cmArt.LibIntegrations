@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\cmArt.LibIntegrations\cmArt.LibIntegrations.csproj" />
-    <ProjectReference Include="..\cmArt.WebJaguar.Data\cmArt.WebJaguar.Data.csproj" />
+    <ProjectReference Include="..\cmArt.WebJaguar.Data\zzDNUcmArt.WebJaguar.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>

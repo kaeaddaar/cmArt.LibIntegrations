@@ -31,9 +31,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTestShopifyApp", "UnitT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Shopify.Connector", "cmArt.Shopify.Connector\cmArt.Shopify.Connector.csproj", "{860309FC-B2B4-43D9-BEB6-5E52A2DDA0F2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.WebJaguar.App", "cmArt.WebJaguar.App\cmArt.WebJaguar.App.csproj", "{0F345647-14E6-43F2-B056-59237A27AA2B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zzDNUcmArt.WebJaguar.App", "cmArt.WebJaguar.App\zzDNUcmArt.WebJaguar.App.csproj", "{0F345647-14E6-43F2-B056-59237A27AA2B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.WebJaguar.Connector", "cmArt.WebJaguar.Connector\cmArt.WebJaguar.Connector.csproj", "{FEDA293D-BCE0-4BC2-BA5F-372BB5378BB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zzDNUcmArt.WebJaguar.Connector", "cmArt.WebJaguar.Connector\zzDNUcmArt.WebJaguar.Connector.csproj", "{FEDA293D-BCE0-4BC2-BA5F-372BB5378BB6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Reece.ShopifyConnector", "cmArt.Reece.ShopifyConnector\cmArt.Reece.ShopifyConnector.csproj", "{4986534E-7134-4BB1-9FB6-1C0F529B1027}"
 EndProject
@@ -49,7 +49,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTestWebJaguarCal
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTestWebJaguarIntegration", "UnitTestWebJaguarIntegration\UnitTestWebJaguarIntegration.csproj", "{4BFFB585-3E45-4514-8842-07ADD43F569C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.WebJaguar.Data", "cmArt.WebJaguar.Data\cmArt.WebJaguar.Data.csproj", "{0FB46D0B-F7C5-40AE-8496-5D9832FE8CEE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zzDNUcmArt.WebJaguar.Data", "cmArt.WebJaguar.Data\zzDNUcmArt.WebJaguar.Data.csproj", "{0FB46D0B-F7C5-40AE-8496-5D9832FE8CEE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
