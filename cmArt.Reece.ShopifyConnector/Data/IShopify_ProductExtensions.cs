@@ -29,6 +29,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public static bool Equals(this IShopify_Product compareFrom, IShopify_Product compareTo)
         {
+            //return false;
             try
             {
                 if (
@@ -55,6 +56,7 @@ namespace cmArt.Reece.ShopifyConnector
             to.InvUnique = from.InvUnique;
             to.PartNumber = from.PartNumber.TrimEnd();
             to.WholesaleCost = from.WholesaleCost;
+            to.WebCategory = from.WebCategory;
             return to;
         }
 
