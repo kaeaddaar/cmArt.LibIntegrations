@@ -287,21 +287,36 @@ namespace cmArt.Reece.ShopifyConnector
             } while (StartAt <= count);
             return results;
         }
-        public static string Products_Edit(IEnumerable<Shopify_Product> NewProducts)
+        public static string Products_Edit(IEnumerable<Shopify_Product> ProductsToEdit)
         {
-            try
-            { 
-                List<Shopify_Product> prods = new List<Shopify_Product>(NewProducts);
-                string strEditProducts = JsonSerializer.Serialize(prods, typeof(List<Shopify_Product>));
-                string results = MakeApiPostCall_Unsecured("/product/edit/", strEditProducts);
-                return results;
-            }
-            catch (Exception e)
+            IEnumerable<Shopify_Product> _ProductsToEdit = ProductsToEdit ?? new List<Shopify_Product>();
+            int total = _ProductsToEdit.Count();
+            int pageSize = 10;
+            int pageNum = 1;
+            int pageMin = pageNum * pageSize - pageSize + 1;
+            int pageMax = pageNum * pageSize;
+            string results = string.Empty;
+            while(pageMin <= total)
             {
-                string msg = "Error in Products_Edit. Messge: " + e.Message;
-                Console.WriteLine(msg);
-                return msg;
+                IEnumerable<Shopify_Product> PageOfProductsToEdit = _ProductsToEdit.Skip(pageMin - 1).Take(pageSize);
+                try
+                { 
+                    List<Shopify_Product> prods = new List<Shopify_Product>(PageOfProductsToEdit);
+                    string strEditProducts = JsonSerializer.Serialize(prods, typeof(List<Shopify_Product>));
+                    string tmpResults = MakeApiPostCall_Unsecured("/product/edit/", strEditProducts);
+                    results += tmpResults;
+                }
+                catch (Exception e)
+                {
+                    string msg = "Error in Products_Edit:" + e.ToString();
+                    Console.WriteLine(msg);
+                    return msg;
+                }
+                pageNum++;
+                pageMin = pageNum * pageSize - pageSize + 1;
+                pageMax = pageNum * pageSize;
             }
+            return "No Records Processed";
         }
         public static IEnumerable<Shopify_Product> GetAllShopify_Products()
         {
