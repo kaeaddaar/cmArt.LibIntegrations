@@ -26,11 +26,11 @@ namespace cmArt.Reece.ShopifyConnector
             {
                 return "Error in MapApiPostCall_Unsecured. Message: " + e.Message;
             }
-            string results = MakeApiPostCall_Unsecured(urlCommand, content);
+            string results = MakeApiPostCall(urlCommand, content);
             MakeLogEntry("results: " + results);
             return results;
         }
-        private static string MakeApiPostCall_Unsecured(string urlCommand, string content)
+        private static string MakeApiPostCall(string urlCommand, string content)
         {
             Console.WriteLine("urlCommand: " + urlCommand);
             Console.WriteLine("content: " + content);
@@ -41,14 +41,14 @@ namespace cmArt.Reece.ShopifyConnector
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.ConnectionClose = true;
 
-            //string clientId = "ed84bfc1c2687d7d6f357717fe977dd6";
-            //string clientSecret = "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";
+            string clientId = "shopravi";
+            string clientSecret = "H9pPG9yW58cMP45e";
 
-            //var authenticationString = $"{clientId}:{clientSecret}";
-            //var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
+            var authenticationString = $"{clientId}:{clientSecret}";
+            var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, baseUri);
-            //requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
             requestMessage.Content = new StringContent(content);
 
             //make the request
@@ -98,8 +98,8 @@ namespace cmArt.Reece.ShopifyConnector
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.ConnectionClose = true;
 
-            string clientId = "ed84bfc1c2687d7d6f357717fe977dd6";
-            string clientSecret = "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";
+            string clientId = "shopravi";
+            string clientSecret = "H9pPG9yW58cMP45e";
 
             var authenticationString = $"{clientId}:{clientSecret}";
             var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
@@ -128,7 +128,7 @@ namespace cmArt.Reece.ShopifyConnector
                     List<Shopify_Quantities> tmpQuantitiesList = new List<Shopify_Quantities>();
                     tmpQuantitiesList.Add(qtys);
                     strQuantitiesList = System.Text.Json.JsonSerializer.Serialize(tmpQuantitiesList.ToList(), typeof(List<Shopify_Quantities>));
-                    results += MakeApiPostCall_Unsecured("/inventory/create", strQuantitiesList);
+                    results += MakeApiPostCall("/inventory/create", strQuantitiesList);
                 }
                 catch (Exception e)
                 {
@@ -151,7 +151,7 @@ namespace cmArt.Reece.ShopifyConnector
                     List<Shopify_Quantities> tmpQuantitiesList = new List<Shopify_Quantities>();
                     tmpQuantitiesList.Add(qtys);
                     strQuantitiesList = System.Text.Json.JsonSerializer.Serialize(tmpQuantitiesList.ToList(), typeof(List<Shopify_Quantities>));
-                    results += MakeApiPostCall_Unsecured("/inventory/edit", strQuantitiesList);
+                    results += MakeApiPostCall("/inventory/edit", strQuantitiesList);
                 }
                 catch (Exception e)
                 {
@@ -181,7 +181,7 @@ namespace cmArt.Reece.ShopifyConnector
                 }
                 try
                 {
-                    results += MakeApiPostCall_Unsecured("/discount/create", strPricesList);
+                    results += MakeApiPostCall("/discount/create", strPricesList);
                 }
                 catch (Exception e)
                 {
@@ -208,23 +208,23 @@ namespace cmArt.Reece.ShopifyConnector
                 {
                     Console.WriteLine("Failed to serialize PricesList in preparation to call to /discounts/edit. Message: " + e.Message);
                 }
-                results += MakeApiPostCall_Unsecured("/discount/edit", strPricesList);
+                results += MakeApiPostCall("/discount/edit", strPricesList);
             }
             return results;
         }
         public static string Products_Sync()
         {
-            string results = MakeApiGetCall_Unsecured("/product/shopify") ?? string.Empty;
+            string results = MakeApiGetCall("/product/shopify") ?? string.Empty;
             return results;
         }
         public static string Discounts_Sync()
         {
-            string results = MakeApiGetCall_Unsecured("/discount/shopify") ?? string.Empty;
+            string results = MakeApiGetCall("/discount/shopify") ?? string.Empty;
             return results;
         }
         public static string Inventory_Sync()
         {
-            string results = MakeApiGetCall_Unsecured("/inventory/shopify") ?? string.Empty;
+            string results = MakeApiGetCall("/inventory/shopify") ?? string.Empty;
             return results;
         }
         public static string Products_DeleteAll()
@@ -251,7 +251,7 @@ namespace cmArt.Reece.ShopifyConnector
             { 
                 List<Shopify_Product> prods = new List<Shopify_Product>(ProductsToDelete);
                 string strEditProducts = JsonSerializer.Serialize(prods, typeof(List<Shopify_Product>));
-                string results = MakeApiPostCall_Unsecured("/product/delete/", strEditProducts);
+                string results = MakeApiPostCall("/product/delete/", strEditProducts);
                 return results;
             }
             catch (Exception e)
@@ -274,7 +274,7 @@ namespace cmArt.Reece.ShopifyConnector
                 {
                     List<Shopify_Product> prods = NewProducts.Skip(StartAt).Take(pageSize).ToList();
                     string strNewProducts = JsonSerializer.Serialize(prods, typeof(List<Shopify_Product>));
-                    results += MakeApiPostCall_Unsecured("/product/add/", strNewProducts) ?? string.Empty;
+                    results += MakeApiPostCall("/product/add/", strNewProducts) ?? string.Empty;
                 }
                 catch (Exception e)
                 {
@@ -303,7 +303,7 @@ namespace cmArt.Reece.ShopifyConnector
                 { 
                     List<Shopify_Product> prods = new List<Shopify_Product>(PageOfProductsToEdit);
                     string strEditProducts = JsonSerializer.Serialize(prods, typeof(List<Shopify_Product>));
-                    string tmpResults = MakeApiPostCall_Unsecured("/product/edit/", strEditProducts);
+                    string tmpResults = MakeApiPostCall("/product/edit/", strEditProducts);
                     results += tmpResults;
                 }
                 catch (Exception e)
@@ -321,7 +321,7 @@ namespace cmArt.Reece.ShopifyConnector
         public static IEnumerable<Shopify_Product> GetAllShopify_Products()
         {
             Products_Sync();
-            string results = MakeApiGetCall_Unsecured("/product/list");
+            string results = MakeApiGetCall("/product/list");
             List<tmpShopify_Product> Data = new List<tmpShopify_Product>();
             try
             {
@@ -338,7 +338,7 @@ namespace cmArt.Reece.ShopifyConnector
             Discounts_Sync();
             try
             {
-                string results = MakeApiGetCall_Unsecured("/discount/list");
+                string results = MakeApiGetCall("/discount/list");
 
                 List<Shopify_Prices> Data = (List<Shopify_Prices>)JsonSerializer.Deserialize(results, typeof(List<Shopify_Prices>));
 
@@ -356,7 +356,7 @@ namespace cmArt.Reece.ShopifyConnector
             Discounts_Sync();
             try
             {
-                string results = MakeApiGetCall_Unsecured("/discount/list");
+                string results = MakeApiGetCall("/discount/list");
 
                 List<tmpShopify_Prices> Data = (List<tmpShopify_Prices>)JsonSerializer.Deserialize(results, typeof(List<tmpShopify_Prices>));
 
@@ -372,7 +372,7 @@ namespace cmArt.Reece.ShopifyConnector
         public static IEnumerable<Shopify_Quantities> GetAllShopify_Quantities()
         {
             Inventory_Sync();
-            string results = MakeApiGetCall_Unsecured("/inventory/list");
+            string results = MakeApiGetCall("/inventory/list");
             List<Shopify_Quantities> Data = new List<Shopify_Quantities>();
             try
             {
@@ -388,7 +388,7 @@ namespace cmArt.Reece.ShopifyConnector
         public static IEnumerable<tmpShopify_Quantities> GetAlltmpShopify_Quantities()
         {
             Inventory_Sync();
-            string results = MakeApiGetCall_Unsecured("/inventory/list");
+            string results = MakeApiGetCall("/inventory/list");
             results = results.Replace("\"id\":null,", string.Empty);
             List<tmpShopify_Quantities> Data = new List<tmpShopify_Quantities>();
             try
