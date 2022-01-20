@@ -295,6 +295,9 @@ namespace cmArt.Shopify.App
             }
             #endregion Perform Adds
 
+            #region Perform Deletes
+            PerformDeletes();
+            #endregion Perform Deletes
             // ----- Reporting goes here -----
 
             string result2 = SerializeForExport(adapters);
@@ -836,6 +839,14 @@ namespace cmArt.Shopify.App
                 IEnumerable<(Shopify_Quantities, IS5InvAssembled)> Map_InvOnly_NoEcomm = map_Quantities.InvOnly_NoEcomm;
                 IEnumerable<Shopify_Quantities_Pair_Flat> InvOnly_NoEcomm = Map_InvOnly_NoEcomm.Select(m => Transform(m));
                 Reports.SaveReport(InvOnly_NoEcomm, $"Venn_{DataName}_InvOnly_NoEcomm", settings, logger);
+            }
+        }
+        private static void PerformDeletes()
+        {
+            IEnumerable<Shopify_Product> ToDelete = map_Product.TOnly.Select(x => x.Item1);
+            foreach(var record in ToDelete)
+            {
+                ReeceShopify.Products_Delete(ToDelete);
             }
         }
         private static void PauseToGiveSomeTimeForNewProductsToLoad(int numNewProducts)
