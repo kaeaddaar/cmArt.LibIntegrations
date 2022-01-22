@@ -247,13 +247,22 @@ namespace cmArt.Shopify.App
             NewPricesPairs = GenericJoins<IShopify_Prices, IShopify_Prices, int>
                 .LeftJoin(adapters, API_Prices, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
             IEnumerable<Shopify_Prices> NewPrices = NewPricesPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsShopify_Prices());
+
+            List<List<Shopify_Prices>> Pages_Prices = GenericAggregateByPage<Shopify_Prices>.ToPages(NewPrices, 10);
+            string Prices_Add_Results = string.Empty;
+
             if (!PreventApiAddsNEdits)
             {
                 if (!PreventPrices)
                 {
                     logger.LogInformation("Performing Prices_Add on NewPrices");
                     logger.LogInformation($"Number of records in NewPrices: {NewPrices.Count()}");
-                    string Prices_Add_Results = ReeceShopify.Prices_Add(NewPrices);
+
+                    foreach (var page in Pages_Prices)
+                    {
+                        string strTempPrice_Add_Results = ReeceShopify.Prices_Add(NewPrices);
+                        Prices_Add_Results += strTempPrice_Add_Results;
+                    }
                 }
                 else { logger.LogInformation("Prevented adding of NewPrices"); }
             }
@@ -272,13 +281,21 @@ namespace cmArt.Shopify.App
             NewQuantitiesPairs = GenericJoins<IShopify_Quantities, IShopify_Quantities, int>
                 .LeftJoin(adapters, API_Quantities, IShopifyDataLoadFormat_Indexes.UniqueId, IShopifyDataLoadFormat_Indexes.UniqueId);
             IEnumerable<Shopify_Quantities> NewQuantities = NewQuantitiesPairs.Where(p => p.Item2 == null).Select(p => p.Item1.AsShopify_Quantities());
+
+            List<List<Shopify_Quantities>> Pages_Quantities = GenericAggregateByPage<Shopify_Quantities>.ToPages(NewQuantities, 10);
+            string Quantities_Add_Results = string.Empty;
+
             if (!PreventApiAddsNEdits)
             {
                 if (!PreventQuantities)
                 {
                     logger.LogInformation("Performing Quantities_Add on NewQuantities");
                     logger.LogInformation($"Number of records in NewQuantities: {NewQuantities.Count()}");
-                    string Quantities_Add_Results = ReeceShopify.Quantities_Add(NewQuantities);
+                    foreach (var page in Pages_Quantities)
+                    {
+                        string tmpString = ReeceShopify.Quantities_Add(page);
+                        Quantities_Add_Results += tmpString;
+                    }
                 }
                 else { logger.LogInformation("Prevented addinf of NewQuantities"); }
             }
@@ -330,7 +347,6 @@ namespace cmArt.Shopify.App
             ConfigureServices(serviceCollection);
             serviceProvider = serviceCollection.BuildServiceProvider();
             logger = serviceProvider.GetService<ILogger<ShopifyConsoleApp>>();
-
         }
         private static void SetupAndDisplaySettings()
         {
