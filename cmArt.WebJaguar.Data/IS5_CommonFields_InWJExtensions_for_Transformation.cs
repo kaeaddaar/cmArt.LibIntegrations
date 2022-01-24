@@ -71,9 +71,10 @@ namespace cmArt.WebJaguar.Data
                 if (pair.Item1.Price != pair.Item2.Price) { return false; }
             }
 
+
             Func<S5QtyPair, short> keyQuantities = (x) => x.Location;
             var QuantitiesPairs = GenericJoins<S5QtyPair, S5QtyPair, short>
-                .FullOuterJoin(data.Quantities, compareTo.Quantities, keyQuantities, keyQuantities);
+                .FullOuterJoin(FillMissingDepts(data.Quantities), FillMissingDepts(compareTo.Quantities), keyQuantities, keyQuantities);
             foreach (var pair in QuantitiesPairs)
             {
                 if (pair.Item1 == null || pair.Item2 == null) { return false; }
@@ -81,6 +82,24 @@ namespace cmArt.WebJaguar.Data
             }
 
             return true;
+        }
+        private static IEnumerable<S5QtyPair> FillMissingDepts(IEnumerable<S5QtyPair> data)
+        {
+            IEnumerable<S5QtyPair> _data = data ?? new List<S5QtyPair>();
+            List<S5QtyPair> lstData = new List<S5QtyPair>();
+            for (short i = 0; i < 4; i++)
+            {
+                S5QtyPair tmp = _data.Where(x => x.Location == i).FirstOrDefault();
+                if (tmp != null)
+                {
+                    lstData.Add(new S5QtyPair(i,0));
+                }
+            }
+            foreach (var pair in _data)
+            {
+                lstData.Add(pair);
+            }
+            return lstData;
         }
         public static S5_CommonFields AsS5_CommonFields(this IS5_CommonFields_In_WJ data)
         {
