@@ -390,7 +390,7 @@ namespace cmArt.Shopify.App
             if (PreventQuantities)
             {
                 logger.LogInformation("INVENTORY or INVENTORYITEMS or INVENTORYITEM not found in arguments so we will prevent them from "
-+ "being sent to Shopify");
+                    + "being sent to Shopify");
             }
             RunAsSelfCompare = (settings.RunAs == "SELFCOMPARE");
         }

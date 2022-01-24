@@ -69,6 +69,7 @@ namespace cmArt.Shopify.App
                     }
                     SendEmail(Error_JSON);
                 }
+                #region Colonial config and date time logic
                 //ConsoleExportPSQLQuery.Program.WriteLogFile($"Worker running at: {DateTimeOffset.Now}");
 
                 //_logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
@@ -153,6 +154,7 @@ namespace cmArt.Shopify.App
                 //ConsoleExportPSQLQuery.Program.WriteLogFile($"{_15_Minutes / 60 / 1000} minutes until next planned execution.");
 
                 //await Task.Delay(_15_Minutes, stoppingToken);
+                #endregion Colonial config and date time logic
             }
         }
 
