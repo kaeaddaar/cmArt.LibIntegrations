@@ -23,7 +23,7 @@ namespace UnitTestReeceShopifyApi
                 Sample1.Description = "Sample1 Description";
                 Sample1.InvUnique = 1;
                 Sample1.PartNumber = "Sample1";
-                Sample1.WholesaleCost = 100;
+                //Sample1.WholesaleCost = 100;
                 List<Shopify_Product> tmp = new List<Shopify_Product>();
                 tmp.Add(Sample1);
                 ReeceShopify.Products_Add(tmp);

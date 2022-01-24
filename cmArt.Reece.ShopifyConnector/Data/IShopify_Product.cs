@@ -8,7 +8,7 @@ namespace cmArt.Reece.ShopifyConnector
     public interface IShopify_Product : IShopify_Identity, IEquality<IShopify_Product>, ICopyable<IShopify_Product>
     {
         string Description { get; set; }
-        decimal WholesaleCost { get; set; }
+        //decimal WholesaleCost { get; set; }
         string WebCategory { get; set; }
     }
 }

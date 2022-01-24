@@ -54,7 +54,7 @@ namespace cmArt.Reece.ShopifyConnector
             shopify_Product.InvUnique = tmpInvUnique;
 
             shopify_Product.PartNumber = this.PartNumber;
-            shopify_Product.WholesaleCost = this.WholesaleCost;
+            //shopify_Product.WholesaleCost = this.WholesaleCost;
             shopify_Product.WebCategory = this.WebCategory;
 
             return shopify_Product;

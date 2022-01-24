@@ -111,14 +111,14 @@ namespace cmArt.Reece.ShopifyConnector
                 }
             }
 
-            if (compareTo.WholesaleCost != compareFrom.WholesaleCost)
-            {
-                Changes_View tmp = GetNewChanges_View_WithDefaults(compareFrom);
-                tmp.FieldName = "WholesaleCost";
-                tmp.S5ValueToSendToExternal = compareFrom.WholesaleCost.ToString();
-                tmp.ExternalValueBeforeUpdate = compareTo.WholesaleCost.ToString();
-                changes.Add(tmp);
-            }
+            //if (compareTo.WholesaleCost != compareFrom.WholesaleCost)
+            //{
+            //    Changes_View tmp = GetNewChanges_View_WithDefaults(compareFrom);
+            //    tmp.FieldName = "WholesaleCost";
+            //    tmp.S5ValueToSendToExternal = compareFrom.WholesaleCost.ToString();
+            //    tmp.ExternalValueBeforeUpdate = compareTo.WholesaleCost.ToString();
+            //    changes.Add(tmp);
+            //}
 
             if (compareTo.WebCategory != compareFrom.WebCategory)
             {

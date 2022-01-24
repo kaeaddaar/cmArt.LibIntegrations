@@ -8,7 +8,7 @@ namespace cmArt.Reece.ShopifyConnector
     public class Shopify_Product : IShopify_Product
     {
         public string Description { get; set; }
-        public decimal WholesaleCost { get; set; }
+        //public decimal WholesaleCost { get; set; }
         public string Cat { get; set; }
         public int InvUnique { get; set; }
         public string PartNumber { get; set; }
