@@ -8,8 +8,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Net.Mail;
 using System.Net;
-
-
+using Microsoft.Extensions.DependencyInjection;
+using cmArt.LibIntegrations.LoggingServices;
 
 namespace cmArt.Shopify.App
 {
@@ -19,9 +19,19 @@ namespace cmArt.Shopify.App
         private readonly ILogger<Worker> _logger;
 
 
-
+        private void ConfigureServices(IServiceCollection services)
+        {
+            services.AddLogging(configure => configure.AddConsole())
+                    .AddTransient<ShopifyConsoleApp>();
+        }
+        private void LogInfo(string msg)
+        {
+            Console.WriteLine(msg);
+            _logger.LogInformation(msg);
+        }
         public Worker(ILogger<Worker> logger, IConfiguration config)
         {
+
             _logger = logger;
             Configuration = config;
         }
@@ -35,126 +45,53 @@ namespace cmArt.Shopify.App
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            DateTime LastRun = new DateTime();
+            ServiceCollection serviceCollection;
+            ServiceProvider serviceProvider;
+            IConfiguration config;
+            StaticSettings settings;
+            LogToFile logger_ToFile = null;
+
+            try
+            {
+                config = new ConfigurationBuilder()
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .Build();
+
+                settings = new StaticSettings(config);
+
+                logger_ToFile = new LogToFile();
+                logger_ToFile.Init(settings.LogfilePath + "\\Integration_LogFile.txt");
+
+                serviceCollection = new ServiceCollection();
+                ConfigureServices(serviceCollection);
+                serviceProvider = serviceCollection.BuildServiceProvider();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error Setting Up Log to File: {e.ToString()}");
+            }
             while (!stoppingToken.IsCancellationRequested)
             {
-                //StaticSettings settings = new StaticSettings(Configuration);
-                try
+                (logger_ToFile ?? new LogToFile()).LogInformation("Worker started running at: {time}", DateTimeOffset.Now);
+                bool KeepRunning = true;
+                while (KeepRunning)
                 {
-                    ShopifyConsoleApp.Main_Console(new string[] { });
-                }
-                catch (Exception_WhileGettingData e)
-                {
-                    string Error_JSON = string.Empty;
                     try
                     {
-                        Error_JSON = System.Text.Json.JsonSerializer.Serialize(e, typeof(Exception_WhileGettingData));
+                        ShopifyConsoleApp.Main_Console(new string[0]);
+                        KeepRunning = true;
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        Error_JSON = "Failed to convert error to JSON. e.Message = " + e.Message + " - Inner Exception Message: " + e.InnerException.Message;
+                        string err = Environment.NewLine + e.ToString();
+                        LogInfo(err);
+                        int TimeToWait = 60 * 1000;
+                        int sec = TimeToWait / 1000;
+                        LogInfo($"Begin {sec} second wait before running the Integration App again");
+                        await Task.Delay(TimeToWait, stoppingToken);
                     }
-                    SendEmail(Error_JSON);
                 }
-                catch (Exception e)
-                {
-                    string Error_JSON = string.Empty;
-                    try
-                    {
-                        Error_JSON = System.Text.Json.JsonSerializer.Serialize(e, typeof(Exception));
-                    }
-                    catch
-                    {
-                        Error_JSON = "Failed to convert error to JSON. e.Message = " + e.Message;
-                    }
-                    SendEmail(Error_JSON);
-                }
-                #region Colonial config and date time logic
-                //ConsoleExportPSQLQuery.Program.WriteLogFile($"Worker running at: {DateTimeOffset.Now}");
-
-                //_logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                ////"E:\_Customers\_ColonialPhotoNHobbyInc\CachedFiles" 
-                ////"E:\_Customers\_ColonialPhotoNHobbyInc\CSVFiles" 
-                ////"E:\_Customers\_ColonialPhotoNHobbyInc\TestImport" 
-                ////"E:\_Customers\_ColonialPhotoNHobbyInc\DakisLoads" 
-                ////"DSN=None" 
-                ////"UseCaching"
-                //string[] args = new string[7];
-                ////args[0] = "E:\\_Customers\\_ColonialPhotoNHobbyInc\\CachedFiles";
-                ////args[1] = "E:\\_Customers\\_ColonialPhotoNHobbyInc\\CSVFiles";
-                ////args[2] = "E:\\_Customers\\_ColonialPhotoNHobbyInc\\TestImport";
-                ////args[3] = "E:\\_Customers\\_ColonialPhotoNHobbyInc\\DakisLoads";
-
-                //args[0] = Configuration["Dakisinfo:CachedFiles"];
-                //args[1] = Configuration["Dakisinfo:CSVFiles"];
-                //args[2] = Configuration["Dakisinfo:CSVConnector"];
-                //args[3] = Configuration["Dakisinfo:DakisLoads"];
-                //args[4] = Configuration["Dakisinfo:DNSinfo"];
-                //args[5] = Configuration["Dakisinfo:Cachinginfo"];
-                //args[6] = Configuration["Dakisinfo:SupressUpload"];
-
-                //smtpAddress = Configuration["Dakisinfo:smtpaddress"];
-                //portNumber = Convert.ToInt32(Configuration["Dakisinfo:smtpport"]);
-                //enableSSL = Convert.ToBoolean(Configuration["Dakisinfo:enableSSL"]);
-                //emailFromAddress = Configuration["Dakisinfo:fromemailaddress"];
-                //password = Configuration["Dakisinfo:fromemailpassword"];
-                //emailToAddress = Configuration["Dakisinfo:errormail"];
-
-                //int exechour = Convert.ToInt32(Configuration["Dakisinfo:Hours"]);
-                //int execminute = Convert.ToInt32(Configuration["Dakisinfo:Minutes"]);
-                //int execsecond = Convert.ToInt32(Configuration["Dakisinfo:Seconds"]);
-
-
-                ////if (DateTime.Now.Hour == exechour && DateTime.Now.Second == execsecond && DateTime.Now.Second == execsecond)
-                ////{
-                ////    ConsoleExportPSQLQuery.Program library = new ConsoleExportPSQLQuery.Program(Configuration);
-                ////    try
-                ////    {
-                ////        if (!ConsoleExportPSQLQuery.Program.ArgumentsAreValid_LoadIfValid(args))
-                ////        {
-                ////            return;
-                ////        }
-
-                ////        int result = ConsoleExportPSQLQuery.Program.SyncToDakis(args);
-                ////    }
-                ////    catch (Exception ex)
-                ////    {
-                ////        SendEmail(ex.Message);
-                ////        throw;
-                ////    }
-                ////}
-
-                //ConsoleExportPSQLQuery.Program library = new ConsoleExportPSQLQuery.Program(Configuration);
-                //try
-                //{
-                //    if (!ConsoleExportPSQLQuery.Program.ArgumentsAreValid_LoadIfValid(args))
-                //    {
-                //        return;
-                //    }
-
-                //    _logger.LogInformation("SyncToDakis", DateTimeOffset.Now);
-                //    int result = ConsoleExportPSQLQuery.Program.SyncToDakis(args);
-                //    _logger.LogInformation("SyncToDakis (Completed)", DateTimeOffset.Now);
-                //}
-                //catch (Exception ex)
-                //{
-                //    ConsoleExportPSQLQuery.Program.WriteLogFile($"Attempting to send error email for error message: {ex.Message}");
-                //    SendEmail(ex.Message);
-                //    ConsoleExportPSQLQuery.Program.WriteLogFile("Attempting to send error email (Complete)");
-
-                //    throw;
-                //}
-
-
-                //int second = 1000;
-                //int minute = second * 60;
-                //int _15_Minutes = minute * 15;
-
-                //_logger.LogInformation("${ _15_Minutes / 60 / 1000} minutes until next planned execution.", DateTimeOffset.Now);
-                //ConsoleExportPSQLQuery.Program.WriteLogFile($"{_15_Minutes / 60 / 1000} minutes until next planned execution.");
-
-                //await Task.Delay(_15_Minutes, stoppingToken);
-                #endregion Colonial config and date time logic
+                await Task.Delay(1000, stoppingToken);
             }
         }
 

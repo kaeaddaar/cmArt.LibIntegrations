@@ -28,6 +28,7 @@ using cmArt.Shopify.App.Services;
 using cmArt.LibIntegrations.VennMapService;
 using cmArt.Shopify.App.ReportViews;
 using cmArt.LibIntegrations.ReportService;
+using cmArt.LibIntegrations.LoggingServices;
 
 namespace cmArt.Shopify.App
 {
@@ -52,7 +53,9 @@ namespace cmArt.Shopify.App
         // SetupLogging()
         private static ServiceCollection serviceCollection;
         private static ServiceProvider serviceProvider;
-        private static ILogger<ShopifyConsoleApp> logger;
+        private static ILogger logger;
+        private static ILogger logger_ApiCalls;
+        private static ILogger logger_AtOrAfter;
         // SetupArgs()
         private static bool PreventApiAddsNEdits;
         private static bool PreventProduct;
@@ -60,6 +63,8 @@ namespace cmArt.Shopify.App
         private static bool PreventQuantities;
         private static string[] _args;
         private static bool RunAsSelfCompare;
+        private static bool RunSyncOnce;
+        private static bool RunAsSyncService;
         //SetupAndDisplaySettings()
         private static IConfiguration config;
         private static StaticSettings settings;
@@ -99,14 +104,47 @@ namespace cmArt.Shopify.App
         private static VennMap_InvAss<Shopify_Product, int> map_Product;
         private static VennMap_InvAss<Shopify_Prices, int> map_Prices;
         private static VennMap_InvAss<Shopify_Quantities, int> map_Quantities;
+        //
+        private static DateTime dtLastRun;
 
         #endregion variables
         public static void Main_Console(string[] args)
         {
+            SetupSettings();
             SetupLogging();
+            SetupArgs(args);
+
+            bool IsAlreadyRanToday = AlreadyRanToday();
+            int ThirtySeconds = 1000 * 30;
+
+            if (RunAsSelfCompare)
+            {
+                SetupLogging_ForDoWork();
+                DoWork(args);
+            }
+            if (RunSyncOnce)
+            {
+                SetupLogging_ForDoWork();
+                DoWork(args);
+            }
+            if (RunAsSyncService)
+            {
+                if (!IsAlreadyRanToday)
+                {
+                    if (AtOrAfterTimeToRun())
+                    {
+                        SetupLogging_ForDoWork();
+                        DoWork(args);
+                    }
+                }
+            }
+            System.Threading.Thread.Sleep(ThirtySeconds);//always wait thirty seconds after any check or action
+        }
+        public static void DoWork(string[] args)
+        {
             logger.LogInformation("Begin");
 
-            SetupAndDisplaySettings();
+            DisplaySettings();
 
             SetupArgs(args);
 
@@ -340,15 +378,99 @@ namespace cmArt.Shopify.App
             Console.WriteLine("Done");
             Console.ReadKey();
         }
+        private static bool AlreadyRanToday()
+        {
+            Get_dtLastRun_FromFile();
+            DateTime dtNow = DateTime.Now;
+            DateTime dtStartOfDay = new DateTime(dtNow.Year, dtNow.Month, dtNow.Day, 0, 0, 0);
+            bool IsToday = dtStartOfDay <= dtLastRun;
+            LogInfo_AtOrAfter($"AlreadyRanToday - Now: {dtNow.ToString()}, LastRun: {dtLastRun.ToString()}, AlreadyRanToday: {IsToday}");
+            return IsToday;
+        }
+        private static void Get_dtLastRun_FromFile()
+        {
+            string strLastRun = string.Empty;
+            try
+            {
+                string pathAndFile = settings.CachedFiles + "\\lastrun.txt";
+                bool fileExists = File.Exists(pathAndFile);
+                if (!fileExists)
+                {
+                    DateTime tmp = new DateTime();
+                    File.WriteAllText(pathAndFile, tmp.ToString());
+                }
+                strLastRun = File.ReadAllText(pathAndFile);
+            }
+            catch (Exception e)
+            {
+                LogInfo_AtOrAfter("Error reading lastrun time from file: " + e.ToString());
+                strLastRun = DateTime.Now.ToString();
+            }
+            DateTime.TryParse(strLastRun, out dtLastRun);
+        }
+        private static void LogInfo_AtOrAfter(string msg)
+        {
+            try
+            {
+                Console.WriteLine(msg);
+                logger_AtOrAfter.LogInformation(msg);
+            }
+            catch (Exception e)
+            {
+                string tmp = $"Error attempting to LogAMessage. message: {e.Message}";
+                Console.WriteLine(tmp);
+            }
+        }
+        private static bool AtOrAfterTimeToRun()
+        {
+            DateTime dtNow = DateTime.Now;
+            int hrs = 0;
+            int.TryParse(settings.Hours, out hrs);
+            int mins = 0;
+            int.TryParse(settings.Minutes, out mins);
+
+            bool IsAtOrAfterTimeToRun = false;
+            if (dtNow.Hour == hrs)
+            {
+                if (dtNow.Minute >= mins)
+                {
+                    IsAtOrAfterTimeToRun = true;
+                }
+            }
+            if (dtNow.Hour > hrs)
+            {
+                IsAtOrAfterTimeToRun = true;
+            }
+            LogInfo_AtOrAfter($"AtOrAfterTimeToRun - Hour: {hrs}, Minutes: {mins}, AtOrAfter: {IsAtOrAfterTimeToRun}");
+            return IsAtOrAfterTimeToRun;
+
+        }
 
         private static void SetupLogging()
         {
-            serviceCollection = new ServiceCollection();
-            ConfigureServices(serviceCollection);
-            serviceProvider = serviceCollection.BuildServiceProvider();
-            logger = serviceProvider.GetService<ILogger<ShopifyConsoleApp>>();
+            LogToFile logger_ToFile = new LogToFile();
+            logger_ToFile.Init(settings.LogfilePath + "\\Integration_LogFile.txt");
+            logger = logger_ToFile;
+
+            LogToFile logger_ToFile_AtOrAfter = new LogToFile();
+            logger_ToFile_AtOrAfter.Init(settings.LogfilePath + "\\AtOrAfter_Sync.txt", false);
+            logger_AtOrAfter = logger_ToFile_AtOrAfter;
         }
-        private static void SetupAndDisplaySettings()
+        private static void SetupLogging_ForDoWork()
+        {
+            LogToFile logger_ToFile_ApiCalls = new LogToFile();
+            logger_ToFile_ApiCalls.Init(settings.LogfilePath + "\\ApiCalls.txt", false);
+            logger_ApiCalls = logger_ToFile_ApiCalls;
+        }
+        private static void SetupSettings()
+        {
+            config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
+            settings = new StaticSettings(config);
+        }
+        private static void DisplaySettings()
         {
             config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -392,7 +514,9 @@ namespace cmArt.Shopify.App
                 logger.LogInformation("INVENTORY or INVENTORYITEMS or INVENTORYITEM not found in arguments so we will prevent them from "
                     + "being sent to Shopify");
             }
-            RunAsSelfCompare = (settings.RunAs == "SELFCOMPARE");
+            RunAsSelfCompare = (settings.RunAs.ToUpper() == "SELFCOMPARE".ToUpper());
+            RunSyncOnce = (settings.RunAs.ToUpper() == "RunSyncOnce".ToUpper());
+            RunAsSyncService = (settings.RunAs.ToUpper() == "SYNC".ToUpper());
         }
         private static void GetSystem5Data()
         {
@@ -420,6 +544,7 @@ namespace cmArt.Shopify.App
         }
         private static void DemoPrep_TurnOnEcommFlagForTop3InventoryItemsOfEachCategory()
         {
+            logger.LogInformation("Performing Demo Prep step - Setting Ecomm to Y for top 3 items of each category.");
             IEnumerable<IGrouping<string, IS5InvAssembled>> grouped = InvAss.OrderBy(x => x.Inv.Cat).GroupBy(x => x.Inv.Cat);
             foreach(var group in grouped)
             {
@@ -429,6 +554,7 @@ namespace cmArt.Shopify.App
                     item.Inv.Ecommerce = "Y";
                 }
             }
+            logger.LogInformation("Finished Performing Demo Prep step");
         }
         private static void FilterForECommAndSave()
         {
@@ -598,6 +724,7 @@ namespace cmArt.Shopify.App
         {
             changes = changes ?? new List<Changes_View>();
 
+            ReeceShopify.AddLogger(logger, logger_ApiCalls);
             GetShopifyData_Reece_Products();
             GetShopifyData_Reece_Prices();
             GetShopifyData_Reece_Quantities();
@@ -632,13 +759,14 @@ namespace cmArt.Shopify.App
             //    }); 
             //    return from.Equals(to); 
             //};
-
+            logger.LogInformation("GetEqualityFunctions()");
             fEquals_Prices = (from, to) => { return from.Equals(to); };
             fEquals_Quantities = (from, to) => { return from.Equals(to); };
             fEquals_Product = (from, to) => { return from.Equals(to); };
         }
         private static void GetChangedRecords()
         {
+            logger.LogInformation("GetChangedRecords()");
             ChangedRecords_Product = UpdateProcessPattern<IShopify_Product, Shopify_Product, int>
                 .GetChangedRecords(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Product, adapters, API_Products);
 
@@ -651,6 +779,7 @@ namespace cmArt.Shopify.App
         }
         private static void GetDetailedDifferences_And_Create_Reports()
         {
+            logger.LogInformation("GetDetailedDifferences_And_Create_Reports()");
             var ChangedRecords_Product_Pairs = UpdateProcessPattern<IShopify_Product, Shopify_Product, int>
                 .GetChangedRecordPairs(IShopifyDataLoadFormat_Indexes.UniqueId, fEquals_Product, adapters, API_Products);
 
@@ -678,6 +807,7 @@ namespace cmArt.Shopify.App
         }
         private static VennMap_InvAss<Shopify_Product, int> ProduceVennMap(VennMap_InvAss<Shopify_Product, int> map)
         {
+            logger.LogInformation("ProduceVennMap(VennMap_InvAss<Shopify_Product, int> map)");
             Func<IS5InvAssembled, IS5InvAssembled> As_S5InvAssembled = (x) =>
             {
                 return new S5InvAssembled
@@ -701,6 +831,7 @@ namespace cmArt.Shopify.App
         }
         private static VennMap_InvAss<Shopify_Prices, int> ProduceVennMap(VennMap_InvAss<Shopify_Prices, int> map)
         {
+            logger.LogInformation("ProduceVennMap(VennMap_InvAss<Shopify_Prices, int> map)");
             Func<IS5InvAssembled, IS5InvAssembled> As_S5InvAssembled = (x) =>
             {
                 return new S5InvAssembled
@@ -724,6 +855,7 @@ namespace cmArt.Shopify.App
         }
         private static VennMap_InvAss<Shopify_Quantities, int> ProduceVennMap(VennMap_InvAss<Shopify_Quantities, int> map)
         {
+            logger.LogInformation("ProduceVennMap(VennMap_InvAss<Shopify_Quantities, int> map)");
             Func<IS5InvAssembled, IS5InvAssembled> As_S5InvAssembled = (x) =>
             {
                 return new S5InvAssembled
@@ -747,6 +879,7 @@ namespace cmArt.Shopify.App
         }
         private static void ProduceReportsBeforeProcessing()
         {
+            logger.LogInformation("ProduceReportsBeforeProcessing()");
             Reports.SaveReport(changes, "Differences_Detail", settings, logger);
             ProduceReportsBeforeProcessing_Product();
             ProduceReportsBeforeProcessing_Prices();
@@ -754,6 +887,7 @@ namespace cmArt.Shopify.App
         }
         private static void ProduceReportsBeforeProcessing_Product()
         {
+            logger.LogInformation("ProduceReportsBeforeProcessing_Product()");
             // Venn Reports are relevant for the Sync process only because it compares System Five and the Web Site we're syncing to.
             bool UsingSyncProcess = (map_Product != null);
             if (UsingSyncProcess)
@@ -789,6 +923,7 @@ namespace cmArt.Shopify.App
         }
         private static void ProduceReportsBeforeProcessing_Prices()
         {
+            logger.LogInformation("ProduceReportsBeforeProcessing_Prices()");
             // Venn Reports are relevant for the Sync process only because it compares System Five and the Web Site we're syncing to.
             bool UsingSyncProcess = (map_Prices != null);
             if (UsingSyncProcess)
@@ -824,6 +959,7 @@ namespace cmArt.Shopify.App
         }
         private static void ProduceReportsBeforeProcessing_Quantities()
         {
+            logger.LogInformation("ProduceReportsBeforeProcessing_Quantities()");
             // Venn Reports are relevant for the Sync process only because it compares System Five and the Web Site we're syncing to.
             bool UsingSyncProcess = (map_Quantities != null);
             if (UsingSyncProcess)
@@ -859,6 +995,7 @@ namespace cmArt.Shopify.App
         }
         private static void PerformDeletes()
         {
+            logger.LogInformation("PerformDeletes()");
             IEnumerable<Shopify_Product> ToDelete = map_Product.TOnly.Select(x => x.Item1);
             foreach(var record in ToDelete)
             {
@@ -867,6 +1004,7 @@ namespace cmArt.Shopify.App
         }
         private static void PauseToGiveSomeTimeForNewProductsToLoad(int numNewProducts)
         {
+            logger.LogInformation("PauseToGiveSomeTimeForNewProductsToLoad(int numNewProducts)");
             int ticsPerMinute = 60 * 1000;
             int ticsToWait = ticsPerMinute * 5 + numNewProducts * ticsPerMinute / 4;
             int tics = 0;

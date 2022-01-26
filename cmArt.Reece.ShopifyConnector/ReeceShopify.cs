@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Diagnostics;
-
+using Microsoft.Extensions.Logging;
 
 namespace cmArt.Reece.ShopifyConnector
 {
@@ -15,11 +15,82 @@ namespace cmArt.Reece.ShopifyConnector
         // Get all records from shopify
         // Store records from shopify
         const string BaseUrl = "https://aquadragonservices.com/pcr/apitest/index.php";
+        protected static ILogger _logger;
+        protected static ILogger _fileLogger;
 
+        private static void LogInfo(string msg)
+        {
+            string _msg = msg ?? string.Empty;
+            bool LoggerExists = _logger != null;
+            if (LoggerExists)
+            {
+                _logger.LogInformation(msg);
+            }
+            LogInfo(msg);
+        }
+        private static void LogApiCalls(string msg)
+        {
+            string _msg = msg ?? string.Empty;
+            bool fileLoggerExists = _fileLogger != null;
+            if (fileLoggerExists)
+            {
+                _fileLogger.LogInformation(msg);
+            }
+            Console.WriteLine(msg);
+        }
+        public static void AddLogger(ILogger logger, ILogger fileLogger = null)
+        {
+            _logger = logger;
+            _fileLogger = fileLogger;
+        }
+        private static void LogInfo_Write(string msg)
+        {
+            string _msg = msg ?? string.Empty;
+            bool LoggerExists = _logger != null;
+            if (LoggerExists)
+            {
+                _logger.LogInformation(msg);
+            }
+            Console.Write(msg);
+        }
+
+        private static string RetryAPICall(Func<string> MakeCall)
+        {
+            string result = string.Empty;
+            int initDelay = 50;
+            int delay = initDelay;
+            int Seconds_30 = 1000 * 30;
+            while (result == string.Empty)
+            {
+                try
+                {
+                    result = MakeCall();
+                }
+                catch (Exception e)
+                {
+                    if (delay > 2000)
+                    {
+                        LogInfo_Write(">2k");
+                        System.Threading.Thread.Sleep(Seconds_30);
+                        delay = initDelay;
+                        result = string.Empty;
+                    }
+                    else
+                    {
+                        LogInfo_Write(".");
+                        delay = delay * 2;
+                        System.Threading.Thread.Sleep(delay);
+                        result = string.Empty;
+                    }
+                }
+            }
+
+            return result;
+        }
         private static string MakeApiPostCall(string urlCommand, string content)
         {
-            Console.WriteLine("urlCommand: " + urlCommand);
-            Console.WriteLine("content: " + content);
+            LogApiCalls("urlCommand: " + urlCommand);
+            LogApiCalls("content: " + content);
             HttpClient client = new HttpClient();
             client.Timeout = TimeSpan.FromMinutes(10);
 
@@ -44,7 +115,7 @@ namespace cmArt.Reece.ShopifyConnector
             response.EnsureSuccessStatusCode();
             string responseBody = response.Content.ReadAsStringAsync().Result;
 
-            Console.WriteLine("responseBody: " + responseBody);
+            LogApiCalls("responseBody: " + responseBody);
             return responseBody;
         }
 
@@ -120,7 +191,7 @@ namespace cmArt.Reece.ShopifyConnector
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Error in QUantities_Add, likely a Serialization issue or issue with call to /inventory/create for " +
+                    LogInfo($"Error in QUantities_Add, likely a Serialization issue or issue with call to /inventory/create for " +
                         "InvUnique: {qtys.InvUnique}. Message: " + e.Message);
                 }
 
@@ -143,7 +214,7 @@ namespace cmArt.Reece.ShopifyConnector
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Error in QUantities_Edit, likely a Serialization issue or issue with call to /inventory/edit for " +
+                    LogInfo($"Error in QUantities_Edit, likely a Serialization issue or issue with call to /inventory/edit for " +
                         "InvUnique: {qtys.InvUnique}. Message: " + e.Message);
                 }
 
@@ -165,7 +236,7 @@ namespace cmArt.Reece.ShopifyConnector
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Failed to serialize PricesList in preparation to call to /discounts/edit. Message: " + e.Message);
+                    LogInfo("Failed to serialize PricesList in preparation to call to /discounts/edit. Message: " + e.Message);
                 }
                 try
                 {
@@ -174,7 +245,7 @@ namespace cmArt.Reece.ShopifyConnector
                 catch (Exception e)
                 {
                     string msg = "Error in call to /discount/add. Message: " + e.Message;
-                    Console.WriteLine(msg);
+                    LogInfo(msg);
                 }
             }
             return results;
@@ -194,7 +265,7 @@ namespace cmArt.Reece.ShopifyConnector
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Failed to serialize PricesList in preparation to call to /discounts/edit. Message: " + e.Message);
+                    LogInfo("Failed to serialize PricesList in preparation to call to /discounts/edit. Message: " + e.Message);
                 }
                 results += MakeApiPostCall("/discount/edit", strPricesList);
             }
@@ -228,8 +299,8 @@ namespace cmArt.Reece.ShopifyConnector
             }
             catch (Exception e)
             {
-                string msg = "Error in Product_DeleteAll. Messge: " + e.Message;
-                Console.WriteLine(msg);
+                string msg = "Error in Product_DeleteAll: " + e.ToString();
+                LogInfo(msg);
                 return msg;
             }
         }
@@ -244,8 +315,8 @@ namespace cmArt.Reece.ShopifyConnector
             }
             catch (Exception e)
             {
-                string msg = "Error in Products_Delete. Messge: " + e.Message;
-                Console.WriteLine(msg);
+                string msg = "Error in Products_Delete: " + e.ToString();
+                LogInfo(msg);
                 return msg;
             }
         }
@@ -266,8 +337,8 @@ namespace cmArt.Reece.ShopifyConnector
                 }
                 catch (Exception e)
                 {
-                    string msg = "Error in Products_Add. Messge: " + e.Message;
-                    Console.WriteLine(msg);
+                    string msg = "Error in Products_Add. Messge: " + e.ToString();
+                    LogInfo(msg);
                     return msg;
                 }
                 page++;
@@ -297,7 +368,7 @@ namespace cmArt.Reece.ShopifyConnector
                 catch (Exception e)
                 {
                     string msg = "Error in Products_Edit:" + e.ToString();
-                    Console.WriteLine(msg);
+                    LogInfo(msg);
                     return msg;
                 }
                 pageNum++;
@@ -317,7 +388,7 @@ namespace cmArt.Reece.ShopifyConnector
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                LogInfo(e.ToString());
             }
             return Data.Select(p => p.AsShopify_Product());
         }
@@ -334,8 +405,8 @@ namespace cmArt.Reece.ShopifyConnector
             }
             catch (Exception e)
             {
-                string msg = "Error in Products_Edit. Messge: " + e.Message;
-                Console.WriteLine(msg);
+                string msg = "Error in Products_Edit: " + e.ToString();
+                LogInfo(msg);
                 return new List<Shopify_Prices>();
             }
         }
@@ -352,8 +423,8 @@ namespace cmArt.Reece.ShopifyConnector
             }
             catch (Exception e)
             {
-                string msg = "Error in Products_Edit. Messge: " + e.Message;
-                Console.WriteLine(msg);
+                string msg = "Error in Products_Edit: " + e.ToString();
+                LogInfo(msg);
                 return new List<tmpShopify_Prices>();
             }
         }
@@ -368,7 +439,7 @@ namespace cmArt.Reece.ShopifyConnector
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                LogInfo(e.ToString());
             }
             Data = Data ?? new List<Shopify_Quantities>();
             return Data;
@@ -385,7 +456,7 @@ namespace cmArt.Reece.ShopifyConnector
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                LogInfo(e.ToString());
             }
             Data = Data ?? new List<tmpShopify_Quantities>();
             foreach(tmpShopify_Quantities qtys in Data)
