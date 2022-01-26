@@ -24,7 +24,7 @@ namespace cmArt.Reece.ShopifyConnector
             {
                 _logger.LogInformation(msg);
             }
-            LogInfo(msg);
+            Console.WriteLine(msg);
         }
         private static void LogApiCalls(string msg)
         {
