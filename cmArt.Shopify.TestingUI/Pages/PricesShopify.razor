@@ -19,7 +19,10 @@ else
                 <th>InvUnique</th>
                 <th>Cat</th>
                 <th>PartNumber</th>
-                <th>Prices</th>
+                @for(int i = 0; i < 15; i++)
+                {
+                    <th style="text-align:right;">Price-@i</th>
+                }
             </tr>
         </thead>
         <tbody>
@@ -29,12 +32,20 @@ else
                     <td>@record.InvUnique.ToString()</td>
                     <td>@record.Cat</td>
                     <td>@record.PartNumber</td>
-                    <td>
-                        @foreach(var price in record.Prices.OrderBy(x => x.Level))
-                        {
-                            <div>@price.Level : @price.Price</div>
-                        }
-                    </td>
+                    @for(int i = 0; i < 15; i++)
+                    {
+                        <td style="text-align:right;">
+                            @if(record.Prices.Where(x => x.Level == i).FirstOrDefault() == null)
+                            {
+                            <div style="float: right;color:red;" align="right" title="Sched-@i missing">@(Decimal.Round((record.Prices.Where(x => x.Level == i).FirstOrDefault() ?? new S5PricePair()).Price, 2))</div>
+                            }
+                            else
+                            {
+                            <div style="float: right;" align="right" title="Sched-i">@(Decimal.Round((record.Prices.Where(x => x.Level == i).FirstOrDefault() ?? new S5PricePair()).Price, 2))</div>
+                            }
+                        </td>
+                    }
+
                 </tr>
             }
         </tbody>

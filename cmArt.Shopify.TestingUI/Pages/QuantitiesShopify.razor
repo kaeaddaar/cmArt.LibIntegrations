@@ -1,11 +1,11 @@
-﻿@page "/PricesS5"
+﻿@page "/QuantitiesShopify"
 @inject HttpClient Http
 @using cmArt.Reece.ShopifyConnector
 
 
-<PageTitle>S5 Prices</PageTitle>
+<PageTitle>Shopify Quantities</PageTitle>
 
-<h1>Price Data - System Five</h1>
+<h1>Quantity Data - Shopify</h1>
 
 @if (records == null)
 {
@@ -19,9 +19,9 @@ else
                 <th>InvUnique</th>
                 <th>Cat</th>
                 <th>PartNumber</th>
-                @for(int i = 0; i < 15; i++)
+                @for(short i = 0; i < 5; i++)
                 {
-                    <th style="text-align:right;">Price-@i</th>
+                    <th style="text-align:right;">Qty(Dept-@i)</th>
                 }
             </tr>
         </thead>
@@ -32,16 +32,16 @@ else
                     <td>@record.InvUnique.ToString()</td>
                     <td>@record.Cat</td>
                     <td>@record.PartNumber</td>
-                    @for(int i = 0; i < 15; i++)
+                    @for(short i = 0; i < 5; i++)
                     {
                         <td style="text-align:right;">
-                            @if(record.Prices.Where(x => x.Level == i).FirstOrDefault() == null)
+                            @if(record.Quantities.Where(x => x.Location == i).FirstOrDefault() == null)
                             {
-                            <div style="float: right;color:red;" align="right" title="Sched-@i missing">@(Decimal.Round((record.Prices.Where(x => x.Level == i).FirstOrDefault() ?? new S5PricePair()).Price, 2))</div>
+                            <div style="float: right;color:red;" align="right" title="Sched-@i missing">@(Decimal.Round((record.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
                             }
                             else
                             {
-                            <div style="float: right;" align="right" title="Sched-i">@(Decimal.Round((record.Prices.Where(x => x.Level == i).FirstOrDefault() ?? new S5PricePair()).Price, 2))</div>
+                            <div style="float: right;" align="right" title="Sched-i">@(Decimal.Round((record.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
                             }
                         </td>
                     }
@@ -53,10 +53,10 @@ else
 }
 
 @code {
-    private Shopify_Prices[]? records;
+    private Shopify_Quantities[]? records;
 
     protected override async Task OnInitializedAsync()
     {
-        records = await Http.GetFromJsonAsync<Shopify_Prices[]>("sample-data/tblPocoPricesAdapted_page1.json");
+        records = await Http.GetFromJsonAsync<Shopify_Quantities[]>("sample-data/tblShopifyQuantities_ReecesAPI_page1.json");
     }
 }
