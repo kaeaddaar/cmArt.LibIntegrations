@@ -12,8 +12,6 @@ namespace cmArt.Reece.ShopifyConnector
 {
     public class ReeceShopify
     {
-        // Get all records from shopify
-        // Store records from shopify
         const string BaseUrl = "https://aquadragonservices.com/pcr/apitest/index.php";
         protected static ILogger _logger;
         protected static ILogger _fileLogger;
@@ -89,7 +87,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         private static string MakeApiPostCall(string urlCommand, string content)
         {
-            LogApiCalls("urlCommand: " + urlCommand);
+            LogApiCalls("urlCommand(Post): " + urlCommand);
             LogApiCalls("content: " + content);
             HttpClient client = new HttpClient();
             client.Timeout = TimeSpan.FromMinutes(10);
@@ -121,6 +119,7 @@ namespace cmArt.Reece.ShopifyConnector
 
         private static string MakeApiGetCall_Unsecured(string urlCommand)
         {
+            LogApiCalls("urlCommand(Get - Unsecured): " + urlCommand);
             HttpClient client = new HttpClient();
             client.Timeout = TimeSpan.FromMinutes(10);
 
@@ -129,15 +128,7 @@ namespace cmArt.Reece.ShopifyConnector
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.ConnectionClose = true;
 
-            //string clientId = "ed84bfc1c2687d7d6f357717fe977dd6";
-            //string clientSecret = "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";
-
-            //var authenticationString = $"{clientId}:{clientSecret}";
-            //var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
-
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, baseUri);
-            //requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
-            ////requestMessage.Content = content;
 
             //make the request
             var task = client.SendAsync(requestMessage);
@@ -145,10 +136,12 @@ namespace cmArt.Reece.ShopifyConnector
             response.EnsureSuccessStatusCode();
             string responseBody = response.Content.ReadAsStringAsync().Result;
 
+            LogApiCalls("responseBody: " + responseBody);
             return responseBody;
         }
         private static string MakeApiGetCall(string urlCommand)
         {
+            LogApiCalls("urlCommand(Get - Secured): " + urlCommand);
             HttpClient client = new HttpClient();
             client.Timeout = TimeSpan.FromMinutes(10);
 
@@ -173,6 +166,7 @@ namespace cmArt.Reece.ShopifyConnector
             response.EnsureSuccessStatusCode();
             string responseBody = response.Content.ReadAsStringAsync().Result;
 
+            LogApiCalls("responseBody: " + responseBody);
             return responseBody;
         }
         public static string Quantities_Add(IEnumerable<Shopify_Quantities> QuantitiesList)
@@ -273,21 +267,25 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public static string Products_Sync()
         {
+            LogInfo("Products_Sync()");
             string results = MakeApiGetCall("/product/shopify") ?? string.Empty;
             return results;
         }
         public static string Discounts_Sync()
         {
+            LogInfo("Discounts_Sync()");
             string results = MakeApiGetCall("/discount/shopify") ?? string.Empty;
             return results;
         }
         public static string Inventory_Sync()
         {
+            LogInfo("Inventory_Sync()");
             string results = MakeApiGetCall("/inventory/shopify") ?? string.Empty;
             return results;
         }
         public static string Products_DeleteAll()
         {
+            LogInfo("Products_DeleteAll()");
             try
             {
                 //get all products
@@ -379,6 +377,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public static IEnumerable<Shopify_Product> GetAllShopify_Products()
         {
+            LogInfo("GetAllShopify_Products()");
             Products_Sync();
             string results = MakeApiGetCall("/product/list");
             List<tmpShopify_Product> Data = new List<tmpShopify_Product>();
@@ -394,6 +393,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public static IEnumerable<Shopify_Prices> GetAllShopify_Prices()
         {
+            LogInfo("GetAllShopify_Prices()");
             Discounts_Sync();
             try
             {
@@ -412,6 +412,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public static IEnumerable<tmpShopify_Prices> GetAlltmpShopify_Prices()
         {
+            LogInfo("GetAlltmpShopify_Prices()");
             Discounts_Sync();
             try
             {
@@ -430,6 +431,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public static IEnumerable<Shopify_Quantities> GetAllShopify_Quantities()
         {
+            LogInfo("GetAllShopify_Quantities()");
             Inventory_Sync();
             string results = MakeApiGetCall("/inventory/list");
             List<Shopify_Quantities> Data = new List<Shopify_Quantities>();
@@ -446,6 +448,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public static IEnumerable<tmpShopify_Quantities> GetAlltmpShopify_Quantities()
         {
+            LogInfo("GetAlltmpShopify_Quantities()");
             Inventory_Sync();
             string results = MakeApiGetCall("/inventory/list");
             results = results.Replace("\"id\":null,", string.Empty);
