@@ -1,0 +1,48 @@
+﻿@page "/ProductsS5"
+@inject HttpClient Http
+@using cmArt.Reece.ShopifyConnector
+
+
+<PageTitle>S5 Products</PageTitle>
+
+<h1>Product Data - System Five</h1>
+
+@if (products == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>InvUnique</th>
+                <th>Cat</th>
+                <th>Description</th>
+                <th>PartNumber</th>
+                <th>WebCategory</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in products)
+            {
+                <tr>
+                    <td>@product.InvUnique.ToString()</td>
+                    <td>@product.Cat</td>
+                    <td>@product.Description</td>
+                    <td>@product.PartNumber</td>
+                    <td>@product.WebCategory</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private Shopify_Product[]? products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await Http.GetFromJsonAsync<Shopify_Product[]>("sample-data/tblPocoProductsAdapted_page1.json");
+    }
+}

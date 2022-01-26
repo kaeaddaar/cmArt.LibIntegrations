@@ -1,0 +1,51 @@
+﻿@page "/PricesS5"
+@inject HttpClient Http
+@using cmArt.Reece.ShopifyConnector
+
+
+<PageTitle>S5 Prices</PageTitle>
+
+<h1>Price Data - System Five</h1>
+
+@if (records == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>InvUnique</th>
+                <th>Cat</th>
+                <th>PartNumber</th>
+                <th>Prices</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var record in records)
+            {
+                <tr>
+                    <td>@record.InvUnique.ToString()</td>
+                    <td>@record.Cat</td>
+                    <td>@record.PartNumber</td>
+                    <td>
+                        @foreach(var price in record.Prices.OrderBy(x => x.Level))
+                        {
+                            <div>@price.Level : @price.Price</div>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private Shopify_Prices[]? records;
+
+    protected override async Task OnInitializedAsync()
+    {
+        records = await Http.GetFromJsonAsync<Shopify_Prices[]>("sample-data/tblPocoPricesAdapted_page1.json");
+    }
+}

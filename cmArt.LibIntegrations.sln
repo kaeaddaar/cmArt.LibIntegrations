@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30804.86
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.LibIntegrations", "cmArt.LibIntegrations\cmArt.LibIntegrations.csproj", "{7BC294C0-1E78-4AD1-A5D0-7613718CDCE3}"
 EndProject
@@ -50,6 +50,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTestWebJaguarIntegration", "UnitTestWebJaguarIntegration\UnitTestWebJaguarIntegration.csproj", "{4BFFB585-3E45-4514-8842-07ADD43F569C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zzDNUcmArt.WebJaguar.Data", "cmArt.WebJaguar.Data\zzDNUcmArt.WebJaguar.Data.csproj", "{0FB46D0B-F7C5-40AE-8496-5D9832FE8CEE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmArt.Shopify.TestingUI", "cmArt.Shopify.TestingUI\cmArt.Shopify.TestingUI.csproj", "{58C3950B-1A5D-452E-BB43-3E6CBF2EF819}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -153,6 +155,10 @@ Global
 		{0FB46D0B-F7C5-40AE-8496-5D9832FE8CEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FB46D0B-F7C5-40AE-8496-5D9832FE8CEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0FB46D0B-F7C5-40AE-8496-5D9832FE8CEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58C3950B-1A5D-452E-BB43-3E6CBF2EF819}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58C3950B-1A5D-452E-BB43-3E6CBF2EF819}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58C3950B-1A5D-452E-BB43-3E6CBF2EF819}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58C3950B-1A5D-452E-BB43-3E6CBF2EF819}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
