@@ -106,7 +106,7 @@ namespace cmArt.Shopify.App
         private static VennMap_InvAss<Shopify_Quantities, int> map_Quantities;
         //
         private static DateTime dtLastRun;
-        private static string dtLastRunPathAndFile = settings.LogfilePath + "\\lastrun.txt";
+        private static string dtLastRunPathAndFile;
 
 
         #endregion variables
@@ -116,6 +116,7 @@ namespace cmArt.Shopify.App
             SetupLogging();
             SetupArgs(args);
 
+            dtLastRunPathAndFile = settings.LogfilePath + "\\lastrun.txt";
             bool IsAlreadyRanToday = AlreadyRanToday();
             int ThirtySeconds = 1000 * 30;
 
@@ -170,6 +171,7 @@ namespace cmArt.Shopify.App
             else
             {
                 GetShopifyData();
+                CacheShopifyData();
                 map_Product = ProduceVennMap(map_Product);
                 map_Prices = ProduceVennMap(map_Prices);
                 map_Quantities = ProduceVennMap(map_Quantities);
@@ -743,6 +745,17 @@ namespace cmArt.Shopify.App
             GetShopifyData_Reece_Products();
             GetShopifyData_Reece_Prices();
             GetShopifyData_Reece_Quantities();
+        }
+        private static void CacheShopifyData()
+        {
+            CachingPattern_Shopify_Product cacheShopify_Product = new CachingPattern_Shopify_Product("ShopifyProducts_ReecesAPI", settings);
+            cacheShopify_Product._02_SaveNewestToCache(API_Products);
+
+            CachingPattern_Shopify_Quantities cacheShopify_Quantities = new CachingPattern_Shopify_Quantities("ShopifyQuantities_ReecesAPI", settings);
+            cacheShopify_Quantities._02_SaveNewestToCache(API_Quantities);
+
+            CachingPattern_Shopify_Prices cacheShopify_Prices = new CachingPattern_Shopify_Prices("ShopifyPrices_ReecesAPI", settings);
+            cacheShopify_Prices._02_SaveNewestToCache(API_Prices);
         }
         private static void CheckForDuplicates()
         {
