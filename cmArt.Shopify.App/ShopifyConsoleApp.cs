@@ -106,6 +106,8 @@ namespace cmArt.Shopify.App
         private static VennMap_InvAss<Shopify_Quantities, int> map_Quantities;
         //
         private static DateTime dtLastRun;
+        private static string dtLastRunPathAndFile = settings.LogfilePath + "\\lastrun.txt";
+
 
         #endregion variables
         public static void Main_Console(string[] args)
@@ -375,6 +377,8 @@ namespace cmArt.Shopify.App
             logger.LogInformation($"Saving ChangedRecords_Product to file: {FileName}");
             File.WriteAllText(FileName, result);
 
+            Save_dtLastRun_ToFile();
+
             Console.WriteLine("Done");
             Console.ReadKey();
         }
@@ -384,7 +388,7 @@ namespace cmArt.Shopify.App
             DateTime dtNow = DateTime.Now;
             DateTime dtStartOfDay = new DateTime(dtNow.Year, dtNow.Month, dtNow.Day, 0, 0, 0);
             bool IsToday = dtStartOfDay <= dtLastRun;
-            LogInfo_AtOrAfter($"AlreadyRanToday - Now: {dtNow.ToString()}, LastRun: {dtLastRun.ToString()}, AlreadyRanToday: {IsToday}");
+            LogInfo_AtOrAfter($"AlreadyRanToday Checks - Now: {dtNow.ToString()}, LastRun: {dtLastRun.ToString()}, AlreadyRanToday: {IsToday}");
             return IsToday;
         }
         private static void Get_dtLastRun_FromFile()
@@ -392,14 +396,13 @@ namespace cmArt.Shopify.App
             string strLastRun = string.Empty;
             try
             {
-                string pathAndFile = settings.CachedFiles + "\\lastrun.txt";
-                bool fileExists = File.Exists(pathAndFile);
+                bool fileExists = File.Exists(dtLastRunPathAndFile);
                 if (!fileExists)
                 {
                     DateTime tmp = new DateTime();
-                    File.WriteAllText(pathAndFile, tmp.ToString());
+                    File.WriteAllText(dtLastRunPathAndFile, tmp.ToString());
                 }
-                strLastRun = File.ReadAllText(pathAndFile);
+                strLastRun = File.ReadAllText(dtLastRunPathAndFile);
             }
             catch (Exception e)
             {
@@ -407,6 +410,18 @@ namespace cmArt.Shopify.App
                 strLastRun = DateTime.Now.ToString();
             }
             DateTime.TryParse(strLastRun, out dtLastRun);
+        }
+        private static void Save_dtLastRun_ToFile()
+        {
+            dtLastRun = DateTime.Now;
+            try
+            {
+                File.WriteAllText(dtLastRunPathAndFile, dtLastRun.ToString());
+            }
+            catch (Exception e)
+            {
+                logger.LogInformation("Error saving time of last run to file: " + e.ToString());
+            }
         }
         private static void LogInfo_AtOrAfter(string msg)
         {
