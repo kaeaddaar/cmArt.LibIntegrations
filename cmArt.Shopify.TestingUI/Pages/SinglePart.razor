@@ -2,6 +2,7 @@
 @inject HttpClient Http
 @using cmArt.Reece.ShopifyConnector
 @using cmArt.LibIntegrations.ReportService
+@using cmArt.LibIntegrations.ETLPatternService
 
 
 <PageTitle>Single Part Review</PageTitle>
@@ -322,7 +323,7 @@ else
 
 <h2>Detailed Differences</h2>
 
-@if(DetailedDifferences == null)
+@if(GetDetailedDifferences() == null)
 {
     <table>
         <thead>
@@ -388,6 +389,7 @@ else
     private Shopify_Quantities ShopifyQuantities;
 
     private List<Changes_View> DetailedDifferences;
+    private ILogger logger;
 
     protected override async Task OnInitializedAsync()
     {
@@ -471,6 +473,10 @@ else
     }
     internal List<Changes_View> GetDetailedDifferences()
     {
-        
+        Func<Shopify_Product, int> fIndex_Product = (x) => x.InvUnique;
+        ETLPattern<Shopify_Product, IShopify_Product, IShopify_Product, IShopify_Product, int> ETL_Product = new ETLPattern<Shopify_Product, IShopify_Product, IShopify_Product, IShopify_Product, int>();
+        ETL_Product.init(products_S5, products_Shopify, logger, null);
+
+        return null;
     }
 }

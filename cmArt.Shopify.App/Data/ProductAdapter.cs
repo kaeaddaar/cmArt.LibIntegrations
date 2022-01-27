@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using cmArt.Reece.ShopifyConnector;
+using cmArt.LibIntegrations.ReportService;
 
 namespace cmArt.Shopify.App.Data
 {
@@ -112,6 +113,11 @@ namespace cmArt.Shopify.App.Data
         public bool Equals(IShopify_Product compareTo)
         {
             return IShopify_ProductExtensions.Equals(this, compareTo);
+        }
+
+        public IEnumerable<Changes_View> Diff(IShopify_Product CompareTo)
+        {
+            return IShopifyDataLoadFormatExtensions.Diff(this, CompareTo);
         }
     }
 }

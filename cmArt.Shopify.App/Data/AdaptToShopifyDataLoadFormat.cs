@@ -6,6 +6,7 @@ using System.Text;
 using System.Linq;
 using cmArt.LibIntegrations.PriceCalculations;
 using cmArt.Reece.ShopifyConnector;
+using cmArt.LibIntegrations.ReportService;
 #nullable enable
 
 namespace cmArt.Shopify.App.Data
@@ -198,6 +199,26 @@ namespace cmArt.Shopify.App.Data
         public IShopify_Product CopyFrom(IShopify_Product IFrom)
         {
             return IShopify_ProductExtensions.CopyFrom(this, IFrom);
+        }
+
+        public IEnumerable<Changes_View> Diff(IShopify_Product CompareTo)
+        {
+            return IShopifyDataLoadFormatExtensions.Diff(this, CompareTo);
+        }
+
+        public IEnumerable<Changes_View> Diff(IShopify_Prices CompareTo)
+        {
+            return IShopifyDataLoadFormatExtensions.Diff(this, CompareTo);
+        }
+
+        public IEnumerable<Changes_View> Diff(IShopify_Quantities CompareTo)
+        {
+            return IShopifyDataLoadFormatExtensions.Diff(this, CompareTo);
+        }
+
+        public IEnumerable<Changes_View> Diff(IShopifyDataLoadFormat CompareTo)
+        {
+            return IShopifyDataLoadFormatExtensions.Diff(this, CompareTo);
         }
     }
 
