@@ -1,4 +1,6 @@
 ﻿using cmArt.LibIntegrations;
+using cmArt.LibIntegrations.ETLPatternService;
+using cmArt.LibIntegrations.ReportService;
 using cmArt.Reece.ShopifyConnector;
 using System;
 using System.Collections.Generic;
@@ -41,14 +43,19 @@ namespace cmArt.Shopify.App.ReportViews
             _Init(shopify_Product_Pair);
         }
 
-        public bool Equals(IShopify_Product compareTo)
+        public bool cmEquals(IShopify_Product compareTo)
         {
-            return ((IEquality<IShopify_Product>)_Shopify).Equals(compareTo);
+            return ((IEquality_cm<IShopify_Product>)_Shopify).Equals(compareTo);
         }
 
         public IShopify_Product CopyFrom(IShopify_Product IFrom)
         {
             return ((ICopyable<IShopify_Product>)_Shopify).CopyFrom(IFrom);
+        }
+
+        public IEnumerable<Changes_View> Diff(IShopify_Product CompareTo)
+        {
+            return IShopifyDataLoadFormatExtensions.Diff(this, CompareTo);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using cmArt.LibIntegrations.ReportService;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
@@ -19,9 +20,14 @@ namespace cmArt.Reece.ShopifyConnector
             return IShopify_ProductExtensions.CopyFrom(this, IFrom);
         }
 
-        public bool Equals(IShopify_Product compareTo)
+        public bool cmEquals(IShopify_Product compareTo)
         {
             return IShopify_Product.Equals(this, compareTo);
+        }
+
+        public IEnumerable<Changes_View> Diff(IShopify_Product CompareTo)
+        {
+            return IShopifyDataLoadFormatExtensions.Diff(this, CompareTo);
         }
     }
 }

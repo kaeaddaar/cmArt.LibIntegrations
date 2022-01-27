@@ -110,7 +110,7 @@ namespace cmArt.Shopify.App.Data
             return IShopify_ProductExtensions.CopyFrom(this, IFrom);
         }
 
-        public bool Equals(IShopify_Product compareTo)
+        public bool cmEquals(IShopify_Product compareTo)
         {
             return IShopify_ProductExtensions.Equals(this, compareTo);
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using cmArt.LibIntegrations.ReportService;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,9 +13,14 @@ namespace cmArt.Reece.ShopifyConnector
         public string PartNumber { get; set; }
         //public decimal WholesaleCost { get; set; }
 
-        public bool Equals(IShopify_Prices compareTo)
+        public bool cmEquals(IShopify_Prices compareTo)
         {
             return IShopify_PricesExtensions.Equals(this, compareTo);
+        }
+
+        public IEnumerable<Changes_View> Diff(IShopify_Prices CompareTo)
+        {
+            return IShopifyDataLoadFormatExtensions.Diff(this, CompareTo);
         }
     }
 }

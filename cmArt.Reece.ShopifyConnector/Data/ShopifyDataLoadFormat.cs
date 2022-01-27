@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using cmArt.LibIntegrations;
 using cmArt.LibIntegrations.GenericJoinsService;
+using cmArt.LibIntegrations.ReportService;
 using FileHelpers;
 
 
@@ -35,29 +36,49 @@ namespace cmArt.Reece.ShopifyConnector
             return this;
         }
 
-        public bool Equals(IShopifyDataLoadFormat compareTo)
+        public bool cmEquals(IShopifyDataLoadFormat compareTo)
         {
             return IShopifyDataLoadFormatExtensions.Equals(this, compareTo);
         }
 
-        public bool Equals(IShopify_Product compareTo)
+        public bool cmEquals(IShopify_Product compareTo)
         {
-            throw new NotImplementedException();
+            return IShopifyDataLoadFormatExtensions.Equals(this, compareTo);
         }
 
-        public bool Equals(IShopify_Prices compareTo)
+        public bool cmEquals(IShopify_Prices compareTo)
         {
-            throw new NotImplementedException();
+            return IShopifyDataLoadFormatExtensions.Equals(this, compareTo);
         }
 
-        public bool Equals(IShopify_Quantities compareTo)
+        public bool cmEquals(IShopify_Quantities compareTo)
         {
-            throw new NotImplementedException();
+            return IShopifyDataLoadFormatExtensions.Equals(this, compareTo);
         }
 
         public IShopify_Product CopyFrom(IShopify_Product IFrom)
         {
             return IShopify_ProductExtensions.CopyFrom(this, IFrom);
+        }
+
+        public IEnumerable<Changes_View> Diff(IShopify_Product CompareTo)
+        {
+            return IShopifyDataLoadFormatExtensions.Diff(this, CompareTo);
+        }
+
+        public IEnumerable<Changes_View> Diff(IShopify_Prices CompareTo)
+        {
+            return IShopifyDataLoadFormatExtensions.Diff(this, CompareTo);
+        }
+
+        public IEnumerable<Changes_View> Diff(IShopify_Quantities CompareTo)
+        {
+            return IShopifyDataLoadFormatExtensions.Diff(this, CompareTo);
+        }
+
+        public IEnumerable<Changes_View> Diff(IShopifyDataLoadFormat CompareTo)
+        {
+            return IShopifyDataLoadFormatExtensions.Diff(this, CompareTo);
         }
 
         public int InvUnique { get; set; }

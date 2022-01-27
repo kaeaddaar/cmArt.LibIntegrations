@@ -176,22 +176,22 @@ namespace cmArt.Shopify.App.Data
             return this;
         }
 
-        public bool Equals(IShopifyDataLoadFormat compareTo)
+        public bool cmEquals(IShopifyDataLoadFormat compareTo)
         {
             return IShopifyDataLoadFormatExtensions.Equals(this, compareTo);
         }
 
-        public bool Equals(IShopify_Product compareTo)
+        public bool cmEquals(IShopify_Product compareTo)
         {
             return IShopify_ProductExtensions.Equals(this, compareTo);
         }
 
-        public bool Equals(IShopify_Prices compareTo)
+        public bool cmEquals(IShopify_Prices compareTo)
         {
             return IShopify_PricesExtensions.Equals(this, compareTo);
         }
 
-        public bool Equals(IShopify_Quantities compareTo)
+        public bool cmEquals(IShopify_Quantities compareTo)
         {
             return IShopify_QuantitiesExtensions.Equals(this, compareTo);
         }

@@ -1,9 +1,8 @@
 ﻿@page "/SinglePart"
 @inject HttpClient Http
-@using cmArt.Reece.ShopifyConnector
 @using cmArt.LibIntegrations.ReportService
 @using cmArt.LibIntegrations.ETLPatternService
-
+@using cmArt.Reece.ShopifyConnector
 
 <PageTitle>Single Part Review</PageTitle>
 
@@ -356,7 +355,7 @@ else
             <th>S5ValueToSendToExternal</th>
         </thead>
         <tbody>
-            @foreach(var record in DetailedDifferences)
+            @foreach(var record in DetailedDifferences_SinglePart)
             {
             <tr>
                 <td>@record.InvUnique</td>
@@ -365,6 +364,7 @@ else
                 <td>@record.FieldName</td>
                 <td>@record.ExternalValueBeforeUpdate</td>
                 <td>@record.S5ValueToSendToExternal</td>
+
             </tr>
             }
         </tbody>
@@ -388,8 +388,9 @@ else
     private Shopify_Quantities S5Quantities;
     private Shopify_Quantities ShopifyQuantities;
 
-    private List<Changes_View> DetailedDifferences;
-    private ILogger logger;
+    private IEnumerable<Changes_View> DetailedDifferences_All;
+    private IEnumerable<Changes_View> DetailedDifferences_SinglePart;
+    //private ILogger logger;
 
     protected override async Task OnInitializedAsync()
     {
@@ -401,7 +402,8 @@ else
         quantities_S5 = await Http.GetFromJsonAsync<Shopify_Quantities[]>("sample-data/tblPocoQuantitiesAdapted_page1.json");
         quantities_Shopify = await Http.GetFromJsonAsync<Shopify_Quantities[]>("sample-data/tblShopifyQuantities_ReecesAPI_page1.json");
 
-        DetailedDifferences = new List<Changes_View>();
+        DetailedDifferences_All = new List<Changes_View>();
+        DetailedDifferences_SinglePart = new List<Changes_View>();
     }
     internal Shopify_Product GetActiveS5Product()
     {
@@ -471,12 +473,14 @@ else
         ShopifyQuantities = quantities_S5.Where(x => x.InvUnique == _invUnique).FirstOrDefault();
         return ShopifyQuantities;
     }
-    internal List<Changes_View> GetDetailedDifferences()
+    internal IEnumerable<Changes_View> GetDetailedDifferences()
     {
-        Func<Shopify_Product, int> fIndex_Product = (x) => x.InvUnique;
-        ETLPattern<Shopify_Product, IShopify_Product, IShopify_Product, IShopify_Product, int> ETL_Product = new ETLPattern<Shopify_Product, IShopify_Product, IShopify_Product, IShopify_Product, int>();
-        ETL_Product.init(products_S5, products_Shopify, logger, null);
+        Func<IShopify_Product, int> fIndex_Product = (x) => x.InvUnique;
+        GenericAnalysis<Shopify_Product, IShopify_Product, int> Analyze_Product = new GenericAnalysis<Shopify_Product, IShopify_Product, int>();
+        Analyze_Product.init(products_S5, products_Shopify, null);
 
-        return null;
+        DetailedDifferences_All = Analyze_Product.GetDetailedDifferences(IShopify_ProductExtensions.Equals, fIndex_Product);
+        DetailedDifferences_SinglePart = DetailedDifferences_All.Where(x => x.InvUnique.ToString() == invUnique);
+        return DetailedDifferences_SinglePart;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using cmArt.LibIntegrations.ReportService;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -11,9 +12,14 @@ namespace cmArt.Reece.ShopifyConnector
         public int InvUnique { get; set; }
         public string PartNumber { get; set; }
 
-        public bool Equals(IShopify_Quantities compareTo)
+        public bool cmEquals(IShopify_Quantities compareTo)
         {
             return IShopify_Quantities.Equals(this, compareTo);
+        }
+
+        public IEnumerable<Changes_View> Diff(IShopify_Quantities CompareTo)
+        {
+            return IShopifyDataLoadFormatExtensions.Diff(this, CompareTo);
         }
     }
 }
