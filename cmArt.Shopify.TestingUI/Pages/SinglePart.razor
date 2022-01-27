@@ -1,0 +1,476 @@
+﻿@page "/SinglePart"
+@inject HttpClient Http
+@using cmArt.Reece.ShopifyConnector
+@using cmArt.LibIntegrations.ReportService
+
+
+<PageTitle>Single Part Review</PageTitle>
+
+<h1>Review all data for a single part</h1>
+
+<select id="optS5Products" @bind="invUnique">
+@if (products_S5 == null)
+{
+        <option value="">No Product Found</option>
+}
+else
+{
+    <option value="0">Select an Inventory Item</option>
+    foreach(var record in products_S5.OrderBy(x => x.PartNumber))
+    {
+        <option value="@record.InvUnique">@record.PartNumber (@record.Cat)</option>
+    }
+}
+</select>
+InvUnique: @invUnique <br />
+
+<h2>S5 Part Info:</h2>
+@if(GetActiveS5Product() == null)
+{
+<table class="table">
+    <thead>
+        <th>Fields</th>
+        <th>Values</th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>InvUnique</td>
+            <td>Record Not Found</td>
+        </tr>
+        <tr>
+            <td>Cat</td>
+            <td>Record Not Found</td>
+        </tr>
+        <tr>
+            <td>PartNumber</td>
+            <td>Record Not Found</td>
+        </tr>
+        <tr>
+            <td>Description</td>
+            <td>Record Not Found</td>
+        </tr>
+        <tr>
+            <td>WebCategory</td>
+            <td>Record Not Found</td>
+        </tr>
+        <tr>
+            <td>Pricing Info</td>
+            <td>Record Not Found</td>
+        </tr>
+    </tbody>
+</table>
+}
+else
+{
+<table class="table">
+    <thead>
+        <th>Fields</th>
+        <th>Values</th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>InvUnique</td>
+            <td>@S5Product.InvUnique</td>
+        </tr>
+        <tr>
+            <td>Cat</td>
+            <td>@S5Product.Cat</td>
+        </tr>
+        <tr>
+            <td>PartNumber</td>
+            <td>@S5Product.PartNumber</td>
+        </tr>
+        <tr>
+            <td>Description</td>
+            <td>@S5Product.Description</td>
+        </tr>
+        <tr>
+            <td>WebCategory</td>
+            <td>@S5Product.WebCategory</td>
+        </tr>
+        <tr>
+            <td>Pricing info</td>
+            <td>
+                @if (GetActiveS5Prices() == null)
+                {
+                    <p><em>Loading...</em></p>
+                }
+                else
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                @for(int i = 0; i < 15; i++)
+                                {
+                                    <th style="text-align:right;">Price-@i</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                @for(int i = 0; i < 15; i++)
+                                {
+                                    <td style="text-align:right;">
+                                        @if(S5Prices.Prices.Where(x => x.Level == i).FirstOrDefault() == null)
+                                        {
+                                        <div style="float: right;color:red;" align="right" title="Sched-@i missing">@(Decimal.Round((S5Prices.Prices.Where(x => x.Level == i).FirstOrDefault() ?? new S5PricePair()).Price, 2))</div>
+                                        }
+                                        else
+                                        {
+                                        <div style="float: right;" align="right" title="Sched-i">@(Decimal.Round((S5Prices.Prices.Where(x => x.Level == i).FirstOrDefault() ?? new S5PricePair()).Price, 2))</div>
+                                        }
+                                    </td>
+                                }
+
+                            </tr>
+                        </tbody>
+                    </table>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Quantity info</td>
+            <td>
+                @if (GetActiveS5Quantities() == null)
+                {
+                    <p><em>Loading...</em></p>
+                }
+                else
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                @for(short i = 0; i < 5; i++)
+                                {
+                                    <th style="text-align:right;">Location-@i</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                @for(short i = 0; i < 5; i++)
+                                {
+                                    <td style="text-align:right;">
+                                        @if(S5Quantities.Quantities.Where(x => x.Location == i).FirstOrDefault() == null)
+                                        {
+                                        <div style="float: right;color:red;" align="right" title="Location-@i missing">@(Decimal.Round((S5Quantities.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
+                                        }
+                                        else
+                                        {
+                                        <div style="float: right;" align="right" title="Location-i">@(Decimal.Round((S5Quantities.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
+                                        }
+                                    </td>
+                                }
+
+                            </tr>
+                        </tbody>
+                    </table>
+                }
+            </td>
+        </tr>
+    </tbody>
+</table>
+}
+
+<h2>Shopify Part Info:</h2>
+@if(GetActiveShopifyProduct() == null)
+{
+<table class="table">
+    <thead>
+        <th>Fields</th>
+        <th>Values</th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>InvUnique</td>
+            <td>Record Not Found</td>
+        </tr>
+        <tr>
+            <td>Cat</td>
+            <td>Record Not Found</td>
+        </tr>
+        <tr>
+            <td>PartNumber</td>
+            <td>Record Not Found</td>
+        </tr>
+        <tr>
+            <td>Description</td>
+            <td>Record Not Found</td>
+        </tr>
+        <tr>
+            <td>WebCategory</td>
+            <td>Record Not Found</td>
+        </tr>
+        <tr>
+            <td>Pricing Info</td>
+            <td>Record Not Found</td>
+        </tr>
+    </tbody>
+</table>
+}
+else
+{
+<table class="table">
+    <thead>
+        <th>Fields</th>
+        <th>Values</th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>InvUnique</td>
+            <td>@ShopifyProduct.InvUnique</td>
+        </tr>
+        <tr>
+            <td>Cat</td>
+            <td>@ShopifyProduct.Cat</td>
+        </tr>
+        <tr>
+            <td>PartNumber</td>
+            <td>@ShopifyProduct.PartNumber</td>
+        </tr>
+        <tr>
+            <td>Description</td>
+            <td>@ShopifyProduct.Description</td>
+        </tr>
+        <tr>
+            <td>WebCategory</td>
+            <td>@ShopifyProduct.WebCategory</td>
+        </tr>
+        <tr>
+            <td>Pricing info</td>
+            <td>
+                @if (GetActiveShopifyPrices() == null)
+                {
+                    <p><em>Loading...</em></p>
+                }
+                else
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                @for(int i = 0; i < 15; i++)
+                                {
+                                    <th style="text-align:right;">Price-@i</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                @for(int i = 0; i < 15; i++)
+                                {
+                                    <td style="text-align:right;">
+                                        @if(ShopifyPrices.Prices.Where(x => x.Level == i).FirstOrDefault() == null)
+                                        {
+                                        <div style="float: right;color:red;" align="right" title="Sched-@i missing">@(Decimal.Round((ShopifyPrices.Prices.Where(x => x.Level == i).FirstOrDefault() ?? new S5PricePair()).Price, 2))</div>
+                                        }
+                                        else
+                                        {
+                                        <div style="float: right;" align="right" title="Sched-i">@(Decimal.Round((ShopifyPrices.Prices.Where(x => x.Level == i).FirstOrDefault() ?? new S5PricePair()).Price, 2))</div>
+                                        }
+                                    </td>
+                                }
+
+                            </tr>
+                        </tbody>
+                    </table>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Quantity info</td>
+            <td>
+                @if (GetActiveShopifyQuantities() == null)
+                {
+                    <p><em>Loading...</em></p>
+                }
+                else
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                @for(short i = 0; i < 5; i++)
+                                {
+                                    <th style="text-align:right;">Location-@i</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                @for(short i = 0; i < 5; i++)
+                                {
+                                    <td style="text-align:right;">
+                                        @if(ShopifyQuantities.Quantities.Where(x => x.Location == i).FirstOrDefault() == null)
+                                        {
+                                        <div style="float: right;color:red;" align="right" title="Location-@i missing">@(Decimal.Round((ShopifyQuantities.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
+                                        }
+                                        else
+                                        {
+                                        <div style="float: right;" align="right" title="Location-i">@(Decimal.Round((ShopifyQuantities.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
+                                        }
+                                    </td>
+                                }
+
+                            </tr>
+                        </tbody>
+                    </table>
+                }
+            </td>
+        </tr>
+    </tbody>
+</table>
+}
+
+<h2>Detailed Differences</h2>
+
+@if(DetailedDifferences == null)
+{
+    <table>
+        <thead>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </thead>
+        <tbody>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+}
+else
+{
+        <table>
+        <thead>
+            <th>InvUnique</th>
+            <th>Cat</th>
+            <th>PartNumber</th>
+            <th>FieldName</th>
+            <th>ExternalValueBeforeUpdate</th>
+            <th>S5ValueToSendToExternal</th>
+        </thead>
+        <tbody>
+            @foreach(var record in DetailedDifferences)
+            {
+            <tr>
+                <td>@record.InvUnique</td>
+                <td>@record.Cat</td>
+                <td>@record.PartNumber</td>
+                <td>@record.FieldName</td>
+                <td>@record.ExternalValueBeforeUpdate</td>
+                <td>@record.S5ValueToSendToExternal</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private Shopify_Product[]? products_S5;
+    private Shopify_Prices[]? prices_S5;
+    private Shopify_Quantities[]? quantities_S5;
+
+    private Shopify_Product[]? products_Shopify;
+    private Shopify_Prices[]? prices_Shopify;
+    private Shopify_Quantities[]? quantities_Shopify;
+
+    private string invUnique;
+    private Shopify_Product S5Product;
+    private Shopify_Product ShopifyProduct;
+    private Shopify_Prices S5Prices;
+    private Shopify_Prices ShopifyPrices;
+    private Shopify_Quantities S5Quantities;
+    private Shopify_Quantities ShopifyQuantities;
+
+    private List<Changes_View> DetailedDifferences;
+
+    protected override async Task OnInitializedAsync()
+    {
+        invUnique = string.Empty;
+        products_S5 = await Http.GetFromJsonAsync<Shopify_Product[]>("sample-data/tblPocoProductsAdapted_page1.json");
+        products_Shopify = await Http.GetFromJsonAsync<Shopify_Product[]>("sample-data/tblShopifyProducts_ReecesAPI_page1.json");
+        prices_S5 = await Http.GetFromJsonAsync<Shopify_Prices[]>("sample-data/tblPocoPricesAdapted_page1.json");
+        prices_Shopify = await Http.GetFromJsonAsync<Shopify_Prices[]>("sample-data/tblShopifyPrices_ReecesAPI_page1.json");
+        quantities_S5 = await Http.GetFromJsonAsync<Shopify_Quantities[]>("sample-data/tblPocoQuantitiesAdapted_page1.json");
+        quantities_Shopify = await Http.GetFromJsonAsync<Shopify_Quantities[]>("sample-data/tblShopifyQuantities_ReecesAPI_page1.json");
+
+        DetailedDifferences = new List<Changes_View>();
+    }
+    internal Shopify_Product GetActiveS5Product()
+    {
+        if(products_S5 == null)
+        {
+            return null;
+        }
+        int _invUnique;
+        int.TryParse(invUnique, out _invUnique);
+        S5Product = products_S5.Where(x => x.InvUnique == _invUnique).FirstOrDefault();
+        return S5Product;
+    }
+    internal Shopify_Product GetActiveShopifyProduct()
+    {
+        if(products_Shopify == null)
+        {
+            return null;
+        }
+        int _invUnique;
+        int.TryParse(invUnique, out _invUnique);
+        ShopifyProduct = products_Shopify.Where(x => x.InvUnique == _invUnique).FirstOrDefault();
+        return ShopifyProduct;
+    }
+
+    internal Shopify_Prices GetActiveS5Prices()
+    {
+        if(prices_S5 == null)
+        {
+            return null;
+        }
+        int _invUnique;
+        int.TryParse(invUnique, out _invUnique);
+        S5Prices = prices_S5.Where(x => x.InvUnique == _invUnique).FirstOrDefault();
+        return S5Prices;
+    }
+    internal Shopify_Prices GetActiveShopifyPrices()
+    {
+        if(prices_Shopify == null)
+        {
+            return null;
+        }
+        int _invUnique;
+        int.TryParse(invUnique, out _invUnique);
+        ShopifyPrices = prices_Shopify.Where(x => x.InvUnique == _invUnique).FirstOrDefault();
+        return ShopifyPrices;
+    }
+
+    internal Shopify_Quantities GetActiveS5Quantities()
+    {
+        if(quantities_S5 == null)
+        {
+            return null;
+        }
+        int _invUnique;
+        int.TryParse(invUnique, out _invUnique);
+        S5Quantities = quantities_S5.Where(x => x.InvUnique == _invUnique).FirstOrDefault();
+        return S5Quantities;
+    }
+    internal Shopify_Quantities GetActiveShopifyQuantities()
+    {
+        if(quantities_Shopify == null)
+        {
+            return null;
+        }
+        int _invUnique;
+        int.TryParse(invUnique, out _invUnique);
+        ShopifyQuantities = quantities_S5.Where(x => x.InvUnique == _invUnique).FirstOrDefault();
+        return ShopifyQuantities;
+    }
+    internal List<Changes_View> GetDetailedDifferences()
+    {
+        
+    }
+}
