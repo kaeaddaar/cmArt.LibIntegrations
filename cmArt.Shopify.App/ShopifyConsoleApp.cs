@@ -170,6 +170,7 @@ namespace cmArt.Shopify.App
             }
             else
             {
+                Cache_Products_Prices_And_Quantities_From_SystemFive();
                 GetShopifyData();
                 CacheShopifyData();
                 map_Product = ProduceVennMap(map_Product);
@@ -630,6 +631,17 @@ namespace cmArt.Shopify.App
             API_Products = PrevDataLoad_Product;
             API_Prices = PrevDataLoad_Prices;
             API_Quantities = PrevDataLoad_Quantities;
+        }
+        private static void Cache_Products_Prices_And_Quantities_From_SystemFive()
+        {
+            CachingPattern_Shopify_Product cacheShopify_Product = new CachingPattern_Shopify_Product("PocoProductsAdapted", settings);
+            cacheShopify_Product._02_SaveNewestToCache(PocoProductsAdapted);
+
+            CachingPattern_Shopify_Quantities cacheShopify_Quantities = new CachingPattern_Shopify_Quantities("PocoQuantitiesAdapted", settings);
+            cacheShopify_Quantities._02_SaveNewestToCache(PocoQuantitiesAdapted);
+
+            CachingPattern_Shopify_Prices cacheShopify_Prices = new CachingPattern_Shopify_Prices("PocoPricesAdapted", settings);
+            cacheShopify_Prices._02_SaveNewestToCache(PocoPricesAdapted);
         }
         private static void GetShopifyData_Reece_Products()
         {
