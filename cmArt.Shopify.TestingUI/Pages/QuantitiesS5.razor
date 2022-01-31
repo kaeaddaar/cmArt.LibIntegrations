@@ -1,6 +1,7 @@
 ﻿@page "/QuantitiesS5"
 @inject HttpClient Http
 @using cmArt.Reece.ShopifyConnector
+@using cmArt.Portal.Data
 
 
 <PageTitle>S5 Quantities</PageTitle>
@@ -57,6 +58,9 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        records = await Http.GetFromJsonAsync<Shopify_Quantities[]>("sample-data/tblPocoQuantitiesAdapted_page1.json");
+        string strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/c0aff18b-a32a-4b0b-bcc7-5808ddace171");
+        Document doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
+        records = (Shopify_Quantities[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Quantities[]));
+        //records = await Http.GetFromJsonAsync<Shopify_Quantities[]>("sample-data/tblPocoQuantitiesAdapted_page1.json");
     }
 }

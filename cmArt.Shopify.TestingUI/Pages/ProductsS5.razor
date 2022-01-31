@@ -1,6 +1,7 @@
 ﻿@page "/ProductsS5"
 @inject HttpClient Http
 @using cmArt.Reece.ShopifyConnector
+@using cmArt.Portal.Data
 
 
 <PageTitle>S5 Products</PageTitle>
@@ -43,6 +44,9 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        products = await Http.GetFromJsonAsync<Shopify_Product[]>("sample-data/tblPocoProductsAdapted_page1.json");
+        string strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/74e5b8d9-f264-4029-af3a-f2c44c906511");
+        Document doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
+        products = (Shopify_Product[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Product[]));
+        //products = await Http.GetFromJsonAsync<Shopify_Product[]>("sample-data/tblPocoProductsAdapted_page1.json");
     }
 }

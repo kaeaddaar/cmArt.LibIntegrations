@@ -30,6 +30,11 @@ using cmArt.Shopify.App.ReportViews;
 using cmArt.LibIntegrations.ReportService;
 using cmArt.LibIntegrations.LoggingServices;
 
+using cmArt.Portal.API;
+using cmArt.Portal.Data;
+using cmArt.Portal.API.Data;
+using cmArt.Portal.API.Repositories;
+
 namespace cmArt.Shopify.App
 {
     [Serializable]
@@ -637,11 +642,38 @@ namespace cmArt.Shopify.App
             CachingPattern_Shopify_Product cacheShopify_Product = new CachingPattern_Shopify_Product("PocoProductsAdapted", settings);
             cacheShopify_Product._02_SaveNewestToCache(PocoProductsAdapted);
 
+            CachingPattern_Shopify_Prices cacheShopify_Prices = new CachingPattern_Shopify_Prices("PocoPricesAdapted", settings);
+            cacheShopify_Prices._02_SaveNewestToCache(PocoPricesAdapted);
+
             CachingPattern_Shopify_Quantities cacheShopify_Quantities = new CachingPattern_Shopify_Quantities("PocoQuantitiesAdapted", settings);
             cacheShopify_Quantities._02_SaveNewestToCache(PocoQuantitiesAdapted);
 
-            CachingPattern_Shopify_Prices cacheShopify_Prices = new CachingPattern_Shopify_Prices("PocoPricesAdapted", settings);
-            cacheShopify_Prices._02_SaveNewestToCache(PocoPricesAdapted);
+            Context context = new Context();
+
+            Document S5_Product_Document = new Document();
+            S5_Product_Document.Id = new Guid("74e5b8d9-f264-4029-af3a-f2c44c906511");
+            S5_Product_Document.DocumentName = "S5_Product";
+            S5_Product_Document.CustomerId = Guid.Empty;
+            S5_Product_Document.ProjectId = Guid.Empty;
+            S5_Product_Document.DocumentValue = System.Text.Json.JsonSerializer.Serialize(PocoProductsAdapted, typeof(IEnumerable<Shopify_Product>));
+            Document_Repository.AddJsonDocument(context, S5_Product_Document);
+
+            Document S5_Prices_Document = new Document();
+            S5_Prices_Document.Id = new Guid("7fb824a1-6b6a-46eb-bb0c-e4a315ccb6ec");
+            S5_Prices_Document.DocumentName = "S5_Prices";
+            S5_Prices_Document.CustomerId = Guid.Empty;
+            S5_Prices_Document.ProjectId = Guid.Empty;
+            S5_Prices_Document.DocumentValue = System.Text.Json.JsonSerializer.Serialize(PocoPricesAdapted, typeof(IEnumerable<Shopify_Prices>));
+            Document_Repository.AddJsonDocument(context, S5_Prices_Document);
+
+            Document S5_Quantities_Document = new Document();
+            S5_Quantities_Document.Id = new Guid("c0aff18b-a32a-4b0b-bcc7-5808ddace171");
+            S5_Quantities_Document.DocumentName = "S5_Quantities";
+            S5_Quantities_Document.CustomerId = Guid.Empty;
+            S5_Quantities_Document.ProjectId = Guid.Empty;
+            S5_Quantities_Document.DocumentValue = System.Text.Json.JsonSerializer.Serialize(PocoQuantitiesAdapted, typeof(IEnumerable<Shopify_Quantities>));
+            Document_Repository.AddJsonDocument(context, S5_Quantities_Document);
+
         }
         private static void GetShopifyData_Reece_Products()
         {
@@ -763,11 +795,37 @@ namespace cmArt.Shopify.App
             CachingPattern_Shopify_Product cacheShopify_Product = new CachingPattern_Shopify_Product("ShopifyProducts_ReecesAPI", settings);
             cacheShopify_Product._02_SaveNewestToCache(API_Products);
 
+            CachingPattern_Shopify_Prices cacheShopify_Prices = new CachingPattern_Shopify_Prices("ShopifyPrices_ReecesAPI", settings);
+            cacheShopify_Prices._02_SaveNewestToCache(API_Prices);
+
             CachingPattern_Shopify_Quantities cacheShopify_Quantities = new CachingPattern_Shopify_Quantities("ShopifyQuantities_ReecesAPI", settings);
             cacheShopify_Quantities._02_SaveNewestToCache(API_Quantities);
 
-            CachingPattern_Shopify_Prices cacheShopify_Prices = new CachingPattern_Shopify_Prices("ShopifyPrices_ReecesAPI", settings);
-            cacheShopify_Prices._02_SaveNewestToCache(API_Prices);
+            Context context = new Context();
+
+            Document Shopify_Product_Document = new Document();
+            Shopify_Product_Document.Id = new Guid("17cf9358-b783-46a2-97ee-ef69388f3904");
+            Shopify_Product_Document.DocumentName = "Shopify_Product";
+            Shopify_Product_Document.CustomerId = Guid.Empty;
+            Shopify_Product_Document.ProjectId = Guid.Empty;
+            Shopify_Product_Document.DocumentValue = System.Text.Json.JsonSerializer.Serialize(API_Products, typeof(IEnumerable<Shopify_Product>));
+            Document_Repository.AddJsonDocument(context, Shopify_Product_Document);
+
+            Document Shopify_Prices_Document = new Document();
+            Shopify_Prices_Document.Id = new Guid("b9ae61e7-4248-4c95-832d-acbb079a68df");
+            Shopify_Prices_Document.DocumentName = "Shopify_Prices";
+            Shopify_Prices_Document.CustomerId = Guid.Empty;
+            Shopify_Prices_Document.ProjectId = Guid.Empty;
+            Shopify_Prices_Document.DocumentValue = System.Text.Json.JsonSerializer.Serialize(API_Prices, typeof(IEnumerable<Shopify_Prices>));
+            Document_Repository.AddJsonDocument(context, Shopify_Prices_Document);
+
+            Document Shopify_Quantities_Document = new Document();
+            Shopify_Quantities_Document.Id = new Guid("c1f7d63e-1f1a-42cd-8c00-254f3b77354d");
+            Shopify_Quantities_Document.DocumentName = "Shopify_Quantities";
+            Shopify_Quantities_Document.CustomerId = Guid.Empty;
+            Shopify_Quantities_Document.ProjectId = Guid.Empty;
+            Shopify_Quantities_Document.DocumentValue = System.Text.Json.JsonSerializer.Serialize(API_Quantities, typeof(IEnumerable<Shopify_Quantities>));
+            Document_Repository.AddJsonDocument(context, Shopify_Quantities_Document);
         }
         private static void CheckForDuplicates()
         {

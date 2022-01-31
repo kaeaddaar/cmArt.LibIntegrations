@@ -1,6 +1,7 @@
 ﻿@page "/PricesShopify"
 @inject HttpClient Http
 @using cmArt.Reece.ShopifyConnector
+@using cmArt.Portal.Data
 
 
 <PageTitle>Shopify Prices</PageTitle>
@@ -57,6 +58,9 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        records = await Http.GetFromJsonAsync<Shopify_Prices[]>("sample-data/tblShopifyPrices_ReecesAPI_page1.json");
+        string strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/b9ae61e7-4248-4c95-832d-acbb079a68df");
+        Document doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
+        records = (Shopify_Prices[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Prices[]));
+        //records = await Http.GetFromJsonAsync<Shopify_Prices[]>("sample-data/tblShopifyPrices_ReecesAPI_page1.json");
     }
 }

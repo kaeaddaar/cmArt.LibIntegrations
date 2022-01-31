@@ -3,6 +3,8 @@
 @using cmArt.LibIntegrations.ReportService
 @using cmArt.LibIntegrations.ETLPatternService
 @using cmArt.Reece.ShopifyConnector
+@using cmArt.Portal.Data
+
 
 <PageTitle>Single Part Review</PageTitle>
 
@@ -29,8 +31,8 @@ InvUnique: @invUnique <br />
 {
 <table class="table">
     <thead>
-        <th>Fields</th>
-        <th>Values</th>
+        <td>Fields</td>
+        <td>Values</td>
     </thead>
     <tbody>
         <tr>
@@ -64,8 +66,8 @@ else
 {
 <table class="table">
     <thead>
-        <th>Fields</th>
-        <th>Values</th>
+        <td>Fields</td>
+        <td>Values</td>
     </thead>
     <tbody>
         <tr>
@@ -111,6 +113,13 @@ else
                                 @for(int i = 0; i < 15; i++)
                                 {
                                     <td style="text-align:right;">
+                                    @if(S5Prices.Prices == null)
+                                    {
+                                    <div style="float: right;color:red;" align="right" title="Prices Missing">Prices Missing</div>
+                                    }
+                                    else
+                                    {
+                                                
                                         @if(S5Prices.Prices.Where(x => x.Level == i).FirstOrDefault() == null)
                                         {
                                         <div style="float: right;color:red;" align="right" title="Sched-@i missing">@(Decimal.Round((S5Prices.Prices.Where(x => x.Level == i).FirstOrDefault() ?? new S5PricePair()).Price, 2))</div>
@@ -119,6 +128,7 @@ else
                                         {
                                         <div style="float: right;" align="right" title="Sched-i">@(Decimal.Round((S5Prices.Prices.Where(x => x.Level == i).FirstOrDefault() ?? new S5PricePair()).Price, 2))</div>
                                         }
+                                    }
                                     </td>
                                 }
 
@@ -151,14 +161,22 @@ else
                                 @for(short i = 0; i < 5; i++)
                                 {
                                     <td style="text-align:right;">
-                                        @if(S5Quantities.Quantities.Where(x => x.Location == i).FirstOrDefault() == null)
+                                        @if(S5Quantities.Quantities == null)
                                         {
-                                        <div style="float: right;color:red;" align="right" title="Location-@i missing">@(Decimal.Round((S5Quantities.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
+                                            <div style="float: right;color:red;" align="right" title="Quantities Missing">Quantities Missing</div>
                                         }
                                         else
                                         {
-                                        <div style="float: right;" align="right" title="Location-i">@(Decimal.Round((S5Quantities.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
+                                            @if(S5Quantities.Quantities.Where(x => x.Location == i).FirstOrDefault() == null)
+                                            {
+                                            <div style="float: right;color:red;" align="right" title="Location-@i missing">@(Decimal.Round((S5Quantities.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
+                                            }
+                                            else
+                                            {
+                                            <div style="float: right;" align="right" title="Location-i">@(Decimal.Round((S5Quantities.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
+                                            }
                                         }
+
                                     </td>
                                 }
 
@@ -177,8 +195,8 @@ else
 {
 <table class="table">
     <thead>
-        <th>Fields</th>
-        <th>Values</th>
+        <td>Fields</td>
+        <td>Values</td>
     </thead>
     <tbody>
         <tr>
@@ -212,8 +230,8 @@ else
 {
 <table class="table">
     <thead>
-        <th>Fields</th>
-        <th>Values</th>
+        <td>Fields</td>
+        <td>Values</td>
     </thead>
     <tbody>
         <tr>
@@ -259,14 +277,21 @@ else
                                 @for(int i = 0; i < 15; i++)
                                 {
                                     <td style="text-align:right;">
-                                        @if(ShopifyPrices.Prices.Where(x => x.Level == i).FirstOrDefault() == null)
-                                        {
-                                        <div style="float: right;color:red;" align="right" title="Sched-@i missing">@(Decimal.Round((ShopifyPrices.Prices.Where(x => x.Level == i).FirstOrDefault() ?? new S5PricePair()).Price, 2))</div>
-                                        }
-                                        else
-                                        {
-                                        <div style="float: right;" align="right" title="Sched-i">@(Decimal.Round((ShopifyPrices.Prices.Where(x => x.Level == i).FirstOrDefault() ?? new S5PricePair()).Price, 2))</div>
-                                        }
+                                        @if(ShopifyPrices.Prices == null)
+                                            {
+                                                <div style="float: right;color:red;" align="right" title="Prices Missing">Prices Missing</div>
+                                            }
+                                            else
+                                            {
+                                                @if(ShopifyPrices.Prices.Where(x => x.Level == i).FirstOrDefault() == null)
+                                                {
+                                                <div style="float: right;color:red;" align="right" title="Sched-@i missing">@(Decimal.Round((ShopifyPrices.Prices.Where(x => x.Level == i).FirstOrDefault() ?? new S5PricePair()).Price, 2))</div>
+                                                }
+                                                else
+                                                {
+                                                <div style="float: right;" align="right" title="Sched-i">@(Decimal.Round((ShopifyPrices.Prices.Where(x => x.Level == i).FirstOrDefault() ?? new S5PricePair()).Price, 2))</div>
+                                                }
+                                            }
                                     </td>
                                 }
 
@@ -299,14 +324,21 @@ else
                                 @for(short i = 0; i < 5; i++)
                                 {
                                     <td style="text-align:right;">
-                                        @if(ShopifyQuantities.Quantities.Where(x => x.Location == i).FirstOrDefault() == null)
-                                        {
-                                        <div style="float: right;color:red;" align="right" title="Location-@i missing">@(Decimal.Round((ShopifyQuantities.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
-                                        }
-                                        else
-                                        {
-                                        <div style="float: right;" align="right" title="Location-i">@(Decimal.Round((ShopifyQuantities.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
-                                        }
+                                        @if(ShopifyQuantities.Quantities == null)
+                                            {
+                                                <div style="float: right;color:red;" align="right" title="Quantities Missing">Quantities Missing</div>
+                                            }
+                                            else
+                                            {
+                                                @if(ShopifyQuantities.Quantities.Where(x => x.Location == i).FirstOrDefault() == null)
+                                                {
+                                                <div style="float: right;color:red;" align="right" title="Location-@i missing">@(Decimal.Round((ShopifyQuantities.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
+                                                }
+                                                else
+                                                {
+                                                <div style="float: right;" align="right" title="Location-i">@(Decimal.Round((ShopifyQuantities.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
+                                                }
+                                            }
                                     </td>
                                 }
 
@@ -326,11 +358,11 @@ else
 {
     <table>
         <thead>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </thead>
         <tbody>
             <tr>
@@ -347,12 +379,12 @@ else
 {
         <table>
         <thead>
-            <th>InvUnique</th>
-            <th>Cat</th>
-            <th>PartNumber</th>
-            <th>FieldName</th>
-            <th>ExternalValueBeforeUpdate</th>
-            <th>S5ValueToSendToExternal</th>
+            <td>InvUnique</td>
+            <td>Cat</td>
+            <td>PartNumber</td>
+            <td>FieldName</td>
+            <td>ExternalValueBeforeUpdate</td>
+            <td>S5ValueToSendToExternal</td>
         </thead>
         <tbody>
             @foreach(var record in DetailedDifferences_SinglePart)
@@ -395,12 +427,37 @@ else
     protected override async Task OnInitializedAsync()
     {
         invUnique = string.Empty;
-        products_S5 = await Http.GetFromJsonAsync<Shopify_Product[]>("sample-data/tblPocoProductsAdapted_page1.json");
-        products_Shopify = await Http.GetFromJsonAsync<Shopify_Product[]>("sample-data/tblShopifyProducts_ReecesAPI_page1.json");
-        prices_S5 = await Http.GetFromJsonAsync<Shopify_Prices[]>("sample-data/tblPocoPricesAdapted_page1.json");
-        prices_Shopify = await Http.GetFromJsonAsync<Shopify_Prices[]>("sample-data/tblShopifyPrices_ReecesAPI_page1.json");
-        quantities_S5 = await Http.GetFromJsonAsync<Shopify_Quantities[]>("sample-data/tblPocoQuantitiesAdapted_page1.json");
-        quantities_Shopify = await Http.GetFromJsonAsync<Shopify_Quantities[]>("sample-data/tblShopifyQuantities_ReecesAPI_page1.json");
+
+        string strDocument = string.Empty; 
+        Document doc = new Document();
+
+        // ----- WARNING: data has to be put into table for each document and http calls adjusted. -----
+        // products
+        strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/74e5b8d9-f264-4029-af3a-f2c44c906511");
+        doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
+        products_S5 = (Shopify_Product[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Product[]));
+
+        strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/17cf9358-b783-46a2-97ee-ef69388f3904");
+        doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
+        products_Shopify = (Shopify_Product[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Product[]));
+
+        // prices
+        strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/7fb824a1-6b6a-46eb-bb0c-e4a315ccb6ec");
+        doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
+        prices_S5 = (Shopify_Prices[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Prices[]));
+
+        strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/b9ae61e7-4248-4c95-832d-acbb079a68df");
+        doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
+        prices_Shopify = (Shopify_Prices[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Prices[]));
+
+        // quantities
+        strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/c0aff18b-a32a-4b0b-bcc7-5808ddace171");
+        doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
+        quantities_S5 = (Shopify_Quantities[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Quantities[]));
+
+        strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/c1f7d63e-1f1a-42cd-8c00-254f3b77354d");
+        doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
+        quantities_Shopify = (Shopify_Quantities[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Quantities[]));
 
         DetailedDifferences_All = new List<Changes_View>();
         DetailedDifferences_SinglePart = new List<Changes_View>();
