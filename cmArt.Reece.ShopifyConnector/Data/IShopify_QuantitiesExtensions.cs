@@ -16,6 +16,15 @@ namespace cmArt.Reece.ShopifyConnector
             _quantities.Quantities = data.Quantities;
             return _quantities;
         }
+        public static IShopify_Quantities CopyFrom(this IShopify_Quantities To, IShopify_Quantities From)
+        {
+            To.Cat = From.Cat.TrimEnd();
+            To.InvUnique = From.InvUnique;
+            To.PartNumber = From.PartNumber.TrimEnd();
+            To.Quantities = From.Quantities;
+
+            return To;
+        }
         public static bool Equals(this IShopify_Quantities compareFrom, IShopify_Quantities compareTo)
         {
             try

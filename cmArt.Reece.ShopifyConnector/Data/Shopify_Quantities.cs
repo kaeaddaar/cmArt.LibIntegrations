@@ -17,6 +17,11 @@ namespace cmArt.Reece.ShopifyConnector
             return IShopify_Quantities.Equals(this, compareTo);
         }
 
+        public IShopify_Quantities CopyFrom(IShopify_Quantities IFrom)
+        {
+            return IShopify_QuantitiesExtensions.CopyFrom(this, IFrom);
+        }
+
         public IEnumerable<Changes_View> Diff(IShopify_Quantities CompareTo)
         {
             return IShopifyDataLoadFormatExtensions.Diff(this, CompareTo);

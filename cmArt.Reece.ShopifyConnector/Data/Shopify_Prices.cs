@@ -18,6 +18,11 @@ namespace cmArt.Reece.ShopifyConnector
             return IShopify_PricesExtensions.Equals(this, compareTo);
         }
 
+        public IShopify_Prices CopyFrom(IShopify_Prices IFrom)
+        {
+            return IShopify_PricesExtensions.CopyFrom(this, IFrom);
+        }
+
         public IEnumerable<Changes_View> Diff(IShopify_Prices CompareTo)
         {
             return IShopifyDataLoadFormatExtensions.Diff(this, CompareTo);
