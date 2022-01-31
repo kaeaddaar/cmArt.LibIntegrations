@@ -527,7 +527,7 @@ else
         }
         int _invUnique;
         int.TryParse(invUnique, out _invUnique);
-        ShopifyQuantities = quantities_S5.Where(x => x.InvUnique == _invUnique).FirstOrDefault();
+        ShopifyQuantities = quantities_Shopify.Where(x => x.InvUnique == _invUnique).FirstOrDefault();
         return ShopifyQuantities;
     }
     internal IEnumerable<Changes_View> GetDetailedDifferences()
