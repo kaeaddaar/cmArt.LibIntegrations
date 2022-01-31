@@ -537,6 +537,42 @@ else
     internal IEnumerable<Changes_View> GetDetailedDifferences()
     {
         Func<IShopify_Identity, int> fIndex = (x) => x.InvUnique;
+        if(products_S5 == null && products_Shopify == null && prices_S5 == null && prices_Shopify == null && quantities_S5 == null && quantities_Shopify == null)
+        {
+            DetailedDifferences_SinglePart = new List<Changes_View>();
+            return new List<Changes_View>(); ;
+        }
+        IEnumerable<Shopify_Product> prodsS5 = products_S5.Where(x => x.InvUnique.ToString() == invUnique);
+        IEnumerable<Shopify_Product> prodsShopify = products_Shopify.Where(x => x.InvUnique.ToString() == invUnique);
+        IEnumerable<Shopify_Prices> pricesS5 = prices_S5.Where(x => x.InvUnique.ToString() == invUnique);
+        IEnumerable<Shopify_Prices> pricesShopify = prices_Shopify.Where(x => x.InvUnique.ToString() == invUnique);
+        IEnumerable<Shopify_Quantities> quantitiesS5 = quantities_S5.Where(x => x.InvUnique.ToString() == invUnique);
+        IEnumerable<Shopify_Quantities> quantitiesShopify = quantities_Shopify.Where(x => x.InvUnique.ToString() == invUnique);
+
+        GenericAnalysis<Shopify_Product, IShopify_Product, int> Analyze_Product = new GenericAnalysis<Shopify_Product, IShopify_Product, int>();
+        Analyze_Product.init(prodsS5, prodsShopify, null);
+        DetailedDifferences_Product = Analyze_Product.GetDetailedDifferences(IShopify_ProductExtensions.Equals, fIndex);
+
+        GenericAnalysis<Shopify_Prices, IShopify_Prices, int> Analyze_Prices= new GenericAnalysis<Shopify_Prices, IShopify_Prices, int>();
+        Analyze_Prices.init(pricesS5, pricesShopify, null);
+        DetailedDifferences_Prices = Analyze_Prices.GetDetailedDifferences(IShopify_PricesExtensions.Equals, fIndex);
+
+        GenericAnalysis<Shopify_Quantities, IShopify_Quantities, int> Analyze_Quantities= new GenericAnalysis<Shopify_Quantities, IShopify_Quantities, int>();
+        Analyze_Quantities.init(quantitiesS5, quantitiesShopify, null);
+        DetailedDifferences_Quantities = Analyze_Quantities.GetDetailedDifferences(IShopify_QuantitiesExtensions.Equals, fIndex);
+
+        List<Changes_View> DetailedDifferences_All = new List<Changes_View>();
+        foreach(var record in DetailedDifferences_Product) { DetailedDifferences_All.Add(record); }
+        foreach(var record in DetailedDifferences_Prices) { DetailedDifferences_All.Add(record); }
+        foreach(var record in DetailedDifferences_Quantities) { DetailedDifferences_All.Add(record); }
+
+        DetailedDifferences_SinglePart = DetailedDifferences_All.Where(x => x.InvUnique.ToString() == invUnique);
+
+        return DetailedDifferences_SinglePart;
+    }
+    internal IEnumerable<Changes_View> GetAllDetailedDifferences()
+    {
+        Func<IShopify_Identity, int> fIndex = (x) => x.InvUnique;
 
         GenericAnalysis<Shopify_Product, IShopify_Product, int> Analyze_Product = new GenericAnalysis<Shopify_Product, IShopify_Product, int>();
         Analyze_Product.init(products_S5, products_Shopify, null);
@@ -559,4 +595,5 @@ else
 
         return DetailedDifferences_SinglePart;
     }
+    
 }

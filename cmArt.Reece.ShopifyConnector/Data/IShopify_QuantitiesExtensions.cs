@@ -36,7 +36,7 @@ namespace cmArt.Reece.ShopifyConnector
                     if (compareFrom.Quantities == null && compareTo.Quantities == null) { return true; }
 
                     IEnumerable<Tuple<S5QtyPair, S5QtyPair>> QtyPairs = GenericJoins<S5QtyPair, S5QtyPair, short>
-                        .FullOuterJoin(LeftRecords: compareTo.Quantities, RightRecords: compareTo.Quantities, LeftKey: S5QtyPairIndexes.Department, RightKey: S5QtyPairIndexes.Department);
+                        .FullOuterJoin(LeftRecords: compareFrom.Quantities, RightRecords: compareTo.Quantities, LeftKey: S5QtyPairIndexes.Department, RightKey: S5QtyPairIndexes.Department);
                     foreach (var QtyPair in QtyPairs)
                     {
                         if (QtyPair.Item1 == null || QtyPair.Item2 == null)

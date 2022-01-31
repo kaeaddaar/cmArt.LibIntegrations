@@ -72,7 +72,27 @@ namespace cmArt.LibIntegrations.GenericJoinsService
                 from RightNullRecord in RightNullRecords.DefaultIfEmpty()
                 select new Tuple<TLeft, TRight>(item1: LeftNullRecord, item2: RightNullRecord);
 
-            return results;
+            IEnumerable<Tuple<TLeft, TRight>> results2 = new List<Tuple<TLeft, TRight>>();
+
+            results2 =
+                from RightNullRecord in _RightRecords.DefaultIfEmpty()
+                join LeftRecord in _LeftRecords
+                on RightKey(RightNullRecord) equals LeftKey(LeftRecord)
+                into LeftNullRecords
+                from LeftNullRecord in LeftNullRecords.DefaultIfEmpty()
+                where LeftNullRecord == null
+                select new Tuple<TLeft, TRight>(item1: LeftNullRecord, item2: RightNullRecord);
+
+            List<Tuple<TLeft, TRight>> finalResults = new List<Tuple<TLeft, TRight>>();
+            foreach (var r in results)
+            {
+                finalResults.Add(r);
+            }
+            foreach (var r2 in results2)
+            {
+                finalResults.Add(r2);
+            }
+            return finalResults;
         }
         public static IEnumerable<Tuple<TLeft, TRight>> RightJoin
         (

@@ -84,7 +84,7 @@ namespace cmArt.Reece.ShopifyConnector
             }
             
             IEnumerable<Tuple<S5PricePair, S5PricePair>> PricePairs = GenericJoins<S5PricePair, S5PricePair, short>
-                .FullOuterJoin(LeftRecords: compareTo.Prices, RightRecords: compareTo.Prices, LeftKey: S5PricePairIndexes.Level, RightKey: S5PricePairIndexes.Level);
+                .FullOuterJoin(LeftRecords: compareFrom.Prices, RightRecords: compareTo.Prices, LeftKey: S5PricePairIndexes.Level, RightKey: S5PricePairIndexes.Level);
             foreach (var PricePair in PricePairs)
             {
                 if (PricePair.Item1.Price != PricePair.Item2.Price)
@@ -98,7 +98,7 @@ namespace cmArt.Reece.ShopifyConnector
             }
 
             IEnumerable<Tuple<S5QtyPair, S5QtyPair>> QtyPairs = GenericJoins<S5QtyPair, S5QtyPair, short>
-                .FullOuterJoin(LeftRecords: compareTo.Quantities, RightRecords: compareTo.Quantities, LeftKey: S5QtyPairIndexes.Department, RightKey: S5QtyPairIndexes.Department);
+                .FullOuterJoin(LeftRecords: compareFrom.Quantities, RightRecords: compareTo.Quantities, LeftKey: S5QtyPairIndexes.Department, RightKey: S5QtyPairIndexes.Department);
             foreach (var QtyPair in QtyPairs)
             {
                 if (QtyPair.Item1.Qty != QtyPair.Item2.Qty)
@@ -136,20 +136,47 @@ namespace cmArt.Reece.ShopifyConnector
             List<Changes_View> changes = new List<Changes_View>();
 
             IEnumerable<Tuple<S5QtyPair, S5QtyPair>> QtyPairs = GenericJoins<S5QtyPair, S5QtyPair, short>
-                .FullOuterJoin(LeftRecords: compareTo.Quantities, RightRecords: compareTo.Quantities, LeftKey: S5QtyPairIndexes.Department, RightKey: S5QtyPairIndexes.Department);
+                .FullOuterJoin(LeftRecords: compareFrom.Quantities, RightRecords: compareTo.Quantities, LeftKey: S5QtyPairIndexes.Department, RightKey: S5QtyPairIndexes.Department);
+            int countInfo = QtyPairs.Count();
             foreach (var QtyPair in QtyPairs)
             {
-                if (QtyPair.Item1.Qty != QtyPair.Item2.Qty)
+                if(QtyPair.Item2 == null && QtyPair.Item1 != null)
                 {
                     Changes_View tmp = new Changes_View();
                     tmp.InvUnique = compareFrom.InvUnique;
                     tmp.Cat = compareFrom.Cat;
                     tmp.PartNumber = compareFrom.PartNumber;
                     tmp.FieldName = "Quantities(Dept " + QtyPair.Item1.Location.ToString() + ")";
-                    tmp.S5ValueToSendToExternal = QtyPair.Item2.Location.ToString();
+                    tmp.S5ValueToSendToExternal = "(Null/Missing)";
                     tmp.ExternalValueBeforeUpdate = QtyPair.Item1.Location.ToString();
                     changes.Add(tmp);
                 }
+                if(QtyPair.Item1 == null && QtyPair.Item2 != null)
+                {
+                    Changes_View tmp = new Changes_View();
+                    tmp.InvUnique = compareFrom.InvUnique;
+                    tmp.Cat = compareFrom.Cat;
+                    tmp.PartNumber = compareFrom.PartNumber;
+                    tmp.FieldName = "Quantities(Dept " + QtyPair.Item2.Location.ToString() + ")";
+                    tmp.S5ValueToSendToExternal = QtyPair.Item2.Location.ToString();
+                    tmp.ExternalValueBeforeUpdate = "(Null/Missing)";
+                    changes.Add(tmp);
+                }
+                if(QtyPair.Item1 != null && QtyPair.Item2 != null)
+                {
+                    if (QtyPair.Item1.Qty != QtyPair.Item2.Qty)
+                    {
+                        Changes_View tmp = new Changes_View();
+                        tmp.InvUnique = compareFrom.InvUnique;
+                        tmp.Cat = compareFrom.Cat;
+                        tmp.PartNumber = compareFrom.PartNumber;
+                        tmp.FieldName = "Quantities(Dept " + QtyPair.Item1.Location.ToString() + ")";
+                        tmp.S5ValueToSendToExternal = QtyPair.Item2.Location.ToString();
+                        tmp.ExternalValueBeforeUpdate = QtyPair.Item1.Location.ToString();
+                        changes.Add(tmp);
+                    }
+                }
+                
             }
 
             return changes;
@@ -159,7 +186,7 @@ namespace cmArt.Reece.ShopifyConnector
             List<Changes_View> changes = new List<Changes_View>();
 
             IEnumerable<Tuple<S5PricePair, S5PricePair>> PricePairs = GenericJoins<S5PricePair, S5PricePair, short>
-                .FullOuterJoin(LeftRecords: compareTo.Prices, RightRecords: compareTo.Prices, LeftKey: S5PricePairIndexes.Level, RightKey: S5PricePairIndexes.Level);
+                .FullOuterJoin(LeftRecords: compareFrom.Prices, RightRecords: compareTo.Prices, LeftKey: S5PricePairIndexes.Level, RightKey: S5PricePairIndexes.Level);
             foreach (var PricePair in PricePairs)
             {
                 if (PricePair.Item1 == null || PricePair.Item2 == null)
@@ -283,7 +310,7 @@ namespace cmArt.Reece.ShopifyConnector
                 )
                 {
                     IEnumerable<Tuple<S5PricePair, S5PricePair>> PricePairs = GenericJoins<S5PricePair, S5PricePair, short>
-                        .FullOuterJoin(LeftRecords: compareTo.Prices, RightRecords: compareTo.Prices, LeftKey: S5PricePairIndexes.Level, RightKey: S5PricePairIndexes.Level);
+                        .FullOuterJoin(LeftRecords: compareFrom.Prices, RightRecords: compareTo.Prices, LeftKey: S5PricePairIndexes.Level, RightKey: S5PricePairIndexes.Level);
                     foreach (var PricePair in PricePairs)
                     {
                         if (PricePair.Item1.Price != PricePair.Item2.Price)
