@@ -101,12 +101,16 @@ namespace cmArt.Reece.ShopifyConnector
                 .FullOuterJoin(LeftRecords: compareFrom.Quantities, RightRecords: compareTo.Quantities, LeftKey: S5QtyPairIndexes.Department, RightKey: S5QtyPairIndexes.Department);
             foreach (var QtyPair in QtyPairs)
             {
-                if (QtyPair.Item1.Qty != QtyPair.Item2.Qty)
+                Tuple<S5QtyPair, S5QtyPair> tmpPair = FillMissing(QtyPair);
+                if (tmpPair.Item1.Qty != tmpPair.Item2.Qty)
                 {
-                    Changes_View tmp = GetNewChanges_View_WithDefaults(compareFrom);
-                    tmp.FieldName = "Quantities(Dept " + QtyPair.Item1.Location.ToString() + ")";
-                    tmp.S5ValueToSendToExternal = QtyPair.Item2.Location.ToString();
-                    tmp.ExternalValueBeforeUpdate = QtyPair.Item1.Location.ToString();
+                    Changes_View tmp = new Changes_View();
+                    tmp.InvUnique = compareFrom.InvUnique;
+                    tmp.Cat = compareFrom.Cat;
+                    tmp.PartNumber = compareFrom.PartNumber;
+                    tmp.FieldName = "Quantities(Dept " + tmpPair.Item1.Location.ToString() + ")";
+                    tmp.S5ValueToSendToExternal = tmpPair.Item2.Qty.ToString();
+                    tmp.ExternalValueBeforeUpdate = tmpPair.Item1.Qty.ToString();
                     changes.Add(tmp);
                 }
             }
@@ -136,50 +140,68 @@ namespace cmArt.Reece.ShopifyConnector
             List<Changes_View> changes = new List<Changes_View>();
 
             IEnumerable<Tuple<S5QtyPair, S5QtyPair>> QtyPairs = GenericJoins<S5QtyPair, S5QtyPair, short>
-                .FullOuterJoin(LeftRecords: compareFrom.Quantities, RightRecords: compareTo.Quantities, LeftKey: S5QtyPairIndexes.Department, RightKey: S5QtyPairIndexes.Department);
+                .FullOuterJoin(LeftRecords: compareTo.Quantities, RightRecords: compareFrom.Quantities, LeftKey: S5QtyPairIndexes.Department, RightKey: S5QtyPairIndexes.Department);
             int countInfo = QtyPairs.Count();
-            foreach (var QtyPair in QtyPairs)
+            foreach (Tuple<S5QtyPair, S5QtyPair> QtyPair in QtyPairs)
             {
-                if(QtyPair.Item2 == null && QtyPair.Item1 != null)
+                Tuple<S5QtyPair, S5QtyPair> tmpPair = FillMissing(QtyPair);
+                if (tmpPair.Item1.Qty != tmpPair.Item2.Qty)
                 {
                     Changes_View tmp = new Changes_View();
                     tmp.InvUnique = compareFrom.InvUnique;
                     tmp.Cat = compareFrom.Cat;
                     tmp.PartNumber = compareFrom.PartNumber;
-                    tmp.FieldName = "Quantities(Dept " + QtyPair.Item1.Location.ToString() + ")";
-                    tmp.S5ValueToSendToExternal = "(Null/Missing)";
-                    tmp.ExternalValueBeforeUpdate = QtyPair.Item1.Location.ToString();
+                    tmp.FieldName = "Quantities(Dept " + tmpPair.Item1.Location.ToString() + ")";
+                    tmp.S5ValueToSendToExternal = tmpPair.Item2.Qty.ToString();
+                    tmp.ExternalValueBeforeUpdate = tmpPair.Item1.Qty.ToString();
                     changes.Add(tmp);
-                }
-                if(QtyPair.Item1 == null && QtyPair.Item2 != null)
-                {
-                    Changes_View tmp = new Changes_View();
-                    tmp.InvUnique = compareFrom.InvUnique;
-                    tmp.Cat = compareFrom.Cat;
-                    tmp.PartNumber = compareFrom.PartNumber;
-                    tmp.FieldName = "Quantities(Dept " + QtyPair.Item2.Location.ToString() + ")";
-                    tmp.S5ValueToSendToExternal = QtyPair.Item2.Location.ToString();
-                    tmp.ExternalValueBeforeUpdate = "(Null/Missing)";
-                    changes.Add(tmp);
-                }
-                if(QtyPair.Item1 != null && QtyPair.Item2 != null)
-                {
-                    if (QtyPair.Item1.Qty != QtyPair.Item2.Qty)
-                    {
-                        Changes_View tmp = new Changes_View();
-                        tmp.InvUnique = compareFrom.InvUnique;
-                        tmp.Cat = compareFrom.Cat;
-                        tmp.PartNumber = compareFrom.PartNumber;
-                        tmp.FieldName = "Quantities(Dept " + QtyPair.Item1.Location.ToString() + ")";
-                        tmp.S5ValueToSendToExternal = QtyPair.Item2.Location.ToString();
-                        tmp.ExternalValueBeforeUpdate = QtyPair.Item1.Location.ToString();
-                        changes.Add(tmp);
-                    }
                 }
                 
             }
 
             return changes;
+        }
+        private static Tuple<S5PricePair, S5PricePair> FillMissing(Tuple<S5PricePair, S5PricePair> data)
+        {
+            if (data.Item1 == null && data.Item2 == null)
+            {
+                Tuple<S5PricePair, S5PricePair> tmpFillEmpty = new Tuple<S5PricePair, S5PricePair>(S5PricePair.Empty(0), S5PricePair.Empty(0));
+                return tmpFillEmpty;
+            }
+            S5PricePair Left = data.Item1;
+            S5PricePair Right = data.Item2;
+            if (Left == null)
+            {
+                Left = S5PricePair.Empty(Right.Level);
+            }
+            if (Right == null)
+            {
+                Right = S5PricePair.Empty(Left.Level);
+            }
+            Tuple<S5PricePair, S5PricePair> tmpFill = new Tuple<S5PricePair, S5PricePair>(Left, Right);
+
+            return tmpFill;
+        }
+        private static Tuple<S5QtyPair, S5QtyPair> FillMissing(Tuple<S5QtyPair, S5QtyPair> data)
+        {
+            if(data.Item1 == null && data.Item2 == null)
+            {
+                Tuple<S5QtyPair, S5QtyPair> tmpFillEmpty = new Tuple<S5QtyPair, S5QtyPair>(new S5QtyPair(1, 0), new S5QtyPair(1, 0));
+                return tmpFillEmpty;
+            }
+            S5QtyPair Left = data.Item1;
+            S5QtyPair Right = data.Item2;
+            if (Left == null)
+            {
+                Left = S5QtyPair.Empty(Right.Location);
+            } 
+            if (Right == null)
+            {
+                Right = S5QtyPair.Empty(Left.Location);
+            }
+            Tuple<S5QtyPair, S5QtyPair> tmpFill = new Tuple<S5QtyPair, S5QtyPair>(Left, Right);
+
+            return tmpFill;
         }
         public static IEnumerable<Changes_View> Diff(this IShopify_Prices compareFrom, IShopify_Prices compareTo)
         {

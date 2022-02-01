@@ -2,8 +2,12 @@
 @inject HttpClient Http
 @using cmArt.LibIntegrations.ReportService
 @using cmArt.LibIntegrations.ETLPatternService
+@using cmArt.LibIntegrations.VennMapService
 @using cmArt.Reece.ShopifyConnector
 @using cmArt.Portal.Data
+@using System.Net.Http
+@using System.Net.Http.Headers
+@using System.Text.Json
 
 
 <PageTitle>Single Part Review</PageTitle>
@@ -25,7 +29,9 @@ else
 }
 </select>
 InvUnique: @invUnique <br />
-
+<button @onclick="OnPartSelected">Does @invUnique need to be Added, Edited, or Deleted?</button> ANS: @PartAction<br />
+<input value="@strS5Json" />
+<input value="@strShopifyJson" />
 <h2>S5 Part Info:</h2>
 @if(GetActiveS5Product() == null)
 {
@@ -173,7 +179,7 @@ else
                                             }
                                             else
                                             {
-                                            <div style="float: right;" align="right" title="Location-i">@(Decimal.Round((S5Quantities.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
+                                            <div style="float: right;" align="right" title="Location-@i">@(Decimal.Round((S5Quantities.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
                                             }
                                         }
 
@@ -336,7 +342,7 @@ else
                                                 }
                                                 else
                                                 {
-                                                <div style="float: right;" align="right" title="Location-i">@(Decimal.Round((ShopifyQuantities.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
+                                                <div style="float: right;" align="right" title="Location-@i">@(Decimal.Round((ShopifyQuantities.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
                                                 }
                                             }
                                     </td>
@@ -426,9 +432,23 @@ else
     private IEnumerable<Changes_View> DetailedDifferences_SinglePart;
     //private ILogger logger;
 
+    private string PartAction;
+    IEnumerable<Shopify_Product> prodsS5;
+    IEnumerable<Shopify_Product> prodsShopify;
+    IEnumerable<Shopify_Prices> pricesS5;
+    IEnumerable<Shopify_Prices> pricesShopify;
+    IEnumerable<Shopify_Quantities> quantitiesS5;
+    IEnumerable<Shopify_Quantities> quantitiesShopify;
+
+    private string strS5Json;
+    private string strShopifyJson;
+
     protected override async Task OnInitializedAsync()
     {
+        PartAction = "Unknown";
         invUnique = string.Empty;
+        strS5Json = "{}";
+        strShopifyJson = "{}";
 
         string strDocument = string.Empty; 
         Document doc = new Document();
@@ -465,6 +485,25 @@ else
         DetailedDifferences_Prices = new List<Changes_View>();
         DetailedDifferences_Quantities = new List<Changes_View>();
         DetailedDifferences_SinglePart = new List<Changes_View>();
+    }
+    internal async void OnPartSelected()
+    {
+        int InvUnique = 0;
+        int.TryParse(invUnique, out InvUnique);
+        if(InvUnique <= 0)
+        {
+            return;
+        }
+        Func<IShopify_Identity, int> fIndex = (x) => x.InvUnique;
+        Func<Shopify_Product, bool> fIsEcomm = (x) => true;
+        VennMap<Shopify_Product, Shopify_Product, int> vennMap_Product = new VennMap<Shopify_Product, Shopify_Product, int>(prodsShopify, prodsS5, fIndex, fIndex, fIsEcomm);
+
+        //string result = cmArt.Reece.ShopifyConnector.ReeceShopify.Products_Edit(vennMap_Product.Both_Ecomm.Select(x => x.Item1));
+        List<Shopify_Product> prods = new List<Shopify_Product>(vennMap_Product.Both_Ecomm.Select(x => x.Item1));
+        string strEditProducts = JsonSerializer.Serialize(prods, typeof(List<Shopify_Product>));
+        string tmpResults = await MakeApiPostCallLocal("/product/edit/", strEditProducts);
+
+        PartAction = tmpResults;
     }
     internal Shopify_Product GetActiveS5Product()
     {
@@ -542,12 +581,12 @@ else
             DetailedDifferences_SinglePart = new List<Changes_View>();
             return new List<Changes_View>(); ;
         }
-        IEnumerable<Shopify_Product> prodsS5 = products_S5.Where(x => x.InvUnique.ToString() == invUnique);
-        IEnumerable<Shopify_Product> prodsShopify = products_Shopify.Where(x => x.InvUnique.ToString() == invUnique);
-        IEnumerable<Shopify_Prices> pricesS5 = prices_S5.Where(x => x.InvUnique.ToString() == invUnique);
-        IEnumerable<Shopify_Prices> pricesShopify = prices_Shopify.Where(x => x.InvUnique.ToString() == invUnique);
-        IEnumerable<Shopify_Quantities> quantitiesS5 = quantities_S5.Where(x => x.InvUnique.ToString() == invUnique);
-        IEnumerable<Shopify_Quantities> quantitiesShopify = quantities_Shopify.Where(x => x.InvUnique.ToString() == invUnique);
+        prodsS5 = products_S5.Where(x => x.InvUnique.ToString() == invUnique);
+        prodsShopify = products_Shopify.Where(x => x.InvUnique.ToString() == invUnique);
+        pricesS5 = prices_S5.Where(x => x.InvUnique.ToString() == invUnique);
+        pricesShopify = prices_Shopify.Where(x => x.InvUnique.ToString() == invUnique);
+        quantitiesS5 = quantities_S5.Where(x => x.InvUnique.ToString() == invUnique);
+        quantitiesShopify = quantities_Shopify.Where(x => x.InvUnique.ToString() == invUnique);
 
         GenericAnalysis<Shopify_Product, IShopify_Product, int> Analyze_Product = new GenericAnalysis<Shopify_Product, IShopify_Product, int>();
         Analyze_Product.init(prodsS5, prodsShopify, null);
@@ -595,5 +634,44 @@ else
 
         return DetailedDifferences_SinglePart;
     }
+    private async Task<string> MakeApiPostCallLocal(string urlCommand, string content)
+    {
+        //LogApiCalls("urlCommand(Post): " + urlCommand);
+        //LogApiCalls("content: " + content);
+
+        const string BaseUrl = "https://aquadragonservices.com/pcr/apitest/index.php";
+
+        HttpClient client = new HttpClient();
+        client.Timeout = TimeSpan.FromMinutes(10);
+
+        Uri baseUri = new Uri(BaseUrl + urlCommand);
+        client.BaseAddress = baseUri;
+        client.DefaultRequestHeaders.Clear();
+        client.DefaultRequestHeaders.ConnectionClose = true;
+
+        string clientId = "shopravi";
+        string clientSecret = "H9pPG9yW58cMP45e";
+
+        // Async Call
+        var authenticationString = $"{clientId}:{clientSecret}";
+        var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
+
+        HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, baseUri);
+        requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+        requestMessage.Content = new StringContent(content);
+
+        //make the request
+        //var task = client.SendAsync(requestMessage);
+        //var response = task.Result;
+        var response = await client.SendAsync(requestMessage);
+        //var response = task.Result;
+        response.EnsureSuccessStatusCode();
+        string responseBody = response.Content.ReadAsStringAsync().Result;
+
+        //LogApiCalls("responseBody: " + responseBody);
+        //Task<string> result = new Task<string>(() => responseBody);
+        return responseBody;
+    }
+
     
 }

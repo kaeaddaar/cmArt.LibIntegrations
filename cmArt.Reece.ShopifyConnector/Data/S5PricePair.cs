@@ -17,6 +17,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public short Level { get; set; }
         public decimal Price { get; set; }
+        public static S5PricePair Empty(short level) => new S5PricePair(level, 100000);
         //public double pricing
         //{
         //    get

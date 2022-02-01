@@ -7,6 +7,9 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using System.Net;
+using System.Text;
+using System.IO;
 
 namespace cmArt.Reece.ShopifyConnector
 {
@@ -100,10 +103,11 @@ namespace cmArt.Reece.ShopifyConnector
             string clientId = "shopravi";
             string clientSecret = "H9pPG9yW58cMP45e";
 
+            // Async Call
             var authenticationString = $"{clientId}:{clientSecret}";
             var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, baseUri);
+            HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, baseUri);
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
             requestMessage.Content = new StringContent(content);
 
@@ -113,6 +117,32 @@ namespace cmArt.Reece.ShopifyConnector
             response.EnsureSuccessStatusCode();
             string responseBody = response.Content.ReadAsStringAsync().Result;
 
+            //// Sync Call
+            //WebRequest request = HttpWebRequest.Create(baseUri);
+            //request.ContentType = "application/json, charset=utf-8";
+            //request.Method = "POST";
+
+            //string encoded = System.Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1")
+            //                               .GetBytes(clientId + ":" + clientSecret));
+            //request.Headers.Add("Authorization", "Basic " + encoded);
+
+            //ASCIIEncoding encoding = new ASCIIEncoding();
+            //byte[] data = encoding.GetBytes(content);
+            //request.ContentLength = data.Length;
+            //Stream newStream = request.GetRequestStream(); //open connection
+            //newStream.Write(data, 0, data.Length); // Send the data.
+            //newStream.Close();
+
+            //string text;
+            //var responseSync = (HttpWebResponse)request.GetResponse();
+
+            //using (var sr = new StreamReader(responseSync.GetResponseStream()))
+            //{
+            //    text = sr.ReadToEnd();
+            //}
+
+            //LogApiCalls("responseBody: " + text);
+            //return text;
             LogApiCalls("responseBody: " + responseBody);
             return responseBody;
         }

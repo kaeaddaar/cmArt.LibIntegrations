@@ -14,6 +14,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public short Location { get; set; }
         public decimal Qty { get; set; }
+        public static S5QtyPair Empty(short department) => new S5QtyPair(department, 0);
 
     }
 }
