@@ -30,6 +30,7 @@ else
 </select>
 InvUnique: @invUnique <br />
 <button @onclick="OnPartSelected">Does @invUnique need to be Added, Edited, or Deleted?</button> ANS: @PartAction<br />
+<button @onclick="() => GetDetailedDifferences()">Get Detailed Differences</button><br />
 <input value="@strS5Json" />
 <input value="@strShopifyJson" />
 <h2>S5 Part Info:</h2>
@@ -658,15 +659,16 @@ else
 
         HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, baseUri);
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
-        requestMessage.Content = new StringContent(content);
+        //requestMessage.Content = new StringContent(content);
+        requestMessage.Content = new StringContent(content, encoding: System.Text.Encoding.ASCII, "application/json" );
 
         //make the request
         //var task = client.SendAsync(requestMessage);
         //var response = task.Result;
         var response = await client.SendAsync(requestMessage);
-        //var response = task.Result;
+
         response.EnsureSuccessStatusCode();
-        string responseBody = response.Content.ReadAsStringAsync().Result;
+        string responseBody = await response.Content.ReadAsStringAsync();
 
         //LogApiCalls("responseBody: " + responseBody);
         //Task<string> result = new Task<string>(() => responseBody);

@@ -421,25 +421,6 @@ namespace cmArt.Reece.ShopifyConnector
             }
             return Data.Select(p => p.AsShopify_Product());
         }
-        public static IEnumerable<Shopify_Prices> GetAllShopify_Prices()
-        {
-            LogInfo("GetAllShopify_Prices()");
-            Discounts_Sync();
-            try
-            {
-                string results = MakeApiGetCall("/discount/list");
-
-                List<Shopify_Prices> Data = (List<Shopify_Prices>)JsonSerializer.Deserialize(results, typeof(List<Shopify_Prices>));
-
-                return Data;
-            }
-            catch (Exception e)
-            {
-                string msg = "Error in Products_Edit: " + e.ToString();
-                LogInfo(msg);
-                return new List<Shopify_Prices>();
-            }
-        }
         public static IEnumerable<tmpShopify_Prices> GetAlltmpShopify_Prices()
         {
             LogInfo("GetAlltmpShopify_Prices()");
@@ -458,23 +439,6 @@ namespace cmArt.Reece.ShopifyConnector
                 LogInfo(msg);
                 return new List<tmpShopify_Prices>();
             }
-        }
-        public static IEnumerable<Shopify_Quantities> GetAllShopify_Quantities()
-        {
-            LogInfo("GetAllShopify_Quantities()");
-            Inventory_Sync();
-            string results = MakeApiGetCall("/inventory/list");
-            List<Shopify_Quantities> Data = new List<Shopify_Quantities>();
-            try
-            {
-                Data = (List<Shopify_Quantities>)JsonSerializer.Deserialize(results, typeof(List<Shopify_Quantities>));
-            }
-            catch (Exception e)
-            {
-                LogInfo(e.ToString());
-            }
-            Data = Data ?? new List<Shopify_Quantities>();
-            return Data;
         }
         public static IEnumerable<tmpShopify_Quantities> GetAlltmpShopify_Quantities()
         {
