@@ -1,3 +1,4 @@
+using cmArt.LibIntegrations.GenericJoinsService;
 using cmArt.Reece.ShopifyConnector;
 using cmArt.Shopify.App.Data;
 using cmArt.System5.Data;
@@ -13,6 +14,53 @@ namespace UnitTestShopifyApp
     [TestClass]
     public class BasicTests
     {
+        [TestMethod]
+        public void Recreation_of_AsShopify_Quantities_or_select_loses_LocationDept_info()
+        {
+            List<tmpShopify_Quantities> tmpApi_Quantities = new List<tmpShopify_Quantities>();
+            
+            tmpShopify_Quantities ItemOne = new tmpShopify_Quantities();
+            ItemOne.partNumber = "ItemOne";
+            ItemOne.Quantities = new List<tmpS5QtyPair>();
+            ItemOne.Quantities.Add(new tmpS5QtyPair("62675222726", 1));
+
+            tmpApi_Quantities.Add(ItemOne);
+
+            IEnumerable<Shopify_Quantities> MissingInfoQuantities = tmpApi_Quantities.Select(p => p.AsShopify_Quantities()).ToList();
+            Assert.AreEqual(1, MissingInfoQuantities.First().Quantities.First().Location);
+            
+            List<Shopify_Product> API_Products = new List<Shopify_Product>();
+
+            Shopify_Product ProductOne = new Shopify_Product();
+            ProductOne.Cat = "000";
+            ProductOne.Description = "Product One Description";
+            ProductOne.PartNumber = "ItemOne";
+            ProductOne.WebCategory = "undefined";
+            ProductOne.InvUnique = 1;
+
+            API_Products.Add(ProductOne);
+
+            Func<IShopify_Quantities, string> fGetQuantitiesPartNumber = (sp) => { return sp.PartNumber.TrimEnd(); };
+            Func<IShopify_Product, string> fGetProductPartNumber = (sp) => { return sp.PartNumber.TrimEnd(); };
+
+            IEnumerable<Tuple<IShopify_Product, Shopify_Quantities>> joined_quantities =
+                GenericJoins<IShopify_Product, Shopify_Quantities, string>.LeftJoin(API_Products, MissingInfoQuantities, fGetProductPartNumber, fGetQuantitiesPartNumber);
+
+            IEnumerable<Shopify_Quantities> API_Quantities = new List<Shopify_Quantities>();
+
+            API_Quantities = joined_quantities.Where(p => p.Item2 != null).Select(p =>
+            {
+                Shopify_Quantities tmpQtys = new Shopify_Quantities();
+                tmpQtys.CopyFrom(p.Item2);
+                tmpQtys.InvUnique = p.Item1.InvUnique;
+                tmpQtys.Cat = p.Item1.Cat;
+                return tmpQtys;
+                //p.Item2.InvUnique = p.Item1.InvUnique;
+                //p.Item2.Cat = p.Item1.Cat;
+                //return p.Item2;
+            });
+            Assert.AreEqual(1, API_Quantities.First().Quantities.First().Location);
+        }
         [TestMethod]
         public void Create_Two_ShopifyDataLoadFormat_records()  // no tests, works if it can do the assignments
         {

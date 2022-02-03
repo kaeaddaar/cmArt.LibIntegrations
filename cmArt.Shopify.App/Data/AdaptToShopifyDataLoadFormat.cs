@@ -220,6 +220,16 @@ namespace cmArt.Shopify.App.Data
         {
             return IShopifyDataLoadFormatExtensions.Diff(this, CompareTo);
         }
+
+        public IShopify_Prices CopyFrom(IShopify_Prices IFrom)
+        {
+            return IShopify_PricesExtensions.CopyFrom(this, IFrom);
+        }
+
+        public IShopify_Quantities CopyFrom(IShopify_Quantities IFrom)
+        {
+            return IShopify_QuantitiesExtensions.CopyFrom(this, IFrom);
+        }
     }
 
 }

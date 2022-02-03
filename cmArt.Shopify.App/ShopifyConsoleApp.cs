@@ -767,16 +767,19 @@ namespace cmArt.Shopify.App
                 logger.LogInformation($"Failed to get All shopify quantities from Custom API. Message = \"{e.Message}\"");
                 Console.ReadKey();
             }
-            IEnumerable<Shopify_Quantities> MissingInfoQuantities = tmpApi_Quantities.Select(p => p.AsShopify_Quantities());
+            IEnumerable<Shopify_Quantities> MissingInfoQuantities = tmpApi_Quantities.Select(p => p.AsShopify_Quantities()).ToList();
             Func<IShopify_Quantities, string> fGetQuantitiesPartNumber = (sp) => { return sp.PartNumber; };
 
             IEnumerable<Tuple<IShopify_Product, Shopify_Quantities>> joined_quantities =
                 GenericJoins<IShopify_Product, Shopify_Quantities, string>.LeftJoin(API_Products, MissingInfoQuantities, fGetProductPartNumber, fGetQuantitiesPartNumber);
+            
             API_Quantities = joined_quantities.Where(p => p.Item2 != null).Select(p =>
             {
-                p.Item2.InvUnique = p.Item1.InvUnique;
-                p.Item2.Cat = p.Item1.Cat;
-                return p.Item2;
+                Shopify_Quantities tmpQtys = new Shopify_Quantities();
+                tmpQtys.CopyFrom(p.Item2);
+                tmpQtys.InvUnique = p.Item1.InvUnique;
+                tmpQtys.Cat = p.Item1.Cat;
+                return tmpQtys;
             });
 
             Reports.SaveReport(API_Quantities, "FromShopify_Quantities", settings, logger);
