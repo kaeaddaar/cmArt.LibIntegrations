@@ -93,7 +93,7 @@ namespace cmArt.Reece.ShopifyConnector
             LogApiCalls("urlCommand(Post): " + urlCommand);
             LogApiCalls("content: " + content);
             HttpClient client = new HttpClient();
-            client.Timeout = TimeSpan.FromMinutes(10);
+            client.Timeout = TimeSpan.FromMinutes(15);
 
             Uri baseUri = new Uri(BaseUrl + urlCommand);
             client.BaseAddress = baseUri;
