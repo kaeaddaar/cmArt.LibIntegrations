@@ -212,7 +212,17 @@ namespace cmArt.Shopify.App
                 {
                     logger.LogInformation("Performing Edits on Changed Products");
                     logger.LogInformation($"Number of Changed Products: {changedProducts.Count()}");
-                    Product_Edit_Results = ReeceShopify.Products_Edit(changedProducts);
+
+                    bool sendAllProductsToBeEdited = false;
+                    if (sendAllProductsToBeEdited)
+                    {
+                        IEnumerable<Shopify_Product> objProds = prods.Select(x => x.AsShopify_Product());
+                        Product_Edit_Results = ReeceShopify.Products_Edit(objProds);
+                    }
+                    else
+                    {
+                        Product_Edit_Results = ReeceShopify.Products_Edit(changedProducts);
+                    }
 
                     string FileNameChangedProducts = settings.OutputDirectory + "\\changedProducts.json.txt";
                     string content = System.Text.Json.JsonSerializer.Serialize(changedProducts.ToList(), typeof(List<Shopify_Product>));
