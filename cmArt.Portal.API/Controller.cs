@@ -22,7 +22,6 @@ namespace BlazorApp.Api
 {
     public static class Controller
     {
-
         [FunctionName("JsonDocument_Controller")]
         public static async Task<IActionResult> Run_JsonDocument
         (
@@ -38,14 +37,14 @@ namespace BlazorApp.Api
         }
 
         [FunctionName("MakeApiPostCall_Controller")]
-        public static async Task<IActionResult> RunMakeApiCall
+        public static async Task<IActionResult> RunMakeApiPostCall
         (
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "MakeApiPostCall")] HttpRequest req,
             ILogger log
         )
         {
 
-            string strUrlCommand = req.Headers["urlCommand"];
+            string urlCommand = req.Headers["urlCommand"];
             string content = string.Empty;
             using (var sr = new StreamReader(req.Body))
             {
@@ -63,7 +62,7 @@ namespace BlazorApp.Api
             HttpClient client = new HttpClient();
             client.Timeout = TimeSpan.FromMinutes(15);
 
-            Uri baseUri = new Uri(BaseUrl + strUrlCommand);
+            Uri baseUri = new Uri(BaseUrl + urlCommand);
             client.BaseAddress = baseUri;
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.ConnectionClose = true;
@@ -85,6 +84,50 @@ namespace BlazorApp.Api
             response.EnsureSuccessStatusCode();
             string responseBody = response.Content.ReadAsStringAsync().Result;
 
+            return new OkObjectResult(responseBody);
+        }
+        [FunctionName("MakeApiGetCall_Controller")]
+        public static async Task<IActionResult> RunMakeApiGetCall
+        (
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "MakeApiGetCall")] HttpRequest req,
+            ILogger log
+        )
+        {
+            string BaseUrl = "https://aquadragonservices.com/pcr/apitest/index.php";
+
+            string urlCommand = req.Headers["urlCommand"];
+            string content = string.Empty;
+            using (var sr = new StreamReader(req.Body))
+            {
+                content = await sr.ReadToEndAsync();
+            }
+
+            //LogApiCalls("urlCommand(Get - Secured): " + urlCommand);
+            HttpClient client = new HttpClient();
+            client.Timeout = TimeSpan.FromMinutes(10);
+
+            Uri baseUri = new Uri(BaseUrl + urlCommand);
+            client.BaseAddress = baseUri;
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.ConnectionClose = true;
+
+            string clientId = "shopravi";
+            string clientSecret = "H9pPG9yW58cMP45e";
+
+            var authenticationString = $"{clientId}:{clientSecret}";
+            var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, baseUri);
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+            //requestMessage.Content = content;
+
+            //make the request
+            var task = client.SendAsync(requestMessage);
+            var response = task.Result;
+            response.EnsureSuccessStatusCode();
+            string responseBody = response.Content.ReadAsStringAsync().Result;
+
+            //LogApiCalls("responseBody: " + responseBody);
             return new OkObjectResult(responseBody);
         }
 
