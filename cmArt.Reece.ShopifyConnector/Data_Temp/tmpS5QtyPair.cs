@@ -21,7 +21,10 @@ namespace cmArt.Reece.ShopifyConnector
             else if (Location == "63449497798") { tmpLocation = 2; }
             else if (Location == "63449530566") { tmpLocation = 3; }
             else if (Location == "63449563334") { tmpLocation = 4; }
-
+            else 
+            {
+                short.TryParse(Location, out tmpLocation);
+            }
             S5QtyPair s5QtyPair = new S5QtyPair(tmpLocation, Qty);
             return s5QtyPair;
         }
