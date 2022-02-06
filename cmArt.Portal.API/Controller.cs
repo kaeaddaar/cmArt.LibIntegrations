@@ -13,11 +13,16 @@ using cmArt.Portal.API.Services;
 using cmArt.Portal.API.Data;
 using cmArt.Portal.API.Repositories;
 using cmArt.Portal.Data;
+// -----
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.IO;
 
 namespace BlazorApp.Api
 {
     public static class Controller
     {
+
         [FunctionName("JsonDocument_Controller")]
         public static async Task<IActionResult> Run_JsonDocument
         (
@@ -31,5 +36,58 @@ namespace BlazorApp.Api
             Func<Context, Document, int> funcDelete = ControllerGeneric<Document, Guid, Context, IContext>.DeleteObject_Default;
             return await ControllerGeneric<Document, Guid, Context, IContext>.Run(Document_Repository.GetJsonDocument, req, log, idIn, funcAdd, funcDelete, utils.StringToGuid);
         }
+
+        [FunctionName("MakeApiPostCall_Controller")]
+        public static async Task<IActionResult> RunMakeApiCall
+        (
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "MakeApiPostCall")] HttpRequest req,
+            ILogger log
+        )
+        {
+
+            string strUrlCommand = req.Headers["urlCommand"];
+            string content = string.Empty;
+            using (var sr = new StreamReader(req.Body))
+            {
+                content = await sr.ReadToEndAsync();
+            }
+
+            //return new OkObjectResult("strUrlCommand"+ strUrlCommand);
+
+            // -----
+            //LogApiCalls("urlCommand(Post): " + urlCommand);
+            //LogApiCalls("content: " + content);
+
+            string BaseUrl = "https://aquadragonservices.com/pcr/apitest/index.php";
+
+            HttpClient client = new HttpClient();
+            client.Timeout = TimeSpan.FromMinutes(15);
+
+            Uri baseUri = new Uri(BaseUrl + strUrlCommand);
+            client.BaseAddress = baseUri;
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.ConnectionClose = true;
+
+            string clientId = "shopravi";
+            string clientSecret = "H9pPG9yW58cMP45e";
+
+            // Async Call
+            var authenticationString = $"{clientId}:{clientSecret}";
+            var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
+
+            HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, baseUri);
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+            requestMessage.Content = new StringContent(content);
+
+            //make the request
+            var task = client.SendAsync(requestMessage);
+            var response = task.Result;
+            response.EnsureSuccessStatusCode();
+            string responseBody = response.Content.ReadAsStringAsync().Result;
+
+            return new OkObjectResult(responseBody);
+        }
+
+
     }
 }
