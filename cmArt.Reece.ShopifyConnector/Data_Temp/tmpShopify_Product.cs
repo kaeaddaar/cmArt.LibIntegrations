@@ -22,7 +22,20 @@ namespace cmArt.Reece.ShopifyConnector
 
         public decimal WholesaleCost { get; set; }
         public string Cat { get; set; }
-        public string InvUnique { get; set; }
+        private int _InvUnique;
+        public string InvUnique 
+        { 
+            get
+            {
+                return _InvUnique.ToString();
+            }
+            set
+            {
+                int tmp = 0;
+                int.TryParse(value, out tmp);
+                _InvUnique = tmp;
+            }
+        }
         public string WebCategory { get; set; }
 
         private string _PartNumber = string.Empty;
