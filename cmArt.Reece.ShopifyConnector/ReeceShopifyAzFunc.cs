@@ -14,9 +14,8 @@ using System.Threading.Tasks;
 
 namespace cmArt.Reece.ShopifyConnector
 {
-    public class ReeceShopify
-    {
-        const string BaseUrl = "https://aquadragonservices.com/pcr/apitest/index.php";
+    public class ReeceShopifyAzFunc
+     {
         protected static ILogger _logger;
         protected static ILogger _fileLogger;
 
@@ -89,9 +88,10 @@ namespace cmArt.Reece.ShopifyConnector
 
             return result;
         }
-
-        private static string MakeApiPostCall(string urlCommand, string content)
+        private static async Task<string> MakeApiPostCall(string urlCommand, string content)
         {
+            string BaseUrl = "http://localhost:7071/api/MakeApiPostCall";
+
             LogApiCalls("urlCommand(Post): " + urlCommand);
             LogApiCalls("content: " + content);
             HttpClient client = new HttpClient();
@@ -114,43 +114,20 @@ namespace cmArt.Reece.ShopifyConnector
             requestMessage.Content = new StringContent(content);
 
             //make the request
-            var task = client.SendAsync(requestMessage);
-            var response = task.Result;
+            //var task = client.SendAsync(requestMessage);
+            //var response = task.Result;
+            var response = await client.SendAsync(requestMessage);
+
             response.EnsureSuccessStatusCode();
             string responseBody = response.Content.ReadAsStringAsync().Result;
 
-            //// Sync Call
-            //WebRequest request = HttpWebRequest.Create(baseUri);
-            //request.ContentType = "application/json, charset=utf-8";
-            //request.Method = "POST";
-
-            //string encoded = System.Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1")
-            //                               .GetBytes(clientId + ":" + clientSecret));
-            //request.Headers.Add("Authorization", "Basic " + encoded);
-
-            //ASCIIEncoding encoding = new ASCIIEncoding();
-            //byte[] data = encoding.GetBytes(content);
-            //request.ContentLength = data.Length;
-            //Stream newStream = request.GetRequestStream(); //open connection
-            //newStream.Write(data, 0, data.Length); // Send the data.
-            //newStream.Close();
-
-            //string text;
-            //var responseSync = (HttpWebResponse)request.GetResponse();
-
-            //using (var sr = new StreamReader(responseSync.GetResponseStream()))
-            //{
-            //    text = sr.ReadToEnd();
-            //}
-
-            //LogApiCalls("responseBody: " + text);
-            //return text;
             LogApiCalls("responseBody: " + responseBody);
             return responseBody;
-        }
 
+        }
         private static string MakeApiGetCall_Unsecured(string urlCommand)
         {
+            string BaseUrl = "http://localhost:7071/api/MakeApiGetCall";
             LogApiCalls("urlCommand(Get - Unsecured): " + urlCommand);
             HttpClient client = new HttpClient();
             client.Timeout = TimeSpan.FromMinutes(10);
@@ -171,13 +148,14 @@ namespace cmArt.Reece.ShopifyConnector
             LogApiCalls("responseBody: " + responseBody);
             return responseBody;
         }
-        private static string MakeApiGetCall(string urlCommand)
+        private static async Task<string> MakeApiGetCall(string urlCommand)
         {
+            string BaseUrl = "http://localhost:7071/api/MakeApiGetCall";
             LogApiCalls("urlCommand(Get - Secured): " + urlCommand);
             HttpClient client = new HttpClient();
-            client.Timeout = TimeSpan.FromMinutes(10);
+            client.Timeout = TimeSpan.FromMinutes(15);
 
-            Uri baseUri = new Uri(BaseUrl + urlCommand);
+            Uri baseUri = new Uri(BaseUrl);
             client.BaseAddress = baseUri;
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.ConnectionClose = true;
@@ -190,11 +168,10 @@ namespace cmArt.Reece.ShopifyConnector
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, baseUri);
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
-            //requestMessage.Content = content;
+            requestMessage.Headers.Add("urlCommand", urlCommand);
 
-            //make the request
-            var task = client.SendAsync(requestMessage);
-            var response = task.Result;
+            HttpResponseMessage response = await client.SendAsync(requestMessage);
+
             response.EnsureSuccessStatusCode();
             string responseBody = response.Content.ReadAsStringAsync().Result;
 
@@ -270,7 +247,7 @@ namespace cmArt.Reece.ShopifyConnector
                 }
                 catch (Exception e)
                 {
-                    string msg = "Error in call to /discount/add: " + e.ToString();
+                    string msg = "Error in call to /discount/add. Message: " + e.Message;
                     LogInfo(msg);
                 }
             }
@@ -297,34 +274,34 @@ namespace cmArt.Reece.ShopifyConnector
             }
             return results;
         }
-        public static string Products_Sync()
+        public static Task<string> Products_Sync()
         {
             LogInfo("Products_Sync()");
-            string results = MakeApiGetCall("/product/shopify") ?? string.Empty;
+            Task<string> results = MakeApiGetCall("/product/shopify");
             return results;
         }
-        public static string Discounts_Sync()
+        public static Task<string> Discounts_Sync()
         {
             LogInfo("Discounts_Sync()");
-            string results = MakeApiGetCall("/discount/shopify") ?? string.Empty;
+            Task<string> results = MakeApiGetCall("/discount/shopify");
             return results;
         }
-        public static string Inventory_Sync()
+        public static Task<string> Inventory_Sync()
         {
             LogInfo("Inventory_Sync()");
-            string results = MakeApiGetCall("/inventory/shopify") ?? string.Empty;
+            Task<string> results = MakeApiGetCall("/inventory/shopify");
             return results;
         }
-        public static string Products_DeleteAll()
+        public static async Task<string> Products_DeleteAll()
         {
             LogInfo("Products_DeleteAll()");
             try
             {
                 //get all products
-                IEnumerable<Shopify_Product> allProducts = GetAllShopify_Products();
+                IEnumerable<Shopify_Product> allProducts = await GetAllShopify_Products();
 
                 //delete all of them
-                string results = Products_Delete(allProducts);
+                string results = await Products_Delete(allProducts);
                 return results;
             }
             catch (Exception e)
@@ -334,13 +311,13 @@ namespace cmArt.Reece.ShopifyConnector
                 return msg;
             }
         }
-        public static string Products_Delete(IEnumerable<Shopify_Product> ProductsToDelete)
+        public static async Task<string> Products_Delete(IEnumerable<Shopify_Product> ProductsToDelete)
         {
             try
             { 
                 List<Shopify_Product> prods = new List<Shopify_Product>(ProductsToDelete);
                 string strEditProducts = JsonSerializer.Serialize(prods, typeof(List<Shopify_Product>));
-                string results = MakeApiPostCall("/product/delete/", strEditProducts);
+                string results = await MakeApiPostCall("/product/delete/", strEditProducts);
                 return results;
             }
             catch (Exception e)
@@ -350,12 +327,13 @@ namespace cmArt.Reece.ShopifyConnector
                 return msg;
             }
         }
-        public static string Products_Add(IEnumerable<Shopify_Product> NewProducts)
+        public static async Task<string> Products_Add(IEnumerable<Shopify_Product> NewProducts)
         {
             int pageSize = 10;
             int page = 0;
             int count = NewProducts.Count();
             int StartAt = page * pageSize;
+            //Task<string> results = new Task<string>(() => string.Empty);
             string results = string.Empty;
             do
             {
@@ -363,7 +341,8 @@ namespace cmArt.Reece.ShopifyConnector
                 {
                     List<Shopify_Product> prods = NewProducts.Skip(StartAt).Take(pageSize).ToList();
                     string strNewProducts = JsonSerializer.Serialize(prods, typeof(List<Shopify_Product>));
-                    results += MakeApiPostCall("/product/add/", strNewProducts) ?? string.Empty;
+                    string strTmp = await MakeApiPostCall("/product/add/", strNewProducts);
+                    results += strTmp;
                 }
                 catch (Exception e)
                 {
@@ -374,9 +353,9 @@ namespace cmArt.Reece.ShopifyConnector
                 page++;
                 StartAt = page * pageSize;
             } while (StartAt <= count);
-            return results;
+            return await new Task<string>(() => results);
         }
-        public static string Products_Edit(IEnumerable<Shopify_Product> ProductsToEdit)
+        public static async Task<string> Products_Edit(IEnumerable<Shopify_Product> ProductsToEdit)
         {
             IEnumerable<Shopify_Product> _ProductsToEdit = ProductsToEdit ?? new List<Shopify_Product>();
             int total = _ProductsToEdit.Count();
@@ -392,7 +371,7 @@ namespace cmArt.Reece.ShopifyConnector
                 { 
                     List<Shopify_Product> prods = new List<Shopify_Product>(PageOfProductsToEdit);
                     string strEditProducts = JsonSerializer.Serialize(prods, typeof(List<Shopify_Product>));
-                    string tmpResults = MakeApiPostCall("/product/edit/", strEditProducts);
+                    string tmpResults = await MakeApiPostCall("/product/edit/", strEditProducts);
                     results += tmpResults;
                 }
                 catch (Exception e)
@@ -405,13 +384,13 @@ namespace cmArt.Reece.ShopifyConnector
                 pageMin = pageNum * pageSize - pageSize + 1;
                 pageMax = pageNum * pageSize;
             }
-            return "No Records Processed";
+            return await new Task<string>(() => "No Records Processed");
         }
-        public static IEnumerable<Shopify_Product> GetAllShopify_Products()
+        public static async Task<IEnumerable<Shopify_Product>> GetAllShopify_Products()
         {
             LogInfo("GetAllShopify_Products()");
             Products_Sync();
-            string results = MakeApiGetCall("/product/list");
+            string results = await MakeApiGetCall("/product/list");
             List<tmpShopify_Product> Data = new List<tmpShopify_Product>();
             try
             {
@@ -423,13 +402,13 @@ namespace cmArt.Reece.ShopifyConnector
             }
             return Data.Select(p => p.AsShopify_Product());
         }
-        public static IEnumerable<tmpShopify_Prices> GetAlltmpShopify_Prices()
+        public static async Task<IEnumerable<tmpShopify_Prices>> GetAlltmpShopify_Prices()
         {
             LogInfo("GetAlltmpShopify_Prices()");
             Discounts_Sync();
             try
             {
-                string results = MakeApiGetCall("/discount/list");
+                string results = await MakeApiGetCall("/discount/list");
 
                 List<tmpShopify_Prices> Data = (List<tmpShopify_Prices>)JsonSerializer.Deserialize(results, typeof(List<tmpShopify_Prices>));
 
@@ -442,11 +421,11 @@ namespace cmArt.Reece.ShopifyConnector
                 return new List<tmpShopify_Prices>();
             }
         }
-        public static IEnumerable<tmpShopify_Quantities> GetAlltmpShopify_Quantities()
+        public static async Task<IEnumerable<tmpShopify_Quantities>> GetAlltmpShopify_Quantities()
         {
             LogInfo("GetAlltmpShopify_Quantities()");
             Inventory_Sync();
-            string results = MakeApiGetCall("/inventory/list");
+            string results = await MakeApiGetCall("/inventory/list");
             results = results.Replace("\"id\":null,", string.Empty);
             List<tmpShopify_Quantities> Data = new List<tmpShopify_Quantities>();
             try

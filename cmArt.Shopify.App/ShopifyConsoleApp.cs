@@ -194,7 +194,7 @@ namespace cmArt.Shopify.App
             if (false)
             {
                 logger.LogInformation("Get Products directly from Shopify");
-                List<Product_Product> all = cmShopify.GetAllShopifyRecords().ToList();
+                List<Product_Product> all = cmShopify.GetAllShopifyProductRecords().ToList();
                 string strProducts = System.Text.Json.JsonSerializer.Serialize(all, typeof(List<Product_Product>));
                 IEnumerable<ProductAdapter> AllProduct = all.Select(prod => { ProductAdapter pa = new ProductAdapter(); pa.Init(prod); return pa; });
             }

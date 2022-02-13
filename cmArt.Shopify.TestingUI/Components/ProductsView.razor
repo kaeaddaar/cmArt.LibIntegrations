@@ -1,0 +1,39 @@
+﻿@using cmArt.Reece.ShopifyConnector
+
+<h3>Products View</h3>
+@if (records == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>InvUnique</th>
+                <th>Cat</th>
+                <th>Description</th>
+                <th>PartNumber</th>
+                <th>WebCategory</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var record in records)
+            {
+                <tr>
+                    <td>@record.InvUnique.ToString()</td>
+                    <td>@record.Cat</td>
+                    <td>@record.Description</td>
+                    <td>@record.PartNumber</td>
+                    <td>@record.WebCategory</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public IEnumerable<IShopify_Product> records { get; set; }
+
+}

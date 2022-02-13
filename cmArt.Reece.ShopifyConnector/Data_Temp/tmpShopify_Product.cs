@@ -23,17 +23,15 @@ namespace cmArt.Reece.ShopifyConnector
         public decimal WholesaleCost { get; set; }
         public string Cat { get; set; }
         private int _InvUnique;
-        public string InvUnique 
+        public int InvUnique 
         { 
             get
             {
-                return _InvUnique.ToString();
+                return _InvUnique;
             }
             set
             {
-                int tmp = 0;
-                int.TryParse(value, out tmp);
-                _InvUnique = tmp;
+                _InvUnique = value;
             }
         }
         public string WebCategory { get; set; }
@@ -62,9 +60,7 @@ namespace cmArt.Reece.ShopifyConnector
             shopify_Product.Cat = this.Cat;
             shopify_Product.Description = this.Description;
             
-            int tmpInvUnique = 0;
-            int.TryParse(this.InvUnique, out tmpInvUnique);
-            shopify_Product.InvUnique = tmpInvUnique;
+            shopify_Product.InvUnique = this.InvUnique;
 
             shopify_Product.PartNumber = this.PartNumber;
             //shopify_Product.WholesaleCost = this.WholesaleCost;

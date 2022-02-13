@@ -23,7 +23,7 @@ namespace cmArt.Shopify.Connector
             return FoundOneOrMore;
         }
         
-        public static IEnumerable<Product_Product>GetAllShopifyRecords()
+        public static IEnumerable<Product_Product>GetAllShopifyProductRecords()
         {
             // count of records
             string strCount = ApiCalls.MakeApiGetCall("/admin/api/2021-07/products/count.json");

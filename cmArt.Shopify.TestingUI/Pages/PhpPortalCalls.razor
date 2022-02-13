@@ -1,0 +1,98 @@
+﻿@page "/Phpportalcalls"
+@using cmArt.Reece.ShopifyConnector
+@using System.Linq
+
+
+<h3>PHP Portal API Calls</h3>
+
+<button @onclick="Perform_Products_Sync">Products Sync</button>
+<button @onclick="Perform_Product_List">Products List</button>
+<button @onclick="Perform_Discount_Sync">Discounts Sync</button>
+<button @onclick="Perform_Discount_List">Discounts List</button>
+<button @onclick="Perform_Quantities_Sync">Quantity Sync</button>
+<button @onclick="Perform_Quantities_List">Quantity List</button>
+
+<h3>Message</h3>
+<p>@msg</p>
+
+<cmArt.Shopify.TestingUI.Components.DiscountsView records="prices"/>
+
+<h3>Results</h3>
+<p>@strResults</p>
+
+@code {
+    private string strResults;
+    private string msg;
+    private IEnumerable<IShopify_Product> products;
+    private IEnumerable<IShopify_Prices> prices;
+    private IEnumerable<IShopify_Quantities> quantities;
+
+    private async void Perform_Products_Sync()
+    {
+        msg = "Begin Perform_Products_Sync";
+        strResults = await ReeceShopifyAzFunc.Products_Sync();
+        msg = "Finished Perform_Products_Sync";
+        strResults = strResults ?? string.Empty;
+        StateHasChanged();
+    }
+    private async void Perform_Product_List()
+    {
+        msg = "Begin Perform_Product_List";
+        products = await ReeceShopifyAzFunc.GetAllShopify_Products();
+
+        strResults = System.Text.Json.JsonSerializer.Serialize(products, typeof(IEnumerable<IShopify_Product>));
+        msg = "Finished Perform_Product_List";
+        strResults = strResults ?? string.Empty;
+        StateHasChanged();
+    }
+
+    private async void Perform_Discount_Sync()
+    {
+        msg = "Begin Perform_Discount_Sync";
+        strResults = await ReeceShopifyAzFunc.Discounts_Sync();
+        msg = "Finished Perform_Discount_Sync";
+        strResults = strResults ?? string.Empty;
+        StateHasChanged();
+    }
+    private async void Perform_Discount_List()
+    {
+        msg = "Begin Perform_Discount_List";
+        IEnumerable<tmpShopify_Prices> tmpPrices = await ReeceShopifyAzFunc.GetAlltmpShopify_Prices();
+        tmpPrices = tmpPrices ?? new List<tmpShopify_Prices>();
+        prices = tmpPrices.Select(x => x.AsShopify_Prices());
+        strResults = System.Text.Json.JsonSerializer.Serialize(prices, typeof(IEnumerable<IShopify_Prices>));
+        msg = "Finished Perform_Discount_List";
+        strResults = strResults ?? string.Empty;
+        StateHasChanged();
+    }
+
+    private async void Perform_Quantities_Sync()
+    {
+        msg = "Begin Perform_Quantities_Sync";
+        strResults = await ReeceShopifyAzFunc.Inventory_Sync();
+        msg = "Finished Perform_Quantities_Sync";
+        strResults = strResults ?? string.Empty;
+        StateHasChanged();
+    }
+    private async void Perform_Quantities_List()
+    {
+        msg = "Begin Perform_Quantities_List";
+        IEnumerable<tmpShopify_Quantities> tmpQuantities = await ReeceShopifyAzFunc.GetAlltmpShopify_Quantities();
+        tmpQuantities = tmpQuantities ?? new List<tmpShopify_Quantities>();
+        quantities = tmpQuantities.Select(x => x.AsShopify_Quantities());
+        strResults = System.Text.Json.JsonSerializer.Serialize(quantities, typeof(IEnumerable<IShopify_Quantities>));
+        msg = "Finished GetAlltmpShopify_Quantities";
+        strResults = strResults ?? string.Empty;
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        strResults = string.Empty;
+        msg = string.Empty;
+        prices = new List<IShopify_Prices>();
+        products = new List<IShopify_Product>();
+        quantities = new List<IShopify_Quantities>();
+        base.OnInitialized();
+    }
+}

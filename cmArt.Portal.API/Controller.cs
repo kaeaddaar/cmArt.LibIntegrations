@@ -89,7 +89,7 @@ namespace BlazorApp.Api
         [FunctionName("MakeApiGetCall_Controller")]
         public static async Task<IActionResult> RunMakeApiGetCall
         (
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "MakeApiGetCall")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "MakeApiGetCall")] HttpRequest req,
             ILogger log
         )
         {
