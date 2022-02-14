@@ -7,46 +7,75 @@
 <PageTitle>Shopify Products</PageTitle>
 
 <h1>Product Data - Shopify</h1>
+<button @onclick="Perform_Products_Sync">Perform Products Sync</button>
+<button @onclick="Perform_Product_List">Pull Live Products List - Shopify</button>
+<div>Part Filter: <input @onchange="OnChangePartNumberFilter" /></div>
+<br />
+<h3>Message</h3>
+<p>@msg</p>
 
-@if (products == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>InvUnique</th>
-                <th>Cat</th>
-                <th>Description</th>
-                <th>PartNumber</th>
-                <th>WebCategory</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var product in products)
-            {
-                <tr>
-                    <td>@product.InvUnique.ToString()</td>
-                    <td>@product.Cat</td>
-                    <td>@product.Description</td>
-                    <td>@product.PartNumber</td>
-                    <td>@product.WebCategory</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<cmArt.Shopify.TestingUI.Components.ProductsView records="products"/>
+
+<h3>Results</h3>
+<p>@strResults</p>
+
 
 @code {
-    private Shopify_Product[]? products;
+    //private Shopify_Product[]? products;
 
+    private string strResults;
+    private string msg;
+    private IEnumerable<IShopify_Product> products;
+    private string PartFilter;
+    private IEnumerable<IShopify_Product> products_orig;
+
+    private void OnChangePartNumberFilter(ChangeEventArgs e)
+    {
+        if (products_orig == null)
+        {
+            products_orig = products;
+        }
+        string value = e.Value.ToString() ?? string.Empty;
+        IEnumerable<IShopify_Product> _products = products ?? new List<IShopify_Product>();
+
+        if (value != string.Empty)
+        {
+            if(_products.Count() > 0)
+            {
+                products = products_orig.Where(x => x.PartNumber.Contains(value));
+            }
+        }
+        else
+        {
+            products = products_orig ?? new List<IShopify_Product>();
+        }
+    }
+    private async void Perform_Products_Sync()
+    {
+        msg = "Begin Perform_Products_Sync";
+        strResults = await ReeceShopifyAzFunc.Products_Sync();
+        msg = "Finished Perform_Products_Sync";
+        strResults = strResults ?? string.Empty;
+        StateHasChanged();
+    }
+    private async void Perform_Product_List()
+    {
+        msg = "Begin Perform_Product_List";
+        products = await ReeceShopifyAzFunc.GetAllShopify_Products();
+
+        strResults = System.Text.Json.JsonSerializer.Serialize(products, typeof(IEnumerable<IShopify_Product>));
+        msg = "Finished Perform_Product_List";
+        strResults = strResults ?? string.Empty;
+        products_orig = null;
+        StateHasChanged();
+    }
     protected override async Task OnInitializedAsync()
     {
         string strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/17cf9358-b783-46a2-97ee-ef69388f3904");
         Document doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
-        products = (Shopify_Product[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Product[]));
-        //products = await Http.GetFromJsonAsync<Shopify_Product[]>("sample-data/tblShopifyProducts_ReecesAPI_page1.json");
+        products = (IEnumerable<IShopify_Product>)System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(IEnumerable<Shopify_Product>));
+        //products = await Http.GetFromJsonAsync<Shopify_Product[]>("sample-data/tblShopifyProducts_ReecesAPI_page1.json");\
+        PartFilter = string.Empty;
+        products_orig = null;
     }
 }

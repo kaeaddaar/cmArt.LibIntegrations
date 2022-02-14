@@ -7,61 +7,73 @@
 
 <h1>Quantity Data - Shopify</h1>
 
-@if (records == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>InvUnique</th>
-                <th>Cat</th>
-                <th>PartNumber</th>
-                @for(short i = 0; i < 5; i++)
-                {
-                    <th style="text-align:right;">Qty(Dept-@i)</th>
-                }
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var record in records)
-            {
-                <tr>
-                    <td>@record.InvUnique.ToString()</td>
-                    <td>@record.Cat</td>
-                    <td>@record.PartNumber</td>
-                    @for(short i = 0; i < 5; i++)
-                    {
-                        <td style="text-align:right;">
-                            @if(record.Quantities.Where(x => x.Location == i).FirstOrDefault() == null)
-                            {
-                            <div style="float: right;color:red;" align="right" title="Sched-@i missing">@(Decimal.Round((record.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
-                            }
-                            else
-                            {
-                            <div style="float: right;" align="right" title="Sched-i">@(Decimal.Round((record.Quantities.Where(x => x.Location == i).FirstOrDefault() ?? new S5QtyPair(i,0)).Qty, 2))</div>
-                            }
-                        </td>
-                    }
+<button @onclick="Perform_Quantities_Sync">Quantity Sync</button>
+<button @onclick="Perform_Quantities_List">Quantity List</button>
+<div>Part Filter: <input @onchange="OnChangePartNumberFilter" /></div>
+<br />
+<h3>Message</h3>
+<p>@msg</p>
 
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<cmArt.Shopify.TestingUI.Components.QuantitiesView records="quantities"/>
+
+<h3>Results</h3>
+<p>@strResults</p>
 
 @code {
-    private Shopify_Quantities[]? records;
+    private string strResults;
+    private string msg;
 
+    private IEnumerable<IShopify_Quantities> quantities;
+    private IEnumerable<IShopify_Quantities> quantities_orig;
+
+    private void OnChangePartNumberFilter(ChangeEventArgs e)
+    {
+        if (quantities_orig == null)
+        {
+            quantities_orig = quantities;
+        }
+        string value = e.Value.ToString() ?? string.Empty;
+        IEnumerable<IShopify_Quantities> _products = quantities ?? new List<IShopify_Quantities>();
+
+        if (value != string.Empty)
+        {
+            if(_products.Count() > 0)
+            {
+                quantities = quantities_orig.Where(x => x.PartNumber.Contains(value));
+            }
+        }
+        else
+        {
+            quantities = quantities_orig ?? new List<IShopify_Quantities>();
+        }
+    }
     protected override async Task OnInitializedAsync()
     {        
         string strDocument = string.Empty; 
         Document doc = new Document();
         strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/c1f7d63e-1f1a-42cd-8c00-254f3b77354d");
         doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
-        records = (Shopify_Quantities[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Quantities[]));
+        quantities = (IEnumerable<Shopify_Quantities>)System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(IEnumerable<Shopify_Quantities>));
         //records = await Http.GetFromJsonAsync<Shopify_Quantities[]>("sample-data/tblShopifyQuantities_ReecesAPI_page1.json");
     }
+    private async void Perform_Quantities_Sync()
+    {
+        msg = "Begin Perform_Quantities_Sync";
+        strResults = await ReeceShopifyAzFunc.Inventory_Sync();
+        msg = "Finished Perform_Quantities_Sync";
+        strResults = strResults ?? string.Empty;
+        StateHasChanged();
+    }
+    private async void Perform_Quantities_List()
+    {
+        msg = "Begin Perform_Quantities_List";
+        IEnumerable<tmpShopify_Quantities> tmpQuantities = await ReeceShopifyAzFunc.GetAlltmpShopify_Quantities();
+        tmpQuantities = tmpQuantities ?? new List<tmpShopify_Quantities>();
+        quantities = tmpQuantities.Select(x => x.AsShopify_Quantities());
+        strResults = System.Text.Json.JsonSerializer.Serialize(quantities, typeof(IEnumerable<IShopify_Quantities>));
+        msg = "Finished GetAlltmpShopify_Quantities";
+        strResults = strResults ?? string.Empty;
+        StateHasChanged();
+    }
+
 }

@@ -8,59 +8,72 @@
 
 <h1>Price Data - Shopify</h1>
 
-@if (records == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>InvUnique</th>
-                <th>Cat</th>
-                <th>PartNumber</th>
-                @for(int i = 0; i < 15; i++)
-                {
-                    <th style="text-align:right;">Price-@i</th>
-                }
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var record in records)
-            {
-                <tr>
-                    <td>@record.InvUnique.ToString()</td>
-                    <td>@record.Cat</td>
-                    <td>@record.PartNumber</td>
-                    @for(int i = 0; i < 15; i++)
-                    {
-                        <td style="text-align:right;">
-                            @if(record.Prices.Where(x => x.Level == i).FirstOrDefault() == null)
-                            {
-                            <div style="float: right;color:red;" align="right" title="Sched-@i missing">@(Decimal.Round((record.Prices.Where(x => x.Level == i).FirstOrDefault() ?? new S5PricePair()).Price, 2))</div>
-                            }
-                            else
-                            {
-                            <div style="float: right;" align="right" title="Sched-i">@(Decimal.Round((record.Prices.Where(x => x.Level == i).FirstOrDefault() ?? new S5PricePair()).Price, 2))</div>
-                            }
-                        </td>
-                    }
+<button @onclick="Perform_Discount_Sync">Discounts Sync</button>
+<button @onclick="Perform_Discount_List">Discounts List</button>
+<div>Part Filter: <input @onchange="OnChangePartNumberFilter" /></div>
+<br />
 
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<h3>Message</h3>
+<p>@msg</p>
+
+<cmArt.Shopify.TestingUI.Components.DiscountsView records="prices"/>
+
+<h3>Results</h3>
+<p>@strResults</p>
 
 @code {
-    private Shopify_Prices[]? records;
+    private string strResults;
+    private string msg;
+    private IEnumerable<IShopify_Prices> prices;
+    private IEnumerable<IShopify_Prices> prices_orig;
+
+    private void OnChangePartNumberFilter(ChangeEventArgs e)
+    {
+        if (prices_orig == null)
+        {
+            prices_orig = prices;
+        }
+        string value = e.Value.ToString() ?? string.Empty;
+        IEnumerable<IShopify_Prices> _products = prices ?? new List<IShopify_Prices>();
+
+        if (value != string.Empty)
+        {
+            if(_products.Count() > 0)
+            {
+                prices = prices_orig.Where(x => x.PartNumber.Contains(value));
+            }
+        }
+        else
+        {
+            prices = prices_orig ?? new List<IShopify_Prices>();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
         string strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/b9ae61e7-4248-4c95-832d-acbb079a68df");
         Document doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
-        records = (Shopify_Prices[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Prices[]));
+        prices = (IEnumerable<IShopify_Prices>)System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(IEnumerable<Shopify_Prices>));
         //records = await Http.GetFromJsonAsync<Shopify_Prices[]>("sample-data/tblShopifyPrices_ReecesAPI_page1.json");
     }
+    private async void Perform_Discount_Sync()
+    {
+        msg = "Begin Perform_Discount_Sync";
+        strResults = await ReeceShopifyAzFunc.Discounts_Sync();
+        msg = "Finished Perform_Discount_Sync";
+        strResults = strResults ?? string.Empty;
+        StateHasChanged();
+    }
+    private async void Perform_Discount_List()
+    {
+        msg = "Begin Perform_Discount_List";
+        IEnumerable<tmpShopify_Prices> tmpPrices = await ReeceShopifyAzFunc.GetAlltmpShopify_Prices();
+        tmpPrices = tmpPrices ?? new List<tmpShopify_Prices>();
+        prices = tmpPrices.Select(x => x.AsShopify_Prices());
+        strResults = System.Text.Json.JsonSerializer.Serialize(prices, typeof(IEnumerable<IShopify_Prices>));
+        msg = "Finished Perform_Discount_List";
+        strResults = strResults ?? string.Empty;
+        StateHasChanged();
+    }
+
 }
