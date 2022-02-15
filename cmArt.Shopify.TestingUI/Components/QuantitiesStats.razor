@@ -1,0 +1,108 @@
+﻿@using cmArt.Reece.ShopifyConnector
+
+<h3>Quantities Statistics</h3>
+<table>
+    <thead>
+        <tr>
+            <td>Statistic</td>
+            <td>Value</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Record Count</td>
+            <td>@data.Count()</td>
+        </tr>
+        <tr>
+            <td>Duplicates by Part Number</td>
+            <td>@GetNumberOfDuplicatesByPartNumber()</td>
+        </tr>
+        <tr>
+            <td># of Default Parts</td>
+            <td>@GetNumberOfDefaultParts()</td>
+        </tr>
+        <tr>
+            <td># of Empty Price Lists</td>
+            <td>@GetNumberOfEmptyPriceLists()</td>
+        </tr>
+        <tr>
+            <td># missing locations/quantities</td>
+            <td>@GetNumberOfMissingQuantities()</td>
+        </tr>
+        <tr>
+            <td>Count of Distinct Price Schedules</td>
+            <td>@CountDistinct</td>
+        </tr>
+        <tr>
+            <td>Distinct Locations</td>
+            <td>
+            @foreach(var sched in distinctLocations)
+            {
+                @(sched + ",");
+            }
+            </td>
+        </tr>
+        <tr>
+            <td># 0 qty locations</td>
+            <td>@GetNumberOfZeroQuanties()</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+@code {
+    private IEnumerable<IShopify_Quantities> _data;
+    private int CountDistinct;
+    private IEnumerable<short> distinctLocations;
+    private int NumLocations => 4;
+
+    [Parameter]
+    public IEnumerable<IShopify_Quantities> data 
+    { 
+        get
+        {
+            return _data ?? new List<IShopify_Quantities>();
+        }
+        set
+        {
+            _data = value ?? _data ?? new List<IShopify_Quantities>();
+        } 
+    }
+
+    private int GetNumberOfDuplicatesByPartNumber()
+    {
+        var Duplicates_Products = data.GroupBy(x => x.PartNumber).Where(x => x.Count() > 1).Select(x => x.Key);
+        //var Duplicates_Prices = API_Prices.GroupBy(x => x.PartNumber).Where(x => x.Count() > 1).Select(x => x.Key);
+        //var Duplicates_Quantities = API_Quantities.GroupBy(x => x.PartNumber).Where(x => x.Count() > 1).Select(x => x.Key);
+        return Duplicates_Products.Count();
+    }
+    private int GetNumberOfDefaultParts()
+    {
+        var DefaultParts = data.Where(x => x.PartNumber.Trim().ToUpper() == "DEFAULT");
+        return DefaultParts.Count();
+    }
+    private int GetNumberOfEmptyPriceLists()
+    {
+        var empty = data.Where(x => x.Quantities.Count() == 0);
+        return empty.Count();
+    }
+    private int GetNumberOfMissingQuantities()
+    {
+        var prices = data.Select(x => x.Quantities);
+        distinctLocations = prices.SelectMany(x => x).Select(x => x.Location).DistinctBy(x => x).OrderBy(x => x);
+        CountDistinct = distinctLocations.Count();
+
+        var MissingCounts = prices.Select(x => NumLocations - Math.Min(x.Count(),NumLocations));
+        var total = MissingCounts.Sum(x => x);
+        return total;
+    }
+    private int GetNumberOfZeroQuanties()
+    {
+        var prices = data.Select(x => x.Quantities);
+        var ZeroPrices = prices.SelectMany(x => x).Select(x => x.Qty).Where(x => decimal.Round(x, 2) == (decimal)0.00);
+
+        return ZeroPrices.Count();
+    }
+}

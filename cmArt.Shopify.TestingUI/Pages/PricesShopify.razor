@@ -42,7 +42,7 @@
         {
             if(_products.Count() > 0)
             {
-                prices = prices_orig.Where(x => x.PartNumber.Contains(value));
+                prices = prices_orig.Where(x => x.PartNumber.ToUpper().Contains(value.ToUpper()));
             }
         }
         else

@@ -9,6 +9,8 @@
 
 <button @onclick="Perform_Quantities_Sync">Quantity Sync</button>
 <button @onclick="Perform_Quantities_List">Quantity List</button>
+<cmArt.Shopify.TestingUI.Components.QuantitiesStats data="quantities"></cmArt.Shopify.TestingUI.Components.QuantitiesStats>
+
 <div>Part Filter: <input @onchange="OnChangePartNumberFilter" /></div>
 <br />
 <h3>Message</h3>
@@ -39,7 +41,7 @@
         {
             if(_products.Count() > 0)
             {
-                quantities = quantities_orig.Where(x => x.PartNumber.Contains(value));
+                quantities = quantities_orig.Where(x => x.PartNumber.ToUpper().Contains(value.ToUpper()));
             }
         }
         else

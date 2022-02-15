@@ -44,7 +44,7 @@
         {
             if(_products.Count() > 0)
             {
-                products = products_orig.Where(x => x.PartNumber.Contains(value));
+                products = products_orig.Where(x => x.PartNumber.ToUpper().Contains(value.ToUpper()));
             }
         }
         else
