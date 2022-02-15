@@ -9,6 +9,9 @@
 <h1>Product Data - System Five</h1>
 <cmArt.Shopify.TestingUI.Components.ProductsStats data="products"></cmArt.Shopify.TestingUI.Components.ProductsStats>
 
+<div>Part Filter: <input @onchange="OnChangePartNumberFilter" /></div>
+<br />
+
 @if (products == null)
 {
     <p><em>Loading...</em></p>
@@ -41,13 +44,36 @@ else
 }
 
 @code {
-    private Shopify_Product[]? products;
+    private IEnumerable<IShopify_Product> products;
+    private string PartFilter;
+    private IEnumerable<IShopify_Product> products_orig;
 
+    private void OnChangePartNumberFilter(ChangeEventArgs e)
+    {
+        if (products_orig == null)
+        {
+            products_orig = products;
+        }
+        string value = e.Value.ToString() ?? string.Empty;
+        IEnumerable<IShopify_Product> _products = products ?? new List<IShopify_Product>();
+
+        if (value != string.Empty)
+        {
+            if (_products.Count() > 0)
+            {
+                products = products_orig.Where(x => x.PartNumber.ToUpper().Contains(value.ToUpper()));
+            }
+        }
+        else
+        {
+            products = products_orig ?? new List<IShopify_Product>();
+        }
+    }
     protected override async Task OnInitializedAsync()
     {
         string strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/74e5b8d9-f264-4029-af3a-f2c44c906511");
         Document doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
-        products = (Shopify_Product[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Product[]));
+        products = (IEnumerable<IShopify_Product>)System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(IEnumerable<Shopify_Product>));
         //products = await Http.GetFromJsonAsync<Shopify_Product[]>("sample-data/tblPocoProductsAdapted_page1.json");
     }
 }

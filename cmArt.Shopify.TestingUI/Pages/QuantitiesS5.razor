@@ -9,6 +9,9 @@
 <h1>Quantity Data - System Five</h1>
 <cmArt.Shopify.TestingUI.Components.QuantitiesStats data="records"></cmArt.Shopify.TestingUI.Components.QuantitiesStats>
 
+<div>Part Filter: <input @onchange="OnChangePartNumberFilter" /></div>
+<br />
+
 @if (records == null)
 {
     <p><em>Loading...</em></p>
@@ -55,13 +58,36 @@ else
 }
 
 @code {
-    private Shopify_Quantities[]? records;
+    private IEnumerable<IShopify_Quantities> records;
+    private IEnumerable<IShopify_Quantities> quantities_orig;
+
+    private void OnChangePartNumberFilter(ChangeEventArgs e)
+    {
+        if (quantities_orig == null)
+        {
+            quantities_orig = records;
+        }
+        string value = e.Value.ToString() ?? string.Empty;
+        IEnumerable<IShopify_Quantities> _products = records ?? new List<IShopify_Quantities>();
+
+        if (value != string.Empty)
+        {
+            if(_products.Count() > 0)
+            {
+                records = quantities_orig.Where(x => x.PartNumber.ToUpper().Contains(value.ToUpper()));
+            }
+        }
+        else
+        {
+            records = quantities_orig ?? new List<IShopify_Quantities>();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
         string strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/c0aff18b-a32a-4b0b-bcc7-5808ddace171");
         Document doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
-        records = (Shopify_Quantities[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Quantities[]));
+        records = (IEnumerable<Shopify_Quantities>)System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(IEnumerable<Shopify_Quantities>));
         //records = await Http.GetFromJsonAsync<Shopify_Quantities[]>("sample-data/tblPocoQuantitiesAdapted_page1.json");
     }
 }

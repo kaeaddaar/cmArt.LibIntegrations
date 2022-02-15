@@ -8,7 +8,8 @@
 
 <h1>Price Data - System Five</h1>
 <cmArt.Shopify.TestingUI.Components.DiscountsStats data="records"></cmArt.Shopify.TestingUI.Components.DiscountsStats>
-
+<div>Part Filter: <input @onchange="OnChangePartNumberFilter" /></div>
+<br />
 @if (records == null)
 {
     <p><em>Loading...</em></p>
@@ -55,7 +56,30 @@ else
 }
 
 @code {
-    private Shopify_Prices[]? records;
+    private IEnumerable<IShopify_Prices> records;
+    private IEnumerable<IShopify_Prices> records_orig;
+
+    private void OnChangePartNumberFilter(ChangeEventArgs e)
+    {
+        if (records_orig == null)
+        {
+            records_orig = records;
+        }
+        string value = e.Value.ToString() ?? string.Empty;
+        IEnumerable<IShopify_Prices> _products = records ?? new List<IShopify_Prices>();
+
+        if (value != string.Empty)
+        {
+            if(_products.Count() > 0)
+            {
+                records = records_orig.Where(x => x.PartNumber.ToUpper().Contains(value.ToUpper()));
+            }
+        }
+        else
+        {
+            records = records_orig ?? new List<IShopify_Prices>();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
