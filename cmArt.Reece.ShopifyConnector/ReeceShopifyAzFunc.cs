@@ -389,7 +389,7 @@ namespace cmArt.Reece.ShopifyConnector
         public static async Task<IEnumerable<Shopify_Product>> GetAllShopify_Products()
         {
             LogInfo("GetAllShopify_Products()");
-            Products_Sync();
+            //Products_Sync();
             string results = await MakeApiGetCall("/product/list");
             List<tmpShopify_Product> Data = new List<tmpShopify_Product>();
             try
@@ -405,7 +405,7 @@ namespace cmArt.Reece.ShopifyConnector
         public static async Task<IEnumerable<tmpShopify_Prices>> GetAlltmpShopify_Prices()
         {
             LogInfo("GetAlltmpShopify_Prices()");
-            Discounts_Sync();
+            //Discounts_Sync();
             try
             {
                 string results = await MakeApiGetCall("/discount/list");
@@ -424,7 +424,7 @@ namespace cmArt.Reece.ShopifyConnector
         public static async Task<IEnumerable<tmpShopify_Quantities>> GetAlltmpShopify_Quantities()
         {
             LogInfo("GetAlltmpShopify_Quantities()");
-            Inventory_Sync();
+            //Inventory_Sync();
             string results = await MakeApiGetCall("/inventory/list");
             results = results.Replace("\"id\":null,", string.Empty);
             List<tmpShopify_Quantities> Data = new List<tmpShopify_Quantities>();
