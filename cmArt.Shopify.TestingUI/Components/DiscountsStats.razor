@@ -50,6 +50,10 @@
             <td>@GetNumberOfOneHundredThousandDollarPrices()</td>
         </tr>
         <tr>
+            <td>Get Number of InvUnique 0 Records</td>
+            <td>@GetNumberOfInvUnique0Records()</td>
+        </tr>
+        <tr>
             <td></td>
             <td></td>
         </tr>
@@ -113,5 +117,10 @@
         var ZeroPrices = prices.SelectMany(x => x).Select(x => x.Price).Where(x => decimal.Round(x, 2) == (decimal)100000.00);
 
         return ZeroPrices.Count();
+    }
+    private int GetNumberOfInvUnique0Records()
+    {
+        int count = data.Where(x => x.InvUnique == 0).Count();
+        return count;
     }
 }

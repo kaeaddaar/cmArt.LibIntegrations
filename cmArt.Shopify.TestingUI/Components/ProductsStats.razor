@@ -28,6 +28,10 @@
             </tr>
         }
         <tr>
+            <td>Get Number of InvUnique 0 Records</td>
+            <td>@GetNumberOfInvUnique0Records()</td>
+        </tr>
+        <tr>
             <td></td>
             <td></td>
         </tr>
@@ -69,5 +73,10 @@
     {
         var grouped = data.Where(x => x.WebCategory.Trim().ToUpper() == WebCategoryToCount.ToUpper());
         return grouped.Count();
+    }
+    private int GetNumberOfInvUnique0Records()
+    {
+        int count = data.Where(x => x.InvUnique == 0).Count();
+        return count;
     }
 }
