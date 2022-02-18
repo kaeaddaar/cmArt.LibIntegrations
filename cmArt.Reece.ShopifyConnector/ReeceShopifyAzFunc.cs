@@ -18,6 +18,7 @@ namespace cmArt.Reece.ShopifyConnector
      {
         protected static ILogger _logger;
         protected static ILogger _fileLogger;
+        const int Api_Timeout_Max = 25;
 
         private static void LogInfo(string msg)
         {
@@ -95,7 +96,7 @@ namespace cmArt.Reece.ShopifyConnector
             LogApiCalls("urlCommand(Post): " + urlCommand);
             LogApiCalls("content: " + content);
             HttpClient client = new HttpClient();
-            client.Timeout = TimeSpan.FromMinutes(15);
+            client.Timeout = TimeSpan.FromMinutes(Api_Timeout_Max);
 
             Uri baseUri = new Uri(BaseUrl + urlCommand);
             client.BaseAddress = baseUri;
@@ -130,7 +131,7 @@ namespace cmArt.Reece.ShopifyConnector
             string BaseUrl = "http://localhost:7071/api/MakeApiGetCall";
             LogApiCalls("urlCommand(Get - Unsecured): " + urlCommand);
             HttpClient client = new HttpClient();
-            client.Timeout = TimeSpan.FromMinutes(10);
+            client.Timeout = TimeSpan.FromMinutes(Api_Timeout_Max);
 
             Uri baseUri = new Uri(BaseUrl + urlCommand);
             client.BaseAddress = baseUri;
@@ -153,7 +154,7 @@ namespace cmArt.Reece.ShopifyConnector
             string BaseUrl = "http://localhost:7071/api/MakeApiGetCall";
             LogApiCalls("urlCommand(Get - Secured): " + urlCommand);
             HttpClient client = new HttpClient();
-            client.Timeout = TimeSpan.FromMinutes(15);
+            client.Timeout = TimeSpan.FromMinutes(Api_Timeout_Max);
 
             Uri baseUri = new Uri(BaseUrl);
             client.BaseAddress = baseUri;
