@@ -732,7 +732,7 @@ namespace cmArt.Shopify.App
             }
             catch (Exception e)
             {
-                logger.LogInformation($"Failed to get All shopify prices from Custom API. Message = \"{e.Message}\"");
+                logger.LogInformation($"Failed to get All shopify prices from Custom API. Error: \"{e.ToString()}\"");
                 Console.ReadKey();
             }
             IEnumerable<Shopify_Prices> MissingInfoPrices = tmpPrices.Select(p => p.AsShopify_Prices());
