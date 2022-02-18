@@ -13,11 +13,13 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public List<tmpS5QtyPair> Quantities { get; set; }
         public string partNumber { get; set; }
+        public int InvUnique { get; set; }
+        public string Cat { get; set; }
         public Shopify_Quantities AsShopify_Quantities()
         {
             Shopify_Quantities shopify_Quantities = new Shopify_Quantities();
-            shopify_Quantities.Cat = string.Empty;
-            shopify_Quantities.InvUnique = 0;
+            shopify_Quantities.Cat = this.Cat;
+            shopify_Quantities.InvUnique = this.InvUnique;
             shopify_Quantities.PartNumber = this.partNumber;
             shopify_Quantities.Quantities = this.Quantities.Select(q => q.AsS5QtyPair());
             return shopify_Quantities;
