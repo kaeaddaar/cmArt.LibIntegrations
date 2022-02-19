@@ -1,13 +1,14 @@
 ﻿using cmArt.LibIntegrations.ClientControllerService;
 using cmArt.LibIntegrations.ReportService;
 using cmArt.Reece.ShopifyConnector;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace cmArt.Portal.Data.OnlineInventory
 {
-    public class WebInventory : IWebInventory, IXRef<int>
+    public class WebInventory : IWebInventory, IXRef<int>, ICopyable<WebInventory>, ICopyableHttpRequest<WebInventory>
     {
         private ShopifyDataLoadFormat _Inventory;
         private ShopifyDataLoadFormat Inventory
@@ -33,6 +34,34 @@ namespace cmArt.Portal.Data.OnlineInventory
         public int GetPrimraryKey()
         {
             return this.InvUnique;
+        }
+
+        public WebInventory CopyFrom(WebInventory FromData)
+        {
+            WebInventory _From = FromData ?? new WebInventory();
+            this.Cat = FromData.Cat;
+            this.Description = FromData.Description;
+            this.ImageLocation = FromData.ImageLocation;
+            this.InvUnique = FromData.InvUnique;
+            this.PartNumber = FromData.PartNumber;
+            this.Prices = FromData.Prices;
+            this.Quantities = FromData.Quantities;
+            this.WebCategory = FromData.WebCategory;
+            return this;
+        }
+
+        public WebInventory CopyFrom(HttpRequest req, dynamic data)
+        {
+            this.Cat = utils.GetValue(req, data?.Cat, "Cat");
+            this.Description = utils.GetValue(req, data?.Description, "Description");
+            this.ImageLocation = utils.GetValue(req, data?.ImageLocation, "ImageLocation");
+            this.InvUnique = utils.StringToInt(utils.GetValue(req, data?.InvUnique, "InvUnique"));
+            this.PartNumber = utils.GetValue(req, data?.PartNumber, "PartNumber");
+            this.Prices = utils.JsonToPrices(req, data?.Prices, "Prices");
+            this.Quantities = utils.JsonToQuantities(req, data?.Quantities, "Quantities");
+            this.WebCategory = utils.GetValue(req, data?.WebCategory, "WebCategory");
+
+            return this;
         }
 
         public string ImageLocation { get; set; }

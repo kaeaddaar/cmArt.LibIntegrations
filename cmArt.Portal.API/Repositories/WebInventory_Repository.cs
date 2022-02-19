@@ -85,7 +85,6 @@ namespace cmArt.Portal.API.Repositories
                 bool FoundToEdit = tmpUpdate != null;
                 if (FoundToEdit)
                 {
-                    tmpUpdate.InvUnique = DocToAdd.InvUnique;
                     tmpUpdate.Cat = (DocToAdd.Cat ?? string.Empty).Trim();
                     tmpUpdate.PartNumber = (DocToAdd.PartNumber ?? String.Empty).Trim();
                     tmpUpdate.Description = (DocToAdd.Description ?? String.Empty).Trim();
