@@ -11,7 +11,7 @@ using cmArt.LibIntegrations.ClientControllerService;
 
 namespace cmArt.LibIntegrations.ClientControllerService
 {
-    public class ClientController<T, Ts, TIndex> : IClientControllerGeneric<T, Ts> where T : IPrimaryKey<TIndex>, new() where Ts : new()
+    public class ClientController_int<T, Ts> : IClientControllerGeneric_int<T, Ts> where T : IPrimaryKey<int>, new() where Ts : new()
     {
         private static HttpClient http = new HttpClient();
         //private static string DefaultBaseAddress = "https://azurefunctionsapitimereventtracker.azurewebsites.net";
@@ -22,13 +22,13 @@ namespace cmArt.LibIntegrations.ClientControllerService
         private T obj;
         private Ts objData;
 
-        public ClientController()
+        public ClientController_int()
         {
             _ControllerRoute = null;
             _FunctionKey = null;
             _BaseAddressSet = false;
         }
-        public ClientController(Uri BaseAddressUri)
+        public ClientController_int(Uri BaseAddressUri)
         {
             _ControllerRoute = null;
             _FunctionKey = null;
@@ -41,7 +41,7 @@ namespace cmArt.LibIntegrations.ClientControllerService
         /// </summary>
         /// <param name="ControllerRoute">ex: "/api/firefighter/" based on "/api/firefighter/{idIn?}" route for function</param>
         /// <param name="FunctionKey">ex: "code=epcME6Rx6kQ8e4qkT3FjSi24IeaAtA181FJvjXdPVQ7aF2rgL5jaJA=="</param>
-        public ClientController(string ControllerRoute, string FunctionKey, Uri BaseAddressUri)
+        public ClientController_int(string ControllerRoute, string FunctionKey, Uri BaseAddressUri)
         {
             _ControllerRoute = ControllerRoute;
             _FunctionKey = FunctionKey;
@@ -75,15 +75,15 @@ namespace cmArt.LibIntegrations.ClientControllerService
                 throw new ArgumentNullException("Controller Route and Function Key required");
             }
         }
-        public async Task<T> Get(string idGuid)
+        public async Task<T> Get(string idIn)
         {
-            Guid objID;
-            Guid.TryParse(idGuid, out objID);
+            int objID;
+            int.TryParse(idIn, out objID);
             T obj;
             obj = await Get(objID: objID);
             return obj;
         }
-        public async Task<T> Get(Guid objID)
+        public async Task<T> Get(int objID)
         {
             string response;
             string strID = HttpUtility.UrlEncode(objID.ToString());
@@ -117,13 +117,13 @@ namespace cmArt.LibIntegrations.ClientControllerService
                 return new T();
             }
         }
-        public async Task<string> Add(string idGuid, Ts objToAdd, Dictionary<string, string> QueryStringArgs_NotEncoded)
+        public async Task<string> Add(string idIn, Ts objToAdd, Dictionary<string, string> QueryStringArgs_NotEncoded)
         {
-            Guid objId;
-            Guid.TryParse(idGuid, out objId);
+            int objId;
+            int.TryParse(idIn, out objId);
             return await Add(objId: objId, objToAdd: objToAdd, QueryStringArgs_NotEncoded);
         }
-        public async Task<string> Add(Guid objId, Ts objToAdd, Dictionary<string, string> QueryStringArgs_NotEncoded)
+        public async Task<string> Add(int objId, Ts objToAdd, Dictionary<string, string> QueryStringArgs_NotEncoded)
         {
             ThrowErrIfRouteAndKeyNotSupplied();
             Dictionary<string, string> _QueryStringArgs_NotEncoded =
@@ -172,13 +172,13 @@ namespace cmArt.LibIntegrations.ClientControllerService
 
             return await ResponseOrError(response);
         }
-        public async Task<string> Update(string idGuid, Ts objToAdd, Dictionary<string, string> QueryStringArgs_NotEncoded)
+        public async Task<string> Update(string idIn, Ts objToAdd, Dictionary<string, string> QueryStringArgs_NotEncoded)
         {
-            Guid objId;
-            Guid.TryParse(idGuid, out objId);
+            int objId;
+            int.TryParse(idIn, out objId);
             return await Add(objId: objId, objToAdd: objToAdd, QueryStringArgs_NotEncoded);
         }
-        public async Task<string> Update(Guid objId, Ts objToAdd, Dictionary<string, string> QueryStringArgs_NotEncoded)
+        public async Task<string> Update(int objId, Ts objToAdd, Dictionary<string, string> QueryStringArgs_NotEncoded)
         {
             ThrowErrIfRouteAndKeyNotSupplied();
             Dictionary<string, string> _QueryStringArgs_NotEncoded =
@@ -224,14 +224,14 @@ namespace cmArt.LibIntegrations.ClientControllerService
 
             return await ResponseOrError(response);
         }
-        public async Task<string> Delete(string idGuid)
+        public async Task<string> Delete(string idIn)
         {
-            Guid objId;
-            Guid.TryParse(idGuid, out objId);
+            int objId;
+            int.TryParse(idIn, out objId);
             string response = await Delete(objId: objId);
             return response;
         }
-        public async Task<string> Delete(Guid objId)
+        public async Task<string> Delete(int objId)
         {
             ThrowErrIfRouteAndKeyNotSupplied();
 
