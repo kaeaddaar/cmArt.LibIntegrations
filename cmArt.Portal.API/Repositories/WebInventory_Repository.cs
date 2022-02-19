@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text.Json;
 using cmArt.Portal.API.Data;
 using cmArt.Portal.Data;
-using cmArt.Portal.Data.OnlineInventory;
+using cmArt.Portal.Data.InventoryData;
 using cmArt.Reece.ShopifyConnector;
 
 
@@ -60,7 +60,7 @@ namespace cmArt.Portal.API.Repositories
             Doc.PartNumber = (DocToAdd.PartNumber ?? String.Empty).Trim();
             Doc.Description = (DocToAdd.Description ?? String.Empty).Trim();
             Doc.WebCategory = (DocToAdd.WebCategory ?? String.Empty).Trim();
-            Doc.ImageLocation = (DocToAdd.ImageLocation ?? string.Empty).Trim();
+            Doc.ImageUrl = (DocToAdd.ImageUrl ?? string.Empty).Trim();
             Doc.Prices = DocToAdd.Prices ?? new List<S5PricePair>();
             Doc.Quantities = DocToAdd.Quantities ?? new List<S5QtyPair>();            
 
@@ -89,7 +89,7 @@ namespace cmArt.Portal.API.Repositories
                     tmpUpdate.PartNumber = (DocToAdd.PartNumber ?? String.Empty).Trim();
                     tmpUpdate.Description = (DocToAdd.Description ?? String.Empty).Trim();
                     tmpUpdate.WebCategory = (DocToAdd.WebCategory ?? String.Empty).Trim();
-                    tmpUpdate.ImageLocation = (DocToAdd.ImageLocation ?? string.Empty).Trim();
+                    tmpUpdate.ImageUrl = (DocToAdd.ImageUrl ?? string.Empty).Trim();
                     tmpUpdate.Prices = DocToAdd.Prices ?? new List<S5PricePair>();
                     tmpUpdate.Quantities = DocToAdd.Quantities ?? new List<S5QtyPair>();
                     context.SaveChanges();

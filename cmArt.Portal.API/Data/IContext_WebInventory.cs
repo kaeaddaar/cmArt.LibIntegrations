@@ -1,5 +1,5 @@
 ﻿using cmArt.Portal.Data;
-using cmArt.Portal.Data.OnlineInventory;
+using cmArt.Portal.Data.InventoryData;
 using Microsoft.EntityFrameworkCore;
 
 namespace cmArt.Portal.API.Data

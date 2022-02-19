@@ -6,9 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace cmArt.Portal.Data.OnlineInventory
+namespace cmArt.Portal.Data.InventoryData
 {
-    public class WebInventory : IWebInventory, IXRef<int>, ICopyable<WebInventory>, ICopyableHttpRequest<WebInventory>
+    public class WebInventory : IWebInventory, IPrimaryKey<int>, ICopyable<WebInventory>, ICopyableHttpRequest<WebInventory>
     {
         private ShopifyDataLoadFormat _Inventory;
         private ShopifyDataLoadFormat Inventory
@@ -26,14 +26,17 @@ namespace cmArt.Portal.Data.OnlineInventory
             Inventory = data ?? Inventory ?? new ShopifyDataLoadFormat();
         }
 
-        public IEnumerable<int> GetXRefValues()
-        {
-            throw new NotImplementedException();
-        }
-
-        public int GetPrimraryKey()
+        //public IEnumerable<int> GetXRefValues()
+        //{
+        //    throw new NotImplementedException();
+        //}
+        public int GetPrimaryKey()
         {
             return this.InvUnique;
+        }
+        public bool IsEmpty(int value)
+        {
+            return value == 0;
         }
 
         public WebInventory CopyFrom(WebInventory FromData)
@@ -41,7 +44,7 @@ namespace cmArt.Portal.Data.OnlineInventory
             WebInventory _From = FromData ?? new WebInventory();
             this.Cat = FromData.Cat;
             this.Description = FromData.Description;
-            this.ImageLocation = FromData.ImageLocation;
+            this.ImageUrl = FromData.ImageUrl;
             this.InvUnique = FromData.InvUnique;
             this.PartNumber = FromData.PartNumber;
             this.Prices = FromData.Prices;
@@ -54,7 +57,7 @@ namespace cmArt.Portal.Data.OnlineInventory
         {
             this.Cat = utils.GetValue(req, data?.Cat, "Cat");
             this.Description = utils.GetValue(req, data?.Description, "Description");
-            this.ImageLocation = utils.GetValue(req, data?.ImageLocation, "ImageLocation");
+            this.ImageUrl = utils.GetValue(req, data?.ImageLocation, "ImageLocation");
             this.InvUnique = utils.StringToInt(utils.GetValue(req, data?.InvUnique, "InvUnique"));
             this.PartNumber = utils.GetValue(req, data?.PartNumber, "PartNumber");
             this.Prices = utils.JsonToPrices(req, data?.Prices, "Prices");
@@ -64,7 +67,7 @@ namespace cmArt.Portal.Data.OnlineInventory
             return this;
         }
 
-        public string ImageLocation { get; set; }
+        public string ImageUrl { get; set; }
         public string Description
         {
             get { return Inventory.Description; }

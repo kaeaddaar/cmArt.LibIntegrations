@@ -6,10 +6,12 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
+using cmArt.LibIntegrations.ClientControllerService;
+
 
 namespace cmArt.LibIntegrations.ClientControllerService
 {
-    public class ClientController<T, Ts> : IClientControllerGeneric<T, Ts> where T : IXRef<Guid>, new() where Ts : new()
+    public class ClientController<T, Ts, TIndex> : IClientControllerGeneric<T, Ts> where T : IPrimaryKey<TIndex>, new() where Ts : new()
     {
         private static HttpClient http = new HttpClient();
         //private static string DefaultBaseAddress = "https://azurefunctionsapitimereventtracker.azurewebsites.net";
@@ -262,7 +264,7 @@ namespace cmArt.LibIntegrations.ClientControllerService
             try
             {
                 T tmpObj = System.Text.Json.JsonSerializer.Deserialize<T>(response);
-                if (tmpObj.GetPrimraryKey() == Guid.Empty)
+                if (tmpObj.IsEmpty(tmpObj.GetPrimaryKey()))
                 {
                     responseIsError = true;
                 }

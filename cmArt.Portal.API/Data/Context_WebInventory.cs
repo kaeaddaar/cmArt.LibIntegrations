@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using cmArt.Portal.Data;
-using cmArt.Portal.Data.OnlineInventory;
+using cmArt.Portal.Data.InventoryData;
 using Microsoft.EntityFrameworkCore;
 
 

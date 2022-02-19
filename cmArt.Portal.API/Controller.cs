@@ -17,7 +17,7 @@ using cmArt.Portal.Data;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.IO;
-using cmArt.Portal.Data.OnlineInventory;
+using cmArt.Portal.Data.InventoryData;
 
 namespace BlazorApp.Api
 {
