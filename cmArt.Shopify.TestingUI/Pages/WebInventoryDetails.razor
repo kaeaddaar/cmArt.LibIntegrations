@@ -1,12 +1,28 @@
-﻿@using cmArt.LibIntegrations.ClientControllerService
+﻿@page "/webinventory"
+@using cmArt.LibIntegrations.ClientControllerService
 @using cmArt.Portal.Data.InventoryData
 @using cmArt.Reece.ShopifyConnector
 @using cmArt.Reece.ShopifyConnector.Data
 
-
+@inject ClientController_int<WebInventory,WebInventory> WebInvnentoryController
 
 <h3>WebInventoryDetails</h3>
 
 @code {
+    protected override void OnInitialized()
+    {
+        WebInventory inv = new WebInventory();
+        inv.Cat = "000";
+        inv.Description = "Description of Test Item";
+        inv.ImageUrl = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fpixabay.com%2Fillustrations%2Ftraffic-signs-right-of-way-test-361514%2F&psig=AOvVaw363cRqzlp9t0Uq_5AQdQxa&ust=1645393402002000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCPDm55vejPYCFQAAAAAdAAAAABAD";
+        inv.InvUnique = 1;
+        inv.PartNumber = "Test one";
+        inv.Prices = new List<S5PricePair>();
+        inv.Quantities = new List<S5QtyPair>();
+        inv.WebCategory = "unassignedTest";
 
+        WebInvnentoryController.Add(1, inv, new Dictionary<string, string>());
+
+        base.OnInitialized();
+    }
 }
