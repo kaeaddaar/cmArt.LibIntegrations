@@ -180,18 +180,18 @@ else
 
 @code {
     // This view should show the view from the SingePart page as a component. 
-    private IEnumerable<PortalInventory> _data;
+    private IEnumerable<WebInventory> _data;
 
     [Parameter]
-    public IEnumerable<PortalInventory> data 
+    public IEnumerable<WebInventory> data 
     { 
         get
         {
-            return _data ?? new List<PortalInventory>();
+            return _data ?? new List<WebInventory>();
         } 
         set
         {
-            _data = value ?? _data ?? new List<PortalInventory>();
+            _data = value ?? _data ?? new List<WebInventory>();
         }
     }
 

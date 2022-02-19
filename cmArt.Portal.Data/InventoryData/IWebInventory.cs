@@ -4,7 +4,7 @@ using cmArt.Reece.ShopifyConnector.Data;
 
 namespace cmArt.Portal.Data.OnlineInventory
 {
-    public interface IPortalInventory : IShopifyDataLoadFormat_POCO
+    public interface IWebInventory : IShopifyDataLoadFormat_POCO
     {
         string ImageLocation { get; set; }
 

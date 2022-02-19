@@ -12,13 +12,13 @@ namespace cmArt.Portal.API.Repositories
 {
     public class Document_Repository : INotifyPropertyChanged
     {
-        IContext _context;
+        IContext_Documents _context;
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        public static List<Document> GetJsonDocuments(Context context)
+        public static List<Document> GetJsonDocuments(Context_Documents context)
         {
             if (context.JsonDocuments.Count() < 1)
             {
@@ -29,7 +29,7 @@ namespace cmArt.Portal.API.Repositories
                 return context.JsonDocuments.ToList();
             }
         }
-        public static Document GetJsonDocument(IContext context, Guid Id)
+        public static Document GetJsonDocument(IContext_Documents context, Guid Id)
         {
             var recordsFiltered = context.JsonDocuments.Where(inv => inv.Id == Id);
             bool HasRecords = recordsFiltered.Count() > 1;
@@ -40,7 +40,7 @@ namespace cmArt.Portal.API.Repositories
             }
             return recordsFiltered.FirstOrDefault();
         }
-        public static Guid AddJsonDocument(Context context, Document DocToAdd)
+        public static Guid AddJsonDocument(Context_Documents context, Document DocToAdd)
         {
             if (context == null)
             {
@@ -94,7 +94,7 @@ namespace cmArt.Portal.API.Repositories
 
             return tmp.Id;
         }
-        public static int DeleteJsonDocument(IContext context, Document DocDel)
+        public static int DeleteJsonDocument(IContext_Documents context, Document DocDel)
         {
             Document Doc = DocDel ?? new Document();
             Guid Unique = Doc.Id;

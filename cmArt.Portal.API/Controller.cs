@@ -31,9 +31,9 @@ namespace BlazorApp.Api
         )
         {
             //return await InventorySimple_Controller_Generic.Run(req, log, idIn);
-            Func<Context, Document, Guid> funcAdd = Document_Repository.AddJsonDocument;
-            Func<Context, Document, int> funcDelete = ControllerGeneric<Document, Guid, Context, IContext>.DeleteObject_Default;
-            return await ControllerGeneric<Document, Guid, Context, IContext>.Run(Document_Repository.GetJsonDocument, req, log, idIn, funcAdd, funcDelete, utils.StringToGuid);
+            Func<Context_Documents, Document, Guid> funcAdd = Document_Repository.AddJsonDocument;
+            Func<Context_Documents, Document, int> funcDelete = ControllerGeneric<Document, Guid, Context_Documents, IContext_Documents>.DeleteObject_Default;
+            return await ControllerGeneric<Document, Guid, Context_Documents, IContext_Documents>.Run(Document_Repository.GetJsonDocument, req, log, idIn, funcAdd, funcDelete, utils.StringToGuid);
         }
 
         [FunctionName("MakeApiPostCall_Controller")]

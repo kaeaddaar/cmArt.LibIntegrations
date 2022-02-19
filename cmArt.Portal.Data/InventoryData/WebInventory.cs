@@ -7,7 +7,7 @@ using System.Text;
 
 namespace cmArt.Portal.Data.OnlineInventory
 {
-    public class PortalInventory : IPortalInventory, IXRef<int>
+    public class WebInventory : IWebInventory, IXRef<int>
     {
         private ShopifyDataLoadFormat _Inventory;
         private ShopifyDataLoadFormat Inventory
@@ -16,7 +16,7 @@ namespace cmArt.Portal.Data.OnlineInventory
             set { _Inventory = value ?? _Inventory ?? new ShopifyDataLoadFormat(); }
         }
 
-        public PortalInventory()
+        public WebInventory()
         {
             Inventory = new ShopifyDataLoadFormat();
         }

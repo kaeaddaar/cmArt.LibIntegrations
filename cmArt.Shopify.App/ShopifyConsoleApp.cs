@@ -658,7 +658,7 @@ namespace cmArt.Shopify.App
             CachingPattern_Shopify_Quantities cacheShopify_Quantities = new CachingPattern_Shopify_Quantities("PocoQuantitiesAdapted", settings);
             cacheShopify_Quantities._02_SaveNewestToCache(PocoQuantitiesAdapted);
 
-            Context context = new Context();
+            Context_Documents context = new Context_Documents();
 
             Document S5_Product_Document = new Document();
             S5_Product_Document.Id = new Guid("74e5b8d9-f264-4029-af3a-f2c44c906511");
@@ -814,7 +814,7 @@ namespace cmArt.Shopify.App
             CachingPattern_Shopify_Quantities cacheShopify_Quantities = new CachingPattern_Shopify_Quantities("ShopifyQuantities_ReecesAPI", settings);
             cacheShopify_Quantities._02_SaveNewestToCache(API_Quantities);
 
-            Context context = new Context();
+            Context_Documents context = new Context_Documents();
 
             Document Shopify_Product_Document = new Document();
             Shopify_Product_Document.Id = new Guid("17cf9358-b783-46a2-97ee-ef69388f3904");
