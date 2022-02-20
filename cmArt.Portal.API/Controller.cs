@@ -18,6 +18,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.IO;
 using cmArt.Portal.Data.InventoryData;
+using cmArt.Portal.API.Models;
 
 namespace BlazorApp.Api
 {
@@ -33,8 +34,8 @@ namespace BlazorApp.Api
         {
             //return await InventorySimple_Controller_Generic.Run(req, log, idIn);
             Func<Context_WebInventory, WebInventory, int> funcAdd = WebInventory_Repository.AddWebInventoryRecord;
-            Func<Context_WebInventory, WebInventory, int> funcDelete = ControllerGeneric<WebInventory, Guid, Context_WebInventory, IContext_WebInventory>.DeleteObject_Default;
-            return await ControllerGeneric<WebInventory, int, Context_WebInventory, IContext_WebInventory>.Run(WebInventory_Repository.GetWebInventoryRecord, req, log, idIn, funcAdd, funcDelete, utils.StringToInt);
+            Func<Context_WebInventory, WebInventory, int> funcDelete = ControllerGeneric<WebInventory, WebInventoryClient, IWebInventory, int, Context_WebInventory, IContext_WebInventory>.DeleteObject_Default;
+            return await ControllerGeneric<WebInventory, WebInventoryClient, IWebInventory, int, Context_WebInventory, IContext_WebInventory>.Run(WebInventory_Repository.GetWebInventoryRecord, req, log, idIn, funcAdd, funcDelete, utils.StringToInt);
         }
         [FunctionName("JsonDocument_Controller")]
         public static async Task<IActionResult> Run_JsonDocument
@@ -46,8 +47,8 @@ namespace BlazorApp.Api
         {
             //return await InventorySimple_Controller_Generic.Run(req, log, idIn);
             Func<Context_Documents, Document, Guid> funcAdd = Document_Repository.AddJsonDocument;
-            Func<Context_Documents, Document, int> funcDelete = ControllerGeneric<Document, Guid, Context_Documents, IContext_Documents>.DeleteObject_Default;
-            return await ControllerGeneric<Document, Guid, Context_Documents, IContext_Documents>.Run(Document_Repository.GetJsonDocument, req, log, idIn, funcAdd, funcDelete, utils.StringToGuid);
+            Func<Context_Documents, Document, int> funcDelete = ControllerGeneric<Document, DocumentClient, IDocument, Guid, Context_Documents, IContext_Documents>.DeleteObject_Default;
+            return await ControllerGeneric<Document, DocumentClient, IDocument, Guid, Context_Documents, IContext_Documents>.Run(Document_Repository.GetJsonDocument, req, log, idIn, funcAdd, funcDelete, utils.StringToGuid);
         }
 
         [FunctionName("MakeApiPostCall_Controller")]

@@ -13,10 +13,12 @@ using Microsoft.Extensions.Logging;
 using System.Web;
 using Microsoft.EntityFrameworkCore;
 using cmArt.Portal.Data;
+using cmArt.LibIntegrations;
+using cmArt.Portal.API.Data;
 
 namespace cmArt.Portal.API.Services
 {
-    public class ControllerGeneric<T, TIndex, TContext, IContext> where T : ICopyable<T>, ICopyableHttpRequest<T>, new() where TContext : DbContext, IContext, new()
+    public class ControllerGeneric<T, TClient, TInterface, TIndex, TContext, IContext> where TClient : T, ICopyable<TInterface>, ICopyableHttpRequest<TInterface>, new() where T : TInterface, new() where TContext : DbContext, IContext, new()
     {
         public static int DeleteObject_Default(TContext context, T objToDelete)
         {
@@ -85,10 +87,10 @@ namespace cmArt.Portal.API.Services
             string AllowUpdate = req.Query["AllowUpdate"];
             AllowUpdate = AllowUpdate ?? data?.AllowUpdate;
 
-            T obj = new T();
+            TClient obj = new TClient();
             TContext context = new TContext();
 
-            T newObj = new T();
+            TClient newObj = new TClient();
 
             string responseMessage = string.Empty;
 
@@ -113,7 +115,9 @@ namespace cmArt.Portal.API.Services
                 try
                 {
                     // ----- GetObj -----
-                    obj = GetObj(context, id); // object specific data reposotory call
+                    T objTmp = GetObj(context, id);
+                    obj.CopyFrom(objTmp);
+                    //obj = GetObj(context, id); // object specific data reposotory call
                     responseMessage = JsonConvert.SerializeObject(obj);
                 }
                 catch (Exception e)
@@ -128,8 +132,13 @@ namespace cmArt.Portal.API.Services
                 try
                 {
                     // ----- GetObj -----
-                    obj = GetObj(context, id); // object specific data reposotory call
-                    found = obj != null;
+                    T objTmp = GetObj(context, id);
+                    //obj = GetObj(context, id); // object specific data reposotory call
+                    found = objTmp != null;
+                    if (found)
+                    { obj.CopyFrom(objTmp); }
+                    else
+                    { obj = default(TClient); }
                 }
                 catch (Exception e)
                 {
@@ -157,11 +166,13 @@ namespace cmArt.Portal.API.Services
                 }
                 if (NotFound_ShouldAdd)
                 {
-                    obj = new T();
+                    obj = new TClient();
                     obj.CopyFrom(newObj);
                     //FillForUpdate(obj, newObj, context);
                     TIndex UniqueIdAdded = AddObj(context, obj);
-                    obj = GetObj(context, UniqueIdAdded);
+                    T objTmp = GetObj(context, UniqueIdAdded);
+                    obj.CopyFrom(objTmp);
+                    //obj = GetObj(context, UniqueIdAdded);
                 }
                 responseMessage = JsonConvert.SerializeObject(obj);
             }
@@ -172,7 +183,9 @@ namespace cmArt.Portal.API.Services
                 try
                 {
                     // ----- GetObj -----
-                    obj = GetObj(context, id); // Field/Object Specific
+                    T objTmp = GetObj(context, id);
+                    obj.CopyFrom(objTmp);
+                    //obj = GetObj(context, id); // Field/Object Specific
                     found = true;
                 }
                 catch (Exception e)
@@ -207,7 +220,9 @@ namespace cmArt.Portal.API.Services
                 try
                 {
                     // ----- GetObj -----
-                    obj = GetObj(context, id); // Field/Object specific
+                    T objTmp = GetObj(context, id);
+                    obj.CopyFrom(objTmp);
+                    //obj = GetObj(context, id); // Field/Object specific
                     found = true;
                 }
                 catch (Exception e)

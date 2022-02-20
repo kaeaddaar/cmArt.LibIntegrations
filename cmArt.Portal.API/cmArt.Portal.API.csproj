@@ -21,9 +21,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\cmArt.Portal.Data\cmArt.Portal.Data.csproj" />
   </ItemGroup>
 </Project>

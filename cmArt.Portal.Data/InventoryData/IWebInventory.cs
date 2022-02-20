@@ -1,6 +1,7 @@
-﻿using cmArt.Reece.ShopifyConnector;
+﻿using cmArt.LibIntegrations;
+using cmArt.Reece.ShopifyConnector;
 using cmArt.Reece.ShopifyConnector.Data;
-
+using cmArt.Portal;
 
 namespace cmArt.Portal.Data.InventoryData
 {
@@ -9,5 +10,6 @@ namespace cmArt.Portal.Data.InventoryData
         string ImageUrl { get; set; }
 
         void Init(ShopifyDataLoadFormat data);
+
     }
 }

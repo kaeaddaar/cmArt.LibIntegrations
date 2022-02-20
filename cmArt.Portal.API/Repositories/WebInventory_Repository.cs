@@ -15,7 +15,7 @@ namespace cmArt.Portal.API.Repositories
 {
     public class WebInventory_Repository : INotifyPropertyChanged
     {
-        IContext_WebInventory _context;
+        //IContext_WebInventory _context;
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
