@@ -4,7 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace cmArt.Portal.Data
+
+namespace cmArt.Portal.API.Data
 {
     public static class utils
     {
@@ -43,7 +44,7 @@ namespace cmArt.Portal.Data
             object _DynamicFieldResult = DynamicFieldResult ?? new object();
 
             if (_fieldName == string.Empty) { return string.Empty; }
-            
+
             string result = _req.Query[_fieldName];
             result = result ?? _DynamicFieldResult.ToString() ?? string.Empty;
 
@@ -68,4 +69,5 @@ namespace cmArt.Portal.Data
             return result;
         }
     }
+
 }

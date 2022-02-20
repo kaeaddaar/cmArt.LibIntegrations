@@ -2,11 +2,16 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.22" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.22" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.13" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\cmArt.Portal.Data2\cmArt.Portal.Data.csproj" />
+    <ProjectReference Include="..\cmArt.Reece.ShopifyConnector\cmArt.Reece.ShopifyConnector.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
@@ -19,8 +24,5 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\cmArt.Portal.Data\cmArt.Portal.Data.csproj" />
   </ItemGroup>
 </Project>

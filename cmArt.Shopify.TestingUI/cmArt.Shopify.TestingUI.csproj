@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\cmArt.Portal.Data\cmArt.Portal.Data.csproj" />
+    <ProjectReference Include="..\cmArt.Portal.Data2\cmArt.Portal.Data.csproj" />
     <ProjectReference Include="..\cmArt.Reece.ShopifyConnector\cmArt.Reece.ShopifyConnector.csproj" />
   </ItemGroup>
 
