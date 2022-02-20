@@ -1,9 +1,7 @@
-﻿* Shopify QTY update problem
-* Implementing the generic filter for only records with changes functionality.
-* Implement Caching Functionality
- - Add ability to read from directory to see if files are there
- - Consider checking for continuity
- - Do the files de-serialize
+﻿ 2022-02-02: Adding As_Type(out objOfT) to support all possible types the object can be. Or maybe we pass in a function that is a factory method. 
+ 
+ Factory method example:
+ Func<T> fAs_Type = () => new PossibleType1();
 
 
 
