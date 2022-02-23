@@ -4,14 +4,14 @@ using System.Text;
 
 namespace cmArt.LibIntegrations.ClientControllerService
 {
-    public interface IXRef<T> : IPrimaryKey<T>
+    public interface IXRef<T> : IIndex<T>
     {
         IEnumerable<T> GetXRefValues();
     }
-    public interface IPrimaryKey<T>
+    public interface IIndex<T>
     {
         bool IsEmpty(T value);
-        T GetPrimaryKey();
+        T GetIndex();
     }
 
 }

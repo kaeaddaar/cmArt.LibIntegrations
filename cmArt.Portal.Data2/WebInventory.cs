@@ -1,6 +1,7 @@
-﻿using cmArt.LibIntegrations;
-using cmArt.LibIntegrations.ClientControllerService;
+﻿//using cmArt.LibIntegrations;
+//using cmArt.LibIntegrations.ClientControllerService;
 using cmArt.LibIntegrations.ReportService;
+using cmArt.Portal.Data6;
 using cmArt.Reece.ShopifyConnector;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Text;
 
 namespace cmArt.Portal.Data.InventoryData
 {
-    public class WebInventory : IWebInventory, IPrimaryKey<int>
+    public class WebInventory : IWebInventory
     {
         private ShopifyDataLoadFormat _Inventory;
         private ShopifyDataLoadFormat Inventory
@@ -30,14 +31,14 @@ namespace cmArt.Portal.Data.InventoryData
         //{
         //    throw new NotImplementedException();
         //}
-        public int GetPrimaryKey()
-        {
-            return this.InvUnique;
-        }
-        public bool IsEmpty(int value)
-        {
-            return value == 0;
-        }
+        //public int GetIndex()
+        //{
+        //    return this.InvUnique;
+        //}
+        //public bool IsEmpty(int value)
+        //{
+        //    return value == 0;
+        //}
 
         public string ImageUrl { get; set; }
         public string Description

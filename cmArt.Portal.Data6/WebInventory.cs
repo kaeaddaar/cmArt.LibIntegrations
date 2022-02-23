@@ -3,9 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+
 namespace cmArt.Portal.Data6
 {
-    public class WebInventory : IWebInventory, IPrimaryKey<int>
+    public class WebInventory : IWebInventory
     {
         private ShopifyDataLoadFormat _Inventory;
         private ShopifyDataLoadFormat Inventory
@@ -27,10 +28,10 @@ namespace cmArt.Portal.Data6
         //{
         //    throw new NotImplementedException();
         //}
-        public int GetPrimaryKey()
-        {
-            return this.InvUnique;
-        }
+        //public int GetIndex()
+        //{
+        //    return this.InvUnique;
+        //}
         public bool IsEmpty(int value)
         {
             return value == 0;

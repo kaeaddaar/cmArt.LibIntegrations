@@ -11,7 +11,7 @@ using cmArt.LibIntegrations.ClientControllerService;
 
 namespace cmArt.LibIntegrations.ClientControllerService
 {
-    public class ClientController_int<T, Ts> : IClientControllerGeneric_int<T, Ts> where T : IPrimaryKey<int>, new() where Ts : new()
+    public class ClientController_int<T, Ts> : IClientControllerGeneric_int<T, Ts> where T : IIndex<int>, new() where Ts : new()
     {
         private static HttpClient http = new HttpClient();
         //private static string DefaultBaseAddress = "https://azurefunctionsapitimereventtracker.azurewebsites.net";
@@ -264,7 +264,7 @@ namespace cmArt.LibIntegrations.ClientControllerService
             try
             {
                 T tmpObj = System.Text.Json.JsonSerializer.Deserialize<T>(response);
-                if (tmpObj.IsEmpty(tmpObj.GetPrimaryKey()))
+                if (tmpObj.IsEmpty(tmpObj.GetIndex()))
                 {
                     responseIsError = true;
                 }

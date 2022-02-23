@@ -1,4 +1,5 @@
 ﻿using cmArt.LibIntegrations;
+using cmArt.LibIntegrations.ClientControllerService;
 using cmArt.Portal.API6.Data;
 using cmArt.Portal.Data6;
 using Microsoft.AspNetCore.Http;
@@ -8,7 +9,7 @@ using System.Text;
 
 namespace cmArt.Portal.API6.Models
 {
-    public class WebInventoryClient : WebInventory, ICopyable<WebInventory>, ICopyableHttpRequest<WebInventory>, IAs_Type<WebInventory>
+    public class WebInventoryClient : WebInventory, ICopyable<WebInventory>, ICopyableHttpRequest<WebInventory>, IAs_Type<WebInventory>, IIndex<int>
     {
         public WebInventory As_Type(Type type)
         {
@@ -49,6 +50,17 @@ namespace cmArt.Portal.API6.Models
 
             return this;
         }
+
+        public int GetIndex()
+        {
+            return this.InvUnique;
+        }
+
+        public bool IsEmpty(int value)
+        {
+            return (this.InvUnique == 0);
+        }
+
         private IWebInventory CopyFrom(IWebInventory ToData, IWebInventory FromData)
         {
             IWebInventory _From = FromData ?? new WebInventoryClient();
