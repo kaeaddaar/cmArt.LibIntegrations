@@ -53,7 +53,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zzDNUcmArt.WebJaguar.Data",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Shopify.TestingUI", "cmArt.Shopify.TestingUI\cmArt.Shopify.TestingUI.csproj", "{58C3950B-1A5D-452E-BB43-3E6CBF2EF819}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Portal.API", "cmArt.Portal.API\cmArt.Portal.API.csproj", "{DF10058C-9A32-4125-A64C-2F3A546C86B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Portal.API_DNU", "cmArt.Portal.API\cmArt.Portal.API_DNU.csproj", "{DF10058C-9A32-4125-A64C-2F3A546C86B4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Portal.Data", "cmArt.Portal.Data2\cmArt.Portal.Data.csproj", "{041D8DB9-A35F-4030-9CC7-FD10E700B5D8}"
 EndProject

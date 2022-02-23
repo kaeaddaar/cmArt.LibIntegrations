@@ -9,8 +9,12 @@
 <h3>WebInventoryDetails</h3>
 
 @code {
+    string results;
+
     protected override void OnInitialized()
     {
+        results = string.Empty;
+
         WebInventory inv = new WebInventory();
         inv.Cat = "000";
         inv.Description = "Description of Test Item";
@@ -21,8 +25,8 @@
         inv.Quantities = new List<S5QtyPair>();
         inv.WebCategory = "unassignedTest";
 
-        WebInvnentoryController.Add(1, inv, new Dictionary<string, string>());
-
+        results = WebInvnentoryController.Add(1, inv, new Dictionary<string, string>()).Result;
+        StateHasChanged();
         base.OnInitialized();
     }
 }
