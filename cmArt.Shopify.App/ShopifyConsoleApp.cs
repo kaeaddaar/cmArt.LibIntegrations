@@ -30,10 +30,10 @@ using cmArt.Shopify.App.ReportViews;
 using cmArt.LibIntegrations.ReportService;
 using cmArt.LibIntegrations.LoggingServices;
 
-using cmArt.Portal.API;
-using cmArt.Portal.Data;
-using cmArt.Portal.API.Data;
-using cmArt.Portal.API.Repositories;
+using cmArt.Portal.API6;
+using cmArt.Portal.Data6;
+using cmArt.Portal.API6.Data;
+using cmArt.Portal.API6.Repositories;
 
 namespace cmArt.Shopify.App
 {

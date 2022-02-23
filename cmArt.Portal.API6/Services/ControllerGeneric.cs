@@ -12,11 +12,17 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Web;
 using Microsoft.EntityFrameworkCore;
-using cmArt.Portal.Data;
+using cmArt.Portal.Data6;
+using cmArt.LibIntegrations;
+using cmArt.Portal.API6.Data;
+
 
 namespace cmArt.Portal.API6.Services
 {
-    public class ControllerGeneric<T, TIndex, TContext, IContext> where T : ICopyable<T>, ICopyableHttpRequest<T>, new() where TContext : DbContext, IContext, new()
+    public class ControllerGeneric<T, TClient, TIndex, TContext, IContext>
+        where TClient : T, ICopyable<T>, ICopyableHttpRequest<T>, IAs_Type<T>, new()
+        where T : new() 
+        where TContext : DbContext, IContext, new()
     {
         public static int DeleteObject_Default(TContext context, T objToDelete)
         {
@@ -95,8 +101,10 @@ namespace cmArt.Portal.API6.Services
             try
             {
                 // ----- Log_Gather_Fill -----
-                newObj.CopyFrom(req, data);
-                //newObj = Log_Gather_Fill(log, req, data, id);
+                TClient tmp = new TClient();
+                tmp.CopyFrom(req, data);
+                newObj = tmp.As_Type(typeof(T));
+                //newObj.CopyFrom(req, data);
             }
             catch (Exception e)
             {
@@ -150,16 +158,20 @@ namespace cmArt.Portal.API6.Services
                     if (IsUpdateAllowed)
                     {
                         // ----- FillForUpdate -----
-                        obj.CopyFrom(newObj);
+                        TClient tmp = new TClient();
+                        tmp.CopyFrom(newObj);
+                        obj = (T)tmp;
+                        //obj.CopyFrom(newObj);
                         context.SaveChanges();
-                        //FillForUpdate(obj, newObj, context); // Field/Object Specific
                     }
                 }
                 if (NotFound_ShouldAdd)
                 {
-                    obj = new T();
-                    obj.CopyFrom(newObj);
-                    //FillForUpdate(obj, newObj, context);
+                    //obj = new T();
+                    TClient tmp = new TClient();
+                    tmp.CopyFrom(newObj);
+                    obj = (T)tmp;
+                    //obj.CopyFrom(newObj);
                     TIndex UniqueIdAdded = AddObj(context, obj);
                     obj = GetObj(context, UniqueIdAdded);
                 }
@@ -194,8 +206,10 @@ namespace cmArt.Portal.API6.Services
                 if (Found_ShouldUpdate)
                 {
                     // ----- FillForUpdate -----
-                    obj.CopyFrom(newObj);
-                    //FillForUpdate(obj, newObj, context); // Field/Object Specific
+                    TClient tmp = new TClient();
+                    tmp.CopyFrom(newObj);
+                    obj = (T)tmp;
+                    //obj.CopyFrom(newObj);
                     await context.SaveChangesAsync();
                 }
                 responseMessage = JsonConvert.SerializeObject(obj);

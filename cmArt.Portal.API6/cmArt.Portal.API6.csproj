@@ -9,7 +9,7 @@
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\cmArt.Portal.Data\cmArt.Portal.Data.csproj" />
+    <ProjectReference Include="..\cmArt.Portal.Data6\cmArt.Portal.Data6.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
