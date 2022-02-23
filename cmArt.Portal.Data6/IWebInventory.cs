@@ -1,7 +1,6 @@
-﻿using cmArt.LibIntegrations;
-using cmArt.Reece.ShopifyConnector;
+﻿using cmArt.Reece.ShopifyConnector;
 using cmArt.Reece.ShopifyConnector.Data;
-using cmArt.Portal;
+
 
 namespace cmArt.Portal.Data6
 {

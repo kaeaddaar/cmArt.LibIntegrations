@@ -1,7 +1,4 @@
-﻿using cmArt.LibIntegrations;
-using cmArt.LibIntegrations.ClientControllerService;
-using cmArt.LibIntegrations.ReportService;
-using cmArt.Reece.ShopifyConnector;
+﻿using cmArt.Reece.ShopifyConnector;
 using System;
 using System.Collections.Generic;
 using System.Text;

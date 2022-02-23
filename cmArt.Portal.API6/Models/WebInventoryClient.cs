@@ -8,24 +8,35 @@ using System.Text;
 
 namespace cmArt.Portal.API6.Models
 {
-    public class WebInventoryClient : WebInventory, ICopyable<IWebInventory>, ICopyableHttpRequest<IWebInventory>
+    public class WebInventoryClient : WebInventory, ICopyable<WebInventory>, ICopyableHttpRequest<WebInventory>, IAs_Type<WebInventory>
     {
-        public IWebInventory CopyFrom(IWebInventory FromData)
+        public WebInventory As_Type(Type type)
         {
-            IWebInventory _From = FromData ?? new WebInventoryClient();
-            this.Cat = FromData.Cat;
-            this.Description = FromData.Description;
-            this.ImageUrl = FromData.ImageUrl;
-            this.InvUnique = FromData.InvUnique;
-            this.PartNumber = FromData.PartNumber;
-            this.Prices = FromData.Prices;
-            this.Quantities = FromData.Quantities;
-            this.WebCategory = FromData.WebCategory;
-            return this;
+            WebInventory result = new WebInventory();
+            CopyFrom(result, this);
+            return result;
+        }
+
+        public WebInventory CopyFrom(WebInventory FromData)
+        {
+            //IWebInventory _From = FromData ?? new WebInventoryClient();
+            //this.Cat = FromData.Cat;
+            //this.Description = FromData.Description;
+            //this.ImageUrl = FromData.ImageUrl;
+            //this.InvUnique = FromData.InvUnique;
+            //this.PartNumber = FromData.PartNumber;
+            //this.Prices = FromData.Prices;
+            //this.Quantities = FromData.Quantities;
+            //this.WebCategory = FromData.WebCategory;
+            //return this;
+
+            WebInventory _From = FromData ?? new WebInventory();
+            CopyFrom(_From, FromData);
+            return _From;
         }
 
 
-        public IWebInventory CopyFrom(HttpRequest req, dynamic data)
+        public WebInventory CopyFrom(HttpRequest req, dynamic data)
         {
             this.Cat = utils.GetValue(req, data?.Cat, "Cat");
             this.Description = utils.GetValue(req, data?.Description, "Description");
@@ -36,6 +47,19 @@ namespace cmArt.Portal.API6.Models
             this.Quantities = utils.JsonToQuantities(req, data?.Quantities, "Quantities");
             this.WebCategory = utils.GetValue(req, data?.WebCategory, "WebCategory");
 
+            return this;
+        }
+        private IWebInventory CopyFrom(IWebInventory ToData, IWebInventory FromData)
+        {
+            IWebInventory _From = FromData ?? new WebInventoryClient();
+            ToData.Cat = FromData.Cat;
+            ToData.Description = FromData.Description;
+            ToData.ImageUrl = FromData.ImageUrl;
+            ToData.InvUnique = FromData.InvUnique;
+            ToData.PartNumber = FromData.PartNumber;
+            ToData.Prices = FromData.Prices;
+            ToData.Quantities = FromData.Quantities;
+            ToData.WebCategory = FromData.WebCategory;
             return this;
         }
     }

@@ -12,7 +12,9 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 //builder.Logging.SetMinimumLevel(LogLevel.Debug);
 //builder.Logging.AddProvider(new CustomLoggingProvider());
-
+string ControllerRoute = "/api/WebInventory_Controller";
+string FunctionKey = "";
+Uri BaseAddressUri = new Uri("http://localhost:7071");
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) })
     .AddScoped(x => new ClientController_int<WebInventory, WebInventory>());
 //builder.Services.AddCors(options =>
