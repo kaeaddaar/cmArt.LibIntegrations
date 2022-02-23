@@ -55,7 +55,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Shopify.TestingUI", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Portal.API", "cmArt.Portal.API\cmArt.Portal.API.csproj", "{DF10058C-9A32-4125-A64C-2F3A546C86B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cmArt.Portal.Data", "cmArt.Portal.Data2\cmArt.Portal.Data.csproj", "{041D8DB9-A35F-4030-9CC7-FD10E700B5D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Portal.Data", "cmArt.Portal.Data2\cmArt.Portal.Data.csproj", "{041D8DB9-A35F-4030-9CC7-FD10E700B5D8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Portal.API6", "cmArt.Portal.API6\cmArt.Portal.API6.csproj", "{0E9EA98C-A812-411C-BFDB-DA180B884B48}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -171,6 +173,10 @@ Global
 		{041D8DB9-A35F-4030-9CC7-FD10E700B5D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{041D8DB9-A35F-4030-9CC7-FD10E700B5D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{041D8DB9-A35F-4030-9CC7-FD10E700B5D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E9EA98C-A812-411C-BFDB-DA180B884B48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E9EA98C-A812-411C-BFDB-DA180B884B48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E9EA98C-A812-411C-BFDB-DA180B884B48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E9EA98C-A812-411C-BFDB-DA180B884B48}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
