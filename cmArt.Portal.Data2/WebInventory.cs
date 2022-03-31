@@ -1,5 +1,6 @@
 ﻿//using cmArt.LibIntegrations;
 //using cmArt.LibIntegrations.ClientControllerService;
+using cmArt.LibIntegrations.ClientControllerService;
 using cmArt.LibIntegrations.ReportService;
 using cmArt.Portal.Data6;
 using cmArt.Reece.ShopifyConnector;
@@ -9,7 +10,7 @@ using System.Text;
 
 namespace cmArt.Portal.Data.InventoryData
 {
-    public class WebInventory : IWebInventory
+    public class WebInventory : IWebInventory, IIndex<int>
     {
         private ShopifyDataLoadFormat _Inventory;
         private ShopifyDataLoadFormat Inventory
@@ -25,6 +26,16 @@ namespace cmArt.Portal.Data.InventoryData
         public void Init(ShopifyDataLoadFormat data)
         {
             Inventory = data ?? Inventory ?? new ShopifyDataLoadFormat();
+        }
+
+        public bool IsEmpty(int value)
+        {
+            return this.InvUnique == 0;
+        }
+
+        public int GetIndex()
+        {
+            return this.InvUnique;
         }
 
         //public IEnumerable<int> GetXRefValues()

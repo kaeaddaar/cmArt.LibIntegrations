@@ -15,8 +15,11 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 string ControllerRoute = "/api/WebInventory_Controller";
 string FunctionKey = "";
 Uri BaseAddressUri = new Uri("http://localhost:7071");
+//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) })
     .AddScoped(x => new ClientController_int<WebInventory, WebInventory>());
+
+
 //builder.Services.AddCors(options =>
 //{
 //    options.AddDefaultPolicy(builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());

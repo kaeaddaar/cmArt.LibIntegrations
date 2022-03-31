@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\cmArt.Portal.API6\cmArt.Portal.API6.csproj" />
     <ProjectReference Include="..\cmArt.Portal.Data2\cmArt.Portal.Data.csproj" />
     <ProjectReference Include="..\cmArt.Reece.ShopifyConnector\cmArt.Reece.ShopifyConnector.csproj" />
   </ItemGroup>
