@@ -335,7 +335,7 @@ namespace cmArt.Reece.ShopifyConnector
                         .FullOuterJoin(LeftRecords: compareFrom.Prices, RightRecords: compareTo.Prices, LeftKey: S5PricePairIndexes.Level, RightKey: S5PricePairIndexes.Level);
                     foreach (var PricePair in PricePairs)
                     {
-                        if (PricePair.Item1.Price != PricePair.Item2.Price)
+                        if (decimal.Round(PricePair.Item1.Price, 2) != decimal.Round(PricePair.Item2.Price, 2))
                         {
                             return false;
                         }

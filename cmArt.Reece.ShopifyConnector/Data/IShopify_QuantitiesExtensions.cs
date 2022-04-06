@@ -43,7 +43,7 @@ namespace cmArt.Reece.ShopifyConnector
                         {
                             return false;
                         }
-                        if (QtyPair.Item1.Qty != QtyPair.Item2.Qty)
+                        if (decimal.Round(QtyPair.Item1.Qty, 0) != decimal.Round(QtyPair.Item2.Qty, 0))
                         {
                             return false;
                         }
