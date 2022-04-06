@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FileHelpers" Version="3.5.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
   </ItemGroup>
@@ -15,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\cmArt.LibIntegrations\cmArt.LibIntegrations.csproj" />
     <ProjectReference Include="..\cmArt.Shopify.Connector\cmArt.Shopify.Connector.csproj" />
+    <ProjectReference Include="..\FileHelpers\FileHelpers.csproj" />
   </ItemGroup>
 
 </Project>

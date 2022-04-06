@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using cmArt.LibIntegrations.CsvFileReaderService;
 using FileHelpers;
+using System.Linq;
 
 
 namespace cmArt.BevNet
@@ -9,11 +11,109 @@ namespace cmArt.BevNet
     [DelimitedRecord(",")]
     public class PriceFile : IPriceFile
     {
-        //[FieldQuoted]
-        //[FieldOptional]
-        //[FieldNullValue(typeof(string), "")]
+//        public PriceFile ProcessLine(string line, PriceFile priceFile)
+//        {
+//            PriceFile p = priceFile ?? new PriceFile();
 
-        [FieldQuoted]
+//            string[] fields = csvLine.GetFields(line).ToArray();
+//            int i = 0;
+//            p.UNIV_PROD = fields[i++];
+//            p.BDESC = fields[i++];
+//            p.DESCRIPTIO = fields[i++];
+//            p.SIZE = fields[i++];
+//            p.VINTAGE = fields[i++];
+//            p.UNIV_CAT = fields[i++];
+//            p.LWBN =  fields[i++];
+//            p.BESTBOT = fields[i++];
+//            p.DATE = fields[i++];
+//            p.BOTPERCASE = fields[i++];
+//            p.SECPACK = fields[i++];
+//            p.WHOLESALER = fields[i++];
+//            p.PROD_ITEM = fields[i++];
+//            p.UPC = fields[i++];
+//            p.CASE_PRICE = fields[i++];
+//            p.BOT_PRICE = fields[i++];
+//            p.FRONT_NYC = fields[i++];
+//            p.POSTOFF = fields[i++];
+//            #region --  qty 1 --
+//            p.QTY1__ = fields[i++];
+//            p.D_TYPE1__ = fields[i++];
+//            p.DISCOUNT1_ = fields[i++];
+//            #endregion --  qty 1 --
+
+//            #region --  qty 2 --
+//            p.QTY2__ = fields[i++];
+//            p.D_TYPE2__ = fields[i++];
+//            p.DISCOUNT2_ = fields[i++];
+//            #endregion --  qty 2 --
+
+//            #region --  qty 3 --
+//            p.QTY3__ = fields[i++];
+//            p.D_TYPE3__ = fields[i++];
+//            p.DISCOUNT3_ = fields[i++];
+//            #endregion --  qty 3 --
+
+//            #region --  qty 4 --
+//            p.QTY4__ = fields[i++];
+//            p.D_TYPE4__ = fields[i++];
+//            p.DISCOUNT4_ = fields[i++];
+//            #endregion --  qty 4 --
+
+//            #region --  qty 5 --
+//            p.QTY5__ = fields[i++];
+//            p.D_TYPE5__ = fields[i++];
+//            p.DISCOUNT5_ = fields[i++];
+//            #endregion --  qty 5 --
+
+//            #region --  qty 6 --
+//            p.QTY6__ = fields[i++];
+//            p.D_TYPE6__ = fields[i++];
+//            p.DISCOUNT6_ = fields[i++];
+//            #endregion --  qty 6 --
+
+//            #region --  qty 7 --
+//            p.QTY7__ = fields[i++];
+//            p.D_TYPE7__ = fields[i++];
+//            p.DISCOUNT7_ = fields[i++];
+//            #endregion --  qty 7 --
+
+//            #region --  qty 8 --
+//            p.QTY8__ = fields[i++];
+//            p.D_TYPE8__ = fields[i++];
+//            p.DISCOUNT8_ = fields[i++];
+//            #endregion --  qty 8 --
+
+//            #region --  qty 9 --
+//            p.QTY9__ = fields[i++];
+//            p.D_TYPE9__ = fields[i++];
+//            p.DISCOUNT9_ = fields[i++];
+//            #endregion --  qty 9 --
+//            p.DIV1___ = fields[i++];
+//            p.DIV2___ = fields[i++];
+//            p.DIV3___ = fields[i++];
+//            p.DIV4___ = fields[i++];
+//            p.DIV5___ = fields[i++];
+//            p.DIV6___ = fields[i++];
+//            p.DIV7___ = fields[i++];
+//            p.DIV9___ = fields[i++];
+//            p.DIV10___ = fields[i++];
+//            p.DIV11___ = fields[i++];
+//            p.DIV12___ = fields[i++];
+//            p.ASST_SIZE = fields[i++];
+//            p.CALE_SHELF = fields[i++];
+//            p.TRUEVINT = fields[i++];
+//            p.FULLCASE = fields[i++];
+//            p.TYPE_DESC = fields[i++];
+//            p.DEPOSIT = fields[i++];
+//            p.WHOLE_NAME = fields[i++];
+//p.
+//            return this;
+//    }
+    //[FieldQuoted]
+    //[FieldOptional]
+    //[FieldNullValue(typeof(string), "")]
+
+    [FieldQuoted]
         [FieldNullValue(typeof(string), "")]
         public string UNIV_PROD { get; set; }
 

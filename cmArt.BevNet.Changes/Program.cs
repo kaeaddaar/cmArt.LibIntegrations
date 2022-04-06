@@ -30,9 +30,13 @@ namespace cmArt.BevNet.App
             const bool DontSuppressRecordErrors = false;
 
             BevNetRecords = FileReaderGeneric<PriceFile>.ReadFile
-            (   PathAndFile: PathAndFile
+            (PathAndFile: PathAndFile
                 , SupressRecordErrors: DontSuppressRecordErrors
             );
+            //BevNetRecords = csvReader<PriceFile>.ReadFile
+            //(   PathAndFile: PathAndFile
+            //    , SupressRecordErrors: DontSuppressRecordErrors
+            //);
 
             int MaxRecordsToDisplay = 10;
             for (int i = 0; i < MaxRecordsToDisplay; i++)

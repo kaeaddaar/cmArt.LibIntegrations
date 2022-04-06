@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FileHelpers" Version="3.5.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
@@ -19,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\cmArt.System5.Data\cmArt.System5.Data.csproj" />
     <ProjectReference Include="..\cmArt.System5.Inventory\cmArt.System5.Inventory.csproj" />
+    <ProjectReference Include="..\FileHelpers\FileHelpers.csproj" />
   </ItemGroup>
 
 </Project>
