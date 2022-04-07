@@ -41,7 +41,10 @@
     private IEnumerable<IShopify_Product> _data;
     private IEnumerable<string> distinctWebCats 
     {
-        get { return data.Select(x => x.WebCategory).DistinctBy(x => x); }
+        get 
+        {
+            return data.Select(x => x.WebCategory).Distinct();
+        }
     }
 
     [Parameter]

@@ -95,7 +95,7 @@
     private int GetNumberOfMissingQuantities()
     {
         var prices = data.Select(x => x.Quantities);
-        distinctLocations = prices.SelectMany(x => x).Select(x => x.Location).DistinctBy(x => x).OrderBy(x => x);
+        distinctLocations = prices.SelectMany(x => x).Select(x => x.Location).Distinct().OrderBy(x => x);
         CountDistinct = distinctLocations.Count();
 
         var MissingCounts = prices.Select(x => NumLocations - Math.Min(x.Count(),NumLocations));

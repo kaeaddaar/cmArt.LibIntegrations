@@ -1,4 +1,6 @@
 ﻿@using cmArt.Reece.ShopifyConnector
+@using System.Linq
+
 <h3>Discounts Statistics</h3>
 <table>
     <thead>
@@ -94,15 +96,25 @@
         var empty = data.Where(x => x.Prices.Count() == 0);
         return empty.Count();
     }
+    //private int GetNumberOfMissingIndividualPrices()
+    //{
+    //    var prices = data.Select(x => x.Prices);
+    //    distinctPriceSchedules = prices.SelectMany(x => x).Select(x => x.Level).DistinctBy(x => x).OrderBy(x => x);
+    //    CountDistinct = distinctPriceSchedules.Count();
+
+    //    var MissingCounts = prices.Select(x => 15 - Math.Min(x.Count(),15));
+    //    var total = MissingCounts.Sum(x => x);
+    //    return total;
+    //}
     private int GetNumberOfMissingIndividualPrices()
     {
         var prices = data.Select(x => x.Prices);
-        distinctPriceSchedules = prices.SelectMany(x => x).Select(x => x.Level).DistinctBy(x => x).OrderBy(x => x);
+        distinctPriceSchedules = prices.SelectMany(x => x).Select(x => x.Level).Distinct().OrderBy(x => x);
         CountDistinct = distinctPriceSchedules.Count();
 
         var MissingCounts = prices.Select(x => 15 - Math.Min(x.Count(),15));
         var total = MissingCounts.Sum(x => x);
-        return total;
+        return total;    
     }
     private int GetNumberOfZeroDollarPrices()
     {
