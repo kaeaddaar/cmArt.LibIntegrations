@@ -98,7 +98,14 @@ else
             <td>@S5Product.WebCategory</td>
         </tr>
         <tr>
-            <td>Pricing info</td>
+            @if (GetActiveS5Prices() == null)
+            {
+                <td>Pricing info</td>
+            }
+            else
+            {
+                <td><div title="@S5Prices.Prices.Count() records found" style="float:left;color:@GetColor_for_PricesCount(S5Prices);">Pricing info</div></td>
+            }
             <td>
                 @if (GetActiveS5Prices() == null)
                 {
@@ -262,7 +269,14 @@ else
             <td>@ShopifyProduct.WebCategory</td>
         </tr>
         <tr>
-            <td>Pricing info</td>
+            @if (GetActiveShopifyPrices() == null)
+            {
+                <td>Pricing info</td>
+            }
+            else
+            {
+                <td><div title="@ShopifyPrices.Prices.Count() records found" style="float:left;color:@GetColor_for_PricesCount(ShopifyPrices);">Pricing info</div></td>
+            }
             <td>
                 @if (GetActiveShopifyPrices() == null)
                 {
@@ -443,7 +457,14 @@ else
 
     private string strS5Json;
     private string strShopifyJson;
-
+    
+    public string GetColor_for_PricesCount(IShopify_Prices record)
+    {
+        if(record.Prices.Count() > 15)
+        { return "Red"; }
+        else
+        { return "Black"; }
+    }
     protected override async Task OnInitializedAsync()
     {
         PartAction = "Unknown";

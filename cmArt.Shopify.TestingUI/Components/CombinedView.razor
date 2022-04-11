@@ -70,14 +70,15 @@ else
                     <td>@record.WebCategory</td>
                 </tr>
                 <tr>
-                    <td>Pricing info</td>
                     <td>
                         @if (record.Prices == null)
                         {
+                            <td>Pricing info</td>
                             <p><em>Loading...</em></p>
                         }
                         else
                         {
+                            <td><div title="@record.Prices.Count() records found" style="float:right;color:@GetColor(record);">Pricing info-cm</div></td>
                             <table class="table">
                                 <thead>
                                     <tr>
@@ -118,8 +119,8 @@ else
                     </td>
                 </tr>
                 <tr>
-                    <td>Quantity info</td>
                     <td>
+                        <td>Quantity info</td>
                         @if (record.Quantities == null)
                         {
                             <p><em>Loading...</em></p>
@@ -187,5 +188,12 @@ else
             _data = value ?? _data ?? new List<IShopifyDataLoadFormat>();
         }
     }
-
+    
+    public string GetColor(IShopify_Prices record)
+    {
+        if(record.Prices.Count() > 15)
+        { return "Red"; }
+        else
+        { return "Black"; }
+    }
 }
