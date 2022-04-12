@@ -17,4 +17,10 @@
     <ProjectReference Include="..\cmArt.Shopify.Connector\cmArt.Shopify.Connector.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings_connector.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
