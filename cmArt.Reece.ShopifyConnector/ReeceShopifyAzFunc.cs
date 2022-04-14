@@ -71,7 +71,7 @@ namespace cmArt.Reece.ShopifyConnector
             Console.Write(msg);
         }
 
-        private static string RetryAPICall(Func<string> MakeCall)
+        public static string RetryAPICall(Func<string> MakeCall)
         {
             string result = string.Empty;
             int initDelay = 50;
@@ -104,7 +104,7 @@ namespace cmArt.Reece.ShopifyConnector
 
             return result;
         }
-        private static async Task<string> MakeApiPostCall(string urlCommand, string content, string BaseUrl = "http://localhost:7071/api/MakeApiPostCall")
+        public static async Task<string> MakeApiPostCall(string urlCommand, string content, string BaseUrl = "http://localhost:7071/api/MakeApiPostCall")
         {
             string _BaseUrl = BaseUrl ?? String.Empty;
             //LoadConfigs();
@@ -143,7 +143,7 @@ namespace cmArt.Reece.ShopifyConnector
             return responseBody;
 
         }
-        private static string MakeApiGetCall_Unsecured(string urlCommand, string BaseUrl = "http://localhost:7071/api/MakeApiGetCall")
+        public static string MakeApiGetCall_Unsecured(string urlCommand, string BaseUrl = "http://localhost:7071/api/MakeApiGetCall")
         {
             string _BaseUrl = BaseUrl ?? String.Empty;
             //LoadConfigs();
@@ -169,12 +169,58 @@ namespace cmArt.Reece.ShopifyConnector
             LogApiCalls("responseBody: " + responseBody);
             return responseBody;
         }
-        private static async Task<string> MakeApiGetCall(string urlCommand, string BaseUrl = "http://localhost:7071/api/MakeApiGetCall")
+        public static async Task<string> MakeApiGetCallGeneric
+        (
+            string ApiConnectorData_Json
+            , string ApiCallData_Json
+            , string BaseUrl = "http://localhost:7071/api/MakeShopifyApiGetCall"
+        )
         {
             LogInfo("BaseUrl: " + BaseUrl);
             string _BaseUrl = BaseUrl ?? String.Empty;
-            //LoadConfigs();
-            //_BaseUrl = settings.PortalApiUrl ?? String.Empty;
+            LogInfo("_BaseUrl: " + _BaseUrl);
+
+            //LogApiCalls("urlCommand(Get - Secured): " + urlCommand);
+            HttpClient client = new HttpClient();
+            client.Timeout = TimeSpan.FromMinutes(Api_Timeout_Max);
+
+            Uri baseUri = new Uri(_BaseUrl);
+            client.BaseAddress = baseUri;
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.ConnectionClose = true;
+
+            //string clientId = clintIdIn ?? string.Empty;
+            //string clientSecret = clientSecretIn ?? string.Empty;
+
+            //var authenticationString = $"{clientId}:{clientSecret}";
+            //var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, baseUri);
+            //requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+            //requestMessage.Headers.Add("urlCommand", urlCommand);
+            requestMessage.Headers.Add("ApiConnectorData_Json", ApiConnectorData_Json);
+            requestMessage.Headers.Add("ApiCallData_Json", ApiCallData_Json);
+
+            HttpResponseMessage response = await client.SendAsync(requestMessage);
+
+            response.EnsureSuccessStatusCode();
+            string responseBody = response.Content.ReadAsStringAsync().Result;
+
+            LogInfo("responseBody: " + responseBody);
+            LogApiCalls("responseBody: " + responseBody);
+            return responseBody;
+
+        }
+        public static async Task<string> MakeApiGetCall
+        (
+            string urlCommand
+            , string BaseUrl = "http://localhost:7071/api/MakeApiGetCall"
+            , string clintIdIn = "shopravi"
+            , string clientSecretIn = "H9pPG9yW58cMP45e"
+        )
+        {
+            LogInfo("BaseUrl: " + BaseUrl);
+            string _BaseUrl = BaseUrl ?? String.Empty;
             LogInfo("_BaseUrl: " + _BaseUrl);
 
             LogApiCalls("urlCommand(Get - Secured): " + urlCommand);
@@ -186,12 +232,8 @@ namespace cmArt.Reece.ShopifyConnector
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.ConnectionClose = true;
 
-            string clientId = "shopravi";
-            string clientSecret = "H9pPG9yW58cMP45e";
-            //string clientId = settings.PortalApiUsername ?? String.Empty;
-            //string clientSecret = settings.PortalApiPassword ?? String.Empty;
-            //LogInfo("clientId: " + clientId);
-            //LogInfo("clientSecrat: " + clientSecret);
+            string clientId = clintIdIn ?? string.Empty;
+            string clientSecret = clientSecretIn ?? string.Empty;
 
             var authenticationString = $"{clientId}:{clientSecret}";
             var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));

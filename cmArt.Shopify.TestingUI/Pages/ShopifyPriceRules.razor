@@ -1,0 +1,70 @@
+﻿@page "/shopifypricerules"
+@using cmArt.Reece.ShopifyConnector
+@using cmArt.LibIntegrations.ApiCallerService
+@using Newtonsoft.Json.Linq
+
+
+<h3>ShopifyPriceRules</h3>
+<button @onclick="LoadPricesList">Load Prices List</button>
+Count: @records.Count()
+<table>
+    @foreach (var record in records)
+    {
+    <tr>
+        <td>@record.title</td>
+    </tr>
+    }
+</table>
+@code {
+    private IEnumerable<dynamic> _records;
+    public IEnumerable<dynamic> records 
+    { 
+        get { return _records ?? new List<dynamic>(); } 
+        set { _records = value ?? _records ?? new List<dynamic>(); }
+    }
+    public async void LoadPricesList()
+    {
+        ApiCallerBase api = new ApiCallerBase();
+        ApiCallData data = new ApiCallData();
+        ApiConnectorData connData = new ApiConnectorData();
+        connData.Url = "https://deltawaterproducts.myshopify.com";
+        connData.UserName = "ed84bfc1c2687d7d6f357717fe977dd6";
+        connData.Password = "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";
+
+        data.UrlCommand = "/admin/api/2022-01/price_rules.json";
+        data.Body = string.Empty;
+
+        string ApiConnectorData_Json = System.Text.Json.JsonSerializer.Serialize(connData, typeof(ApiConnectorData));
+        string ApiCallData_Json = System.Text.Json.JsonSerializer.Serialize(data, typeof(ApiCallData));
+
+        string results = await ReeceShopifyAzFunc.MakeApiGetCallGeneric(ApiConnectorData_Json, ApiCallData_Json);
+
+        var tmp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(results);
+        records = tmp.price_rules;
+
+        // ----- ----- ----- ----- -----
+        //records = JObject.Parse(results);
+
+        // ----- ----- ----- ----- -----
+        //var it = System.Text.Json.JsonDocument.Parse(results);
+        //var root = it.RootElement;
+        //List<dynamic> tmpRecords = new List<dynamic>();
+        //foreach (var priceRule in root.EnumerateArray())
+        //{
+        //    dynamic tmpRule = new object();
+        //    tmpRule.title = priceRule.GetProperty("title");
+        //}
+        StateHasChanged();
+    }
+    public async void LoadPricesList2()
+    {
+        string results = await ReeceShopifyAzFunc.MakeApiGetCall
+        (
+            "/admin/api/2022-01/price_rules.json"
+            , "https://deltawaterproducts.myshopify.com"
+            , "ed84bfc1c2687d7d6f357717fe977dd6"
+            , "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"
+        );
+
+    }
+}
