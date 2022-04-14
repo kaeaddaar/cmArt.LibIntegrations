@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 //using Microsoft.Extensions.Configuration;
 
 
-
 namespace cmArt.Reece.ShopifyConnector
 {
     public class ReeceShopifyAzFunc
@@ -205,6 +204,24 @@ namespace cmArt.Reece.ShopifyConnector
 
             response.EnsureSuccessStatusCode();
             string responseBody = response.Content.ReadAsStringAsync().Result;
+
+            string raw = response.Content.Headers.ToString();
+            //foreach (AuthenticationHeaderValue authenticationHeaderValue in response.Headers.WwwAuthenticate)
+            //{
+            //    string scheme = authenticationHeaderValue.Scheme;
+            //    string parameter = authenticationHeaderValue.Parameter;
+            //}
+            string raw2 = response.Headers.ToString();
+            foreach (var header in response.Headers)
+            {
+                Console.WriteLine($"{header.Key}={header.Value.First()}");
+            }
+            string raw3 = response.TrailingHeaders.ToString();
+            //var hKey = response.Headers.ToList();
+            //var h = response.Headers.Where(x => x.Key == "Link").Select(x => string.Join(',',x.Value)).ToList();
+            //string PageInfo = response.Content.Headers.GetValues("Link").FirstOrDefault();
+            //string PageInfo = response.Headers.FirstOrDefault(i => i.Key == "Link").Value.FirstOrDefault() ?? string.Empty;
+            string PageInfo = response.Headers.Where(x => x.Key == "Link").Select(x => string.Join(',', x.Value)).FirstOrDefault() ?? string.Empty;
 
             LogInfo("responseBody: " + responseBody);
             LogApiCalls("responseBody: " + responseBody);

@@ -8,10 +8,19 @@
 <button @onclick="LoadPricesList">Load Prices List</button>
 Count: @records.Count()
 <table>
+    <tr>
+        <td>record.title</td>
+        <td>record.value</td>
+        <td>record.id</td>
+        <td>record.value_type</td>
+    </tr>
     @foreach (var record in records)
     {
     <tr>
         <td>@record.title</td>
+        <td>@record.value</td>
+        <td>@record.id</td>
+        <td>@record.value_type</td>
     </tr>
     }
 </table>
@@ -34,27 +43,33 @@ Count: @records.Count()
         data.UrlCommand = "/admin/api/2022-01/price_rules.json";
         data.Body = string.Empty;
 
+        //string ApiConnectorData_Json = System.Text.Json.JsonSerializer.Serialize(connData, typeof(ApiConnectorData));
+        //string ApiCallData_Json = System.Text.Json.JsonSerializer.Serialize(data, typeof(ApiCallData));
+
+        //string results = await ReeceShopifyAzFunc.MakeApiGetCallGeneric(ApiConnectorData_Json, ApiCallData_Json);
+
+        //var tmp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(results);
+        dynamic tmp = await GetPageOfPriceRules(api, connData, data);
+        records = tmp.price_rules;
+        
+        StateHasChanged();
+    }
+    private async Task<dynamic> GetPageOfPriceRules(ApiCallerBase api, ApiConnectorData connData, ApiCallData data)
+    {
+        //ApiCallerBase api = new ApiCallerBase();
+        //ApiCallData data = new ApiCallData();
+        //ApiConnectorData connData = new ApiConnectorData();
+
+        //data.UrlCommand = "/admin/api/2022-01/price_rules.json";
+        //data.Body = string.Empty;
+
         string ApiConnectorData_Json = System.Text.Json.JsonSerializer.Serialize(connData, typeof(ApiConnectorData));
         string ApiCallData_Json = System.Text.Json.JsonSerializer.Serialize(data, typeof(ApiCallData));
 
         string results = await ReeceShopifyAzFunc.MakeApiGetCallGeneric(ApiConnectorData_Json, ApiCallData_Json);
 
-        var tmp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(results);
-        records = tmp.price_rules;
-
-        // ----- ----- ----- ----- -----
-        //records = JObject.Parse(results);
-
-        // ----- ----- ----- ----- -----
-        //var it = System.Text.Json.JsonDocument.Parse(results);
-        //var root = it.RootElement;
-        //List<dynamic> tmpRecords = new List<dynamic>();
-        //foreach (var priceRule in root.EnumerateArray())
-        //{
-        //    dynamic tmpRule = new object();
-        //    tmpRule.title = priceRule.GetProperty("title");
-        //}
-        StateHasChanged();
+        dynamic tmp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(results);
+        return tmp;
     }
     public async void LoadPricesList2()
     {

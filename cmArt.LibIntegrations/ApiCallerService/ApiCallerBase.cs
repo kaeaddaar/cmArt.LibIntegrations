@@ -164,7 +164,7 @@ namespace cmArt.LibIntegrations.ApiCallerService
 
             return responseBody;
         }
-        protected string MakeApiGetCall(string urlCommand)
+        public string MakeApiGetCall(string urlCommand)
         {
             HttpClient client = new HttpClient();
 
