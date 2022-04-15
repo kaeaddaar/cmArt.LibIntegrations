@@ -5,10 +5,10 @@ namespace cmArt.Portal.Data
 {
     public class Document : IDocument
     {
-        public Guid Id { get; set; }
-        public Guid CustomerId { get; set; }
-        public Guid ProjectId { get; set; }
-        public string DocumentName { get; set; }//50 characters
-        public string DocumentValue { get; set; }
+        public Guid id { get; set; }
+        public Guid customerId { get; set; }
+        public Guid projectId { get; set; }
+        public string documentName { get; set; }//50 characters
+        public string documentValue { get; set; }
     }
 }

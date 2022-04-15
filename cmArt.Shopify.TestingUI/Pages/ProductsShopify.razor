@@ -75,7 +75,7 @@
     {
         string strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/17cf9358-b783-46a2-97ee-ef69388f3904");
         Document doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
-        products = (IEnumerable<IShopify_Product>)System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(IEnumerable<Shopify_Product>));
+        products = (IEnumerable<IShopify_Product>)System.Text.Json.JsonSerializer.Deserialize(doc.documentValue, typeof(IEnumerable<Shopify_Product>));
         //products = await Http.GetFromJsonAsync<Shopify_Product[]>("sample-data/tblShopifyProducts_ReecesAPI_page1.json");\
         PartFilter = string.Empty;
         products_orig = null;

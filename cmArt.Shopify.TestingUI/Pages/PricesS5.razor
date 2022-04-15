@@ -85,7 +85,7 @@ else
     {
         string strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/7fb824a1-6b6a-46eb-bb0c-e4a315ccb6ec");
         Document doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
-        records = (Shopify_Prices[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Prices[]));
+        records = (Shopify_Prices[])System.Text.Json.JsonSerializer.Deserialize(doc.documentValue, typeof(Shopify_Prices[]));
         //records = await Http.GetFromJsonAsync<Shopify_Prices[]>("sample-data/tblPocoPricesAdapted_page1.json");
     }
 }

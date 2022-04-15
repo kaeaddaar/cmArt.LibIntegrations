@@ -4,10 +4,10 @@ namespace cmArt.Portal.Data
 {
     public interface IDocument
     {
-        Guid CustomerId { get; set; }
-        string DocumentName { get; set; }
-        string DocumentValue { get; set; }
-        Guid Id { get; set; }
-        Guid ProjectId { get; set; }
+        Guid customerId { get; set; }
+        string documentName { get; set; }
+        string documentValue { get; set; }
+        Guid id { get; set; }
+        Guid projectId { get; set; }
     }
 }

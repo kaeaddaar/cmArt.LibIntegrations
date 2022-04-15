@@ -13,21 +13,21 @@ namespace cmArt.Portal.Data
         public IDocument CopyFrom(IDocument FromData)
         {
             IDocument _FromData = FromData ?? new Document();
-            this.Id = _FromData.Id;
-            this.CustomerId = _FromData.CustomerId;
-            this.ProjectId = _FromData.ProjectId;
-            this.DocumentName = (_FromData.DocumentName ?? string.Empty).TrimEnd();
-            this.DocumentValue = (_FromData.DocumentValue ?? string.Empty).TrimEnd();
+            this.id = _FromData.id;
+            this.customerId = _FromData.customerId;
+            this.projectId = _FromData.projectId;
+            this.documentName = (_FromData.documentName ?? string.Empty).TrimEnd();
+            this.documentValue = (_FromData.documentValue ?? string.Empty).TrimEnd();
 
             return this;
         }
         public IDocument CopyFrom(HttpRequest req, dynamic data)
         {
-            this.Id = utils.StringToGuid(utils.GetValue(req, data?.Id, "Id"));
-            this.CustomerId = utils.StringToGuid(utils.GetValue(req, data?.CustomerId, "CustomerId"));
-            this.ProjectId = utils.StringToGuid(utils.GetValue(req, data?.ProjectId, "ProjectId"));
-            this.DocumentName = utils.GetValue(req, data?.DocumentName, "DocumentName");
-            this.DocumentValue = utils.GetValue(req, data?.DocumentValue, "DocumentValue");
+            this.id = utils.StringToGuid(utils.GetValue(req, data?.id, "id"));
+            this.customerId = utils.StringToGuid(utils.GetValue(req, data?.customerId, "customerId"));
+            this.projectId = utils.StringToGuid(utils.GetValue(req, data?.projectId, "projectId"));
+            this.documentName = utils.GetValue(req, data?.documentName, "documentName");
+            this.documentValue = utils.GetValue(req, data?.documentValue, "documentValue");
 
             return this;
         }

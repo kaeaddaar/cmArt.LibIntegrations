@@ -55,7 +55,7 @@
         Document doc = new Document();
         strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/c1f7d63e-1f1a-42cd-8c00-254f3b77354d");
         doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
-        quantities = (IEnumerable<Shopify_Quantities>)System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(IEnumerable<Shopify_Quantities>));
+        quantities = (IEnumerable<Shopify_Quantities>)System.Text.Json.JsonSerializer.Deserialize(doc.documentValue, typeof(IEnumerable<Shopify_Quantities>));
         //records = await Http.GetFromJsonAsync<Shopify_Quantities[]>("sample-data/tblShopifyQuantities_ReecesAPI_page1.json");
     }
     private async void Perform_Quantities_Sync()

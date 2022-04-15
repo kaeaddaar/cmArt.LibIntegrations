@@ -1,7 +1,12 @@
 ﻿@page "/shopifypricerules"
+@using cmArt.Portal.Data
 @using cmArt.Reece.ShopifyConnector
 @using cmArt.LibIntegrations.ApiCallerService
 @using Newtonsoft.Json.Linq
+@using cmArt.LibIntegrations.ClientControllerService
+@using cmArt.Portal.Data.ShopifyData
+
+@inject ClientController_Guid<Document_PK,Document> DocumentController
 
 
 <h3>ShopifyPriceRules</h3>
@@ -27,7 +32,7 @@ Page Count: @PageCount
     </tr>
     }
 </table>
-
+<input @bind="json_results" />
 <h3>Url Commands Used</h3>
 @foreach(var url in UrlCommands)
 {
@@ -36,6 +41,12 @@ Page Count: @PageCount
 @code {
     private List<dynamic> _records;
     private List<string> _UrlCommands;
+    private string _json_results;
+    public string json_results
+    {
+        get { return _json_results ?? string.Empty; }
+        set { _json_results = value ?? string.Empty; }
+    }
     public IEnumerable<dynamic> records 
     { 
         get { return _records ?? new List<dynamic>(); } 
@@ -55,7 +66,44 @@ Page Count: @PageCount
     }
     public async void SavePricesToFile()
     {
-        
+        string records_Json = Newtonsoft.Json.JsonConvert.SerializeObject(records);
+        json_results = records_Json;
+        //// -- Getting document
+        //strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/c1f7d63e-1f1a-42cd-8c00-254f3b77354d");
+        //doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
+        //quantities_Shopify = (Shopify_Quantities[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Quantities[]));
+        //// Getting docuemnt --
+
+        //// -- Saving document
+        //Context_Documents context = new Context_Documents();
+        //Document S5_Product_Document = new Document();
+        //S5_Product_Document.Id = new Guid("74e5b8d9-f264-4029-af3a-f2c44c906511");
+        //S5_Product_Document.DocumentName = "S5_Product";
+        //S5_Product_Document.CustomerId = Guid.Empty;
+        //S5_Product_Document.ProjectId = Guid.Empty;
+        //S5_Product_Document.DocumentValue = System.Text.Json.JsonSerializer.Serialize(PocoProductsAdapted, typeof(IEnumerable<Shopify_Product>));
+        //Document_Repository.AddJsonDocument(context, S5_Product_Document);
+        //// Saving document --
+
+        // transform records to shopify_price_rule
+        var objRecords = records.Select(x =>
+        {
+            shopify_price_rule tmp = new shopify_price_rule();
+            tmp.id = x.id;
+            tmp.title = x.title;
+            tmp.value = x.value;
+            tmp.value_type = x.value_type;
+            return tmp;
+        }
+        );
+
+        Document doc = new Document();
+        doc.id = new Guid("ed5f1fc0-aedb-4c42-8962-25708480457a");
+        doc.documentName = "shopify_price_rules";
+        doc.customerId = Guid.Empty;
+        doc.documentValue = Newtonsoft.Json.JsonConvert.SerializeObject(objRecords);
+
+        DocumentController.Add(doc.id, doc, new Dictionary<string, string>());
     }
     public async void LoadPricesList()
     {
@@ -100,6 +148,7 @@ Page Count: @PageCount
         HttpResponseMessage results = await ReeceShopifyAzFunc.MakeApiGetCallGeneric(ApiConnectorData_Json, ApiCallData_Json);
         string strResults = results.Content.ReadAsStringAsync().Result;
         dynamic tmp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(strResults);
+        //string TestSerialize = Newtonsoft.Json.JsonConvert.SerializeObject(tmp);
         records = tmp.price_rules;
 
         //string strLink = results.Headers.Where(x => x.Key == "Link").Select(x => string.Join(',', x.Value)).FirstOrDefault() ?? string.Empty;
@@ -142,7 +191,7 @@ Page Count: @PageCount
         int posgt = strLink.IndexOf('>');
         int lenUrl = posgt - poslt - 1;
         bool LinkMissing = lenUrl <= 0;
-        if (LinkMissing)
+        if (LinkMissing) // turns out there is a previous and a next ex: rel="previous"
         { 
             data.UrlCommand = string.Empty;
             return data;

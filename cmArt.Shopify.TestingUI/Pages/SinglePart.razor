@@ -479,29 +479,29 @@ else
         // products
         strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/74e5b8d9-f264-4029-af3a-f2c44c906511");
         doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
-        products_S5 = (Shopify_Product[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Product[]));
+        products_S5 = (Shopify_Product[])System.Text.Json.JsonSerializer.Deserialize(doc.documentValue, typeof(Shopify_Product[]));
 
         strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/17cf9358-b783-46a2-97ee-ef69388f3904");
         doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
-        products_Shopify = (Shopify_Product[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Product[]));
+        products_Shopify = (Shopify_Product[])System.Text.Json.JsonSerializer.Deserialize(doc.documentValue, typeof(Shopify_Product[]));
 
         // prices
         strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/7fb824a1-6b6a-46eb-bb0c-e4a315ccb6ec");
         doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
-        prices_S5 = (Shopify_Prices[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Prices[]));
+        prices_S5 = (Shopify_Prices[])System.Text.Json.JsonSerializer.Deserialize(doc.documentValue, typeof(Shopify_Prices[]));
 
         strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/b9ae61e7-4248-4c95-832d-acbb079a68df");
         doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
-        prices_Shopify = (Shopify_Prices[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Prices[]));
+        prices_Shopify = (Shopify_Prices[])System.Text.Json.JsonSerializer.Deserialize(doc.documentValue, typeof(Shopify_Prices[]));
 
         // quantities
         strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/c0aff18b-a32a-4b0b-bcc7-5808ddace171");
         doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
-        quantities_S5 = (Shopify_Quantities[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Quantities[]));
+        quantities_S5 = (Shopify_Quantities[])System.Text.Json.JsonSerializer.Deserialize(doc.documentValue, typeof(Shopify_Quantities[]));
 
         strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/c1f7d63e-1f1a-42cd-8c00-254f3b77354d");
         doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
-        quantities_Shopify = (Shopify_Quantities[])System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(Shopify_Quantities[]));
+        quantities_Shopify = (Shopify_Quantities[])System.Text.Json.JsonSerializer.Deserialize(doc.documentValue, typeof(Shopify_Quantities[]));
 
         DetailedDifferences_Product = new List<Changes_View>();
         DetailedDifferences_Prices = new List<Changes_View>();

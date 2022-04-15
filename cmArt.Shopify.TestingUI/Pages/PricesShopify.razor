@@ -55,7 +55,7 @@
     {
         string strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/b9ae61e7-4248-4c95-832d-acbb079a68df");
         Document doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
-        prices = (IEnumerable<IShopify_Prices>)System.Text.Json.JsonSerializer.Deserialize(doc.DocumentValue, typeof(IEnumerable<Shopify_Prices>));
+        prices = (IEnumerable<IShopify_Prices>)System.Text.Json.JsonSerializer.Deserialize(doc.documentValue, typeof(IEnumerable<Shopify_Prices>));
         //records = await Http.GetFromJsonAsync<Shopify_Prices[]>("sample-data/tblShopifyPrices_ReecesAPI_page1.json");
     }
     private async void Perform_Discount_Sync()
