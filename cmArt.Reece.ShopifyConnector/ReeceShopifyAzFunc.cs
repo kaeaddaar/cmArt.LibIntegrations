@@ -168,7 +168,7 @@ namespace cmArt.Reece.ShopifyConnector
             LogApiCalls("responseBody: " + responseBody);
             return responseBody;
         }
-        public static async Task<string> MakeApiGetCallGeneric
+        public static async Task<HttpResponseMessage> MakeApiGetCallGeneric
         (
             string ApiConnectorData_Json
             , string ApiCallData_Json
@@ -196,36 +196,20 @@ namespace cmArt.Reece.ShopifyConnector
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, baseUri);
             //requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
-            //requestMessage.Headers.Add("urlCommand", urlCommand);
             requestMessage.Headers.Add("ApiConnectorData_Json", ApiConnectorData_Json);
             requestMessage.Headers.Add("ApiCallData_Json", ApiCallData_Json);
 
             HttpResponseMessage response = await client.SendAsync(requestMessage);
 
             response.EnsureSuccessStatusCode();
-            string responseBody = response.Content.ReadAsStringAsync().Result;
+            return response;
+            //string responseBody = response.Content.ReadAsStringAsync().Result;
 
-            string raw = response.Content.Headers.ToString();
-            //foreach (AuthenticationHeaderValue authenticationHeaderValue in response.Headers.WwwAuthenticate)
-            //{
-            //    string scheme = authenticationHeaderValue.Scheme;
-            //    string parameter = authenticationHeaderValue.Parameter;
-            //}
-            string raw2 = response.Headers.ToString();
-            foreach (var header in response.Headers)
-            {
-                Console.WriteLine($"{header.Key}={header.Value.First()}");
-            }
-            string raw3 = response.TrailingHeaders.ToString();
-            //var hKey = response.Headers.ToList();
-            //var h = response.Headers.Where(x => x.Key == "Link").Select(x => string.Join(',',x.Value)).ToList();
-            //string PageInfo = response.Content.Headers.GetValues("Link").FirstOrDefault();
-            //string PageInfo = response.Headers.FirstOrDefault(i => i.Key == "Link").Value.FirstOrDefault() ?? string.Empty;
-            string PageInfo = response.Headers.Where(x => x.Key == "Link").Select(x => string.Join(',', x.Value)).FirstOrDefault() ?? string.Empty;
+            //string PageInfo = response.Headers.Where(x => x.Key == "Link").Select(x => string.Join(',', x.Value)).FirstOrDefault() ?? string.Empty;
 
-            LogInfo("responseBody: " + responseBody);
-            LogApiCalls("responseBody: " + responseBody);
-            return responseBody;
+            //LogInfo("responseBody: " + responseBody);
+            //LogApiCalls("responseBody: " + responseBody);
+            //return responseBody;
 
         }
         public static async Task<string> MakeApiGetCall

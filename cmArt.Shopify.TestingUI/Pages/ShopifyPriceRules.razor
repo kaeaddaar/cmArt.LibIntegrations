@@ -6,7 +6,9 @@
 
 <h3>ShopifyPriceRules</h3>
 <button @onclick="LoadPricesList">Load Prices List</button>
-Count: @records.Count()
+Record Count: @records.Count()
+<br />
+Page Count: @PageCount
 <table>
     <tr>
         <td>record.title</td>
@@ -24,12 +26,31 @@ Count: @records.Count()
     </tr>
     }
 </table>
+
+<h3>Url Commands Used</h3>
+@foreach(var url in UrlCommands)
+{
+    @url <br />
+}
 @code {
     private IEnumerable<dynamic> _records;
+    private List<string> _UrlCommands;
     public IEnumerable<dynamic> records 
     { 
         get { return _records ?? new List<dynamic>(); } 
         set { _records = value ?? _records ?? new List<dynamic>(); }
+    }
+    private int PageCount { get; set; }
+    public List<string> UrlCommands 
+    { 
+        get
+        {
+            return _UrlCommands ?? new List<string>();
+        }
+        set
+        {
+            _UrlCommands = value ?? _UrlCommands ?? new List<string>();
+        }
     }
     public async void LoadPricesList()
     {
@@ -50,8 +71,13 @@ Count: @records.Count()
 
         //var tmp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(results);
         dynamic tmp = await GetPageOfPriceRules(api, connData, data);
+        if (tmp == null)
+        { Console.WriteLine("tmp which should contain List of Price Rules was null"); }
+        if (tmp.price_rules == null)
+        { Console.WriteLine("List of Price Rules was null"); }
+
         records = tmp.price_rules;
-        
+
         StateHasChanged();
     }
     private async Task<dynamic> GetPageOfPriceRules(ApiCallerBase api, ApiConnectorData connData, ApiCallData data)
@@ -66,10 +92,57 @@ Count: @records.Count()
         string ApiConnectorData_Json = System.Text.Json.JsonSerializer.Serialize(connData, typeof(ApiConnectorData));
         string ApiCallData_Json = System.Text.Json.JsonSerializer.Serialize(data, typeof(ApiCallData));
 
-        string results = await ReeceShopifyAzFunc.MakeApiGetCallGeneric(ApiConnectorData_Json, ApiCallData_Json);
+        HttpResponseMessage results = await ReeceShopifyAzFunc.MakeApiGetCallGeneric(ApiConnectorData_Json, ApiCallData_Json);
+        string strResults = results.Content.ReadAsStringAsync().Result;
+        dynamic tmp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(strResults);
 
-        dynamic tmp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(results);
+        //string strLink = results.Headers.Where(x => x.Key == "Link").Select(x => string.Join(',', x.Value)).FirstOrDefault() ?? string.Empty;
+        //int poslt = strLink.IndexOf('<');
+        //int posgt = strLink.IndexOf('>');
+        //string strNextPageUrl = strLink.Substring(poslt + 1, posgt - poslt - 1);
+        //int lenBaseUrl = connData.Url.Length;
+        //int lenNextPageUrl = strNextPageUrl.Length;
+        //data.UrlCommand = strNextPageUrl.Substring(lenBaseUrl, lenNextPageUrl - lenBaseUrl);
+
+        //List<string> UrlCommandsUsed = new List<string>();
+        UrlCommands.Add("Page (" + PageCount + ") UrlCommand: " + data.UrlCommand);
+        data = GetNextPage_ApiCallData(results, connData, data);
+        UrlCommands.Add("Page (" + PageCount + ") UrlCommand: " + data.UrlCommand);
+
+        PageCount = 1;
+
+        while (data.UrlCommand != string.Empty)
+        {
+            ApiConnectorData_Json = System.Text.Json.JsonSerializer.Serialize(connData, typeof(ApiConnectorData));
+            ApiCallData_Json = System.Text.Json.JsonSerializer.Serialize(data, typeof(ApiCallData));
+
+            results = await ReeceShopifyAzFunc.MakeApiGetCallGeneric(ApiConnectorData_Json, ApiCallData_Json);
+            strResults = results.Content.ReadAsStringAsync().Result;
+            data = GetNextPage_ApiCallData(results, connData, data);
+            UrlCommands.Add("Page (" + PageCount + ") UrlCommand: " + data.UrlCommand);
+            PageCount++;
+            StateHasChanged();
+        }
         return tmp;
+    }
+    private ApiCallData GetNextPage_ApiCallData(HttpResponseMessage results, ApiConnectorData connData, ApiCallData data)
+    {
+        string strLink = results.Headers.Where(x => x.Key == "Link").Select(x => string.Join(',', x.Value)).FirstOrDefault() ?? string.Empty;
+        int poslt = strLink.IndexOf('<');
+        int posgt = strLink.IndexOf('>');
+        int lenUrl = posgt - poslt - 1;
+        bool LinkMissing = lenUrl <= 0;
+        if (LinkMissing)
+        { 
+            data.UrlCommand = string.Empty;
+            return data;
+        }
+        string strNextPageUrl = strLink.Substring(poslt + 1, posgt - poslt - 1);
+        int lenBaseUrl = connData.Url.Length;
+        int lenNextPageUrl = strNextPageUrl.Length;
+        data.UrlCommand = strNextPageUrl.Substring(lenBaseUrl, lenNextPageUrl - lenBaseUrl);
+
+        return data;
     }
     public async void LoadPricesList2()
     {
