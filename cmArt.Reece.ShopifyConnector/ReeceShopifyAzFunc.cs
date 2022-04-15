@@ -178,6 +178,8 @@ namespace cmArt.Reece.ShopifyConnector
             LogInfo("BaseUrl: " + BaseUrl);
             string _BaseUrl = BaseUrl ?? String.Empty;
             LogInfo("_BaseUrl: " + _BaseUrl);
+            LogInfo("ApiConnectorData_Json: " + ApiConnectorData_Json);
+            LogInfo("ApiCallData_Json: " + ApiCallData_Json);
 
             //LogApiCalls("urlCommand(Get - Secured): " + urlCommand);
             HttpClient client = new HttpClient();
@@ -201,6 +203,18 @@ namespace cmArt.Reece.ShopifyConnector
 
             HttpResponseMessage response = await client.SendAsync(requestMessage);
 
+            if (response.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                await Task.Delay(510); // just over half a second
+
+                var requestMessage_Delay = new HttpRequestMessage(HttpMethod.Get, baseUri);
+                //requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+                requestMessage_Delay.Headers.Add("ApiConnectorData_Json", ApiConnectorData_Json);
+                requestMessage_Delay.Headers.Add("ApiCallData_Json", ApiCallData_Json);
+
+                HttpResponseMessage response_Delay = await client.SendAsync(requestMessage);
+                response = response_Delay;
+            }
             response.EnsureSuccessStatusCode();
             return response;
             //string responseBody = response.Content.ReadAsStringAsync().Result;

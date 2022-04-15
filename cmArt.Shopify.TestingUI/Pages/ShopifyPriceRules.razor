@@ -6,6 +6,7 @@
 
 <h3>ShopifyPriceRules</h3>
 <button @onclick="LoadPricesList">Load Prices List</button>
+<button @onclick="SavePricesToFile">Save Prices To File</button>
 Record Count: @records.Count()
 <br />
 Page Count: @PageCount
@@ -33,12 +34,12 @@ Page Count: @PageCount
     @url <br />
 }
 @code {
-    private IEnumerable<dynamic> _records;
+    private List<dynamic> _records;
     private List<string> _UrlCommands;
     public IEnumerable<dynamic> records 
     { 
         get { return _records ?? new List<dynamic>(); } 
-        set { _records = value ?? _records ?? new List<dynamic>(); }
+        set { _records = value.ToList() ?? _records ?? new List<dynamic>(); }
     }
     private int PageCount { get; set; }
     public List<string> UrlCommands 
@@ -52,6 +53,10 @@ Page Count: @PageCount
             _UrlCommands = value ?? _UrlCommands ?? new List<string>();
         }
     }
+    public async void SavePricesToFile()
+    {
+        
+    }
     public async void LoadPricesList()
     {
         ApiCallerBase api = new ApiCallerBase();
@@ -61,7 +66,7 @@ Page Count: @PageCount
         connData.UserName = "ed84bfc1c2687d7d6f357717fe977dd6";
         connData.Password = "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";
 
-        data.UrlCommand = "/admin/api/2022-01/price_rules.json";
+        data.UrlCommand = "/admin/api/2022-01/price_rules.json?limit=250";
         data.Body = string.Empty;
 
         //string ApiConnectorData_Json = System.Text.Json.JsonSerializer.Serialize(connData, typeof(ApiConnectorData));
@@ -95,6 +100,7 @@ Page Count: @PageCount
         HttpResponseMessage results = await ReeceShopifyAzFunc.MakeApiGetCallGeneric(ApiConnectorData_Json, ApiCallData_Json);
         string strResults = results.Content.ReadAsStringAsync().Result;
         dynamic tmp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(strResults);
+        records = tmp.price_rules;
 
         //string strLink = results.Headers.Where(x => x.Key == "Link").Select(x => string.Join(',', x.Value)).FirstOrDefault() ?? string.Empty;
         //int poslt = strLink.IndexOf('<');
@@ -119,6 +125,10 @@ Page Count: @PageCount
             results = await ReeceShopifyAzFunc.MakeApiGetCallGeneric(ApiConnectorData_Json, ApiCallData_Json);
             strResults = results.Content.ReadAsStringAsync().Result;
             data = GetNextPage_ApiCallData(results, connData, data);
+
+            dynamic tmpPage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(strResults);
+            foreach(var tmpPageItem in tmpPage.price_rules) { _records.Add(tmpPageItem); }
+
             UrlCommands.Add("Page (" + PageCount + ") UrlCommand: " + data.UrlCommand);
             PageCount++;
             StateHasChanged();

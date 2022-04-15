@@ -142,12 +142,18 @@ namespace cmArt.Portal.API
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
             req.HttpContext.Response.Headers.Add("cmArtTry100000", "Test123");
             requestMessage.Content = new StringContent(content);
-            
-            var task = client.SendAsync(requestMessage);
-            var response = task.Result;
 
+            Task<HttpResponseMessage> task = client.SendAsync(requestMessage);
+            HttpResponseMessage response = task.Result;
+
+            if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+            {
+                return new ContentResult() { StatusCode = (int)System.Net.HttpStatusCode.TooManyRequests };
+            }
             string strLink = response.Headers.Where(x => x.Key == "Link").Select(x => string.Join(',', x.Value)).FirstOrDefault() ?? string.Empty;
             req.HttpContext.Response.Headers.Add("Link", strLink);
+
+            string ExternalContent = response.Content.ReadAsStringAsync().Result;
 
             //ContentResult returned = new ContentResult();
             //returned.Content = ApiCallResults;
@@ -158,7 +164,7 @@ namespace cmArt.Portal.API
             //    string value = item.Value.FirstOrDefault();
             //    req.HttpContext.Response.Headers.Add(key, value);
             //}
-            return new OkObjectResult(content);
+            return new OkObjectResult(ExternalContent);
             //return returned;
 
             ////make the request
