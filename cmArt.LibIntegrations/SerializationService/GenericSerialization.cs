@@ -68,12 +68,12 @@ namespace cmArt.LibIntegrations.SerializationService
 
         }
 
-        public static bool Exists(string CachedFilesdDirectory, string TableName)
+        public static bool Exists(string CachedFilesDirectory, string TableName)
         {
             bool directoryExists = false;
 
-            directoryExists = Directory.Exists(CachedFilesdDirectory);
-            IEnumerable<string> ListOfFiles = Directory.GetFiles(CachedFilesdDirectory);
+            directoryExists = Directory.Exists(CachedFilesDirectory);
+            IEnumerable<string> ListOfFiles = Directory.GetFiles(CachedFilesDirectory);
 
             bool FilesExist = false;
             try
