@@ -15,6 +15,8 @@
 Record Count: @records.Count()
 <br />
 Page Count: @PageCount
+<br />
+@json_results
 <table>
     <tr>
         <td>record.title</td>
@@ -32,13 +34,13 @@ Page Count: @PageCount
     </tr>
     }
 </table>
-<input @bind="json_results" />
 <h3>Url Commands Used</h3>
 @foreach(var url in UrlCommands)
 {
     @url <br />
 }
 @code {
+    private int DevCountExit;
     private List<dynamic> _records;
     private List<string> _UrlCommands;
     private string _json_results;
@@ -66,8 +68,10 @@ Page Count: @PageCount
     }
     public async void SavePricesToFile()
     {
+        Console.WriteLine("records count: " + records.Count());
         string records_Json = Newtonsoft.Json.JsonConvert.SerializeObject(records);
         json_results = records_Json;
+
         //// -- Getting document
         //strDocument = await Http.GetStringAsync("http://localhost:7071/api/JsonDocument/c1f7d63e-1f1a-42cd-8c00-254f3b77354d");
         //doc = (Document)System.Text.Json.JsonSerializer.Deserialize(strDocument, typeof(Document));
@@ -86,22 +90,24 @@ Page Count: @PageCount
         //// Saving document --
 
         // transform records to shopify_price_rule
-        var objRecords = records.Select(x =>
-        {
-            shopify_price_rule tmp = new shopify_price_rule();
-            tmp.id = x.id;
-            tmp.title = x.title;
-            tmp.value = x.value;
-            tmp.value_type = x.value_type;
-            return tmp;
-        }
-        );
+        //var objRecords = records.Select(x =>
+        //{
+        //    shopify_price_rule tmp = new shopify_price_rule();
+        //    tmp.id = x.id;
+        //    tmp.title = x.title;
+        //    tmp.value = x.value;
+        //    tmp.value_type = x.value_type;
+        //    return tmp;
+        //}
+        //);
 
         Document doc = new Document();
         doc.id = new Guid("ed5f1fc0-aedb-4c42-8962-25708480457a");
         doc.documentName = "shopify_price_rules";
         doc.customerId = Guid.Empty;
-        doc.documentValue = Newtonsoft.Json.JsonConvert.SerializeObject(objRecords);
+        doc.documentValue = records_Json;
+        int lenRecords_Json = records_Json.Length;
+        int lenDocumentValue = doc.documentValue.Length;
 
         DocumentController.Add(doc.id, doc, new Dictionary<string, string>());
     }
@@ -123,17 +129,17 @@ Page Count: @PageCount
         //string results = await ReeceShopifyAzFunc.MakeApiGetCallGeneric(ApiConnectorData_Json, ApiCallData_Json);
 
         //var tmp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(results);
-        dynamic tmp = await GetPageOfPriceRules(api, connData, data);
+        dynamic tmp = await GetAllPriceRules(api, connData, data);
         if (tmp == null)
         { Console.WriteLine("tmp which should contain List of Price Rules was null"); }
         if (tmp.price_rules == null)
         { Console.WriteLine("List of Price Rules was null"); }
 
-        records = tmp.price_rules;
+        //records = tmp.price_rules;
 
         StateHasChanged();
     }
-    private async Task<dynamic> GetPageOfPriceRules(ApiCallerBase api, ApiConnectorData connData, ApiCallData data)
+    private async Task<dynamic> GetAllPriceRules(ApiCallerBase api, ApiConnectorData connData, ApiCallData data)
     {
         //ApiCallerBase api = new ApiCallerBase();
         //ApiCallData data = new ApiCallData();
@@ -186,12 +192,15 @@ Page Count: @PageCount
     }
     private ApiCallData GetNextPage_ApiCallData(HttpResponseMessage results, ApiConnectorData connData, ApiCallData data)
     {
-        string strLink = results.Headers.Where(x => x.Key == "Link").Select(x => string.Join(',', x.Value)).FirstOrDefault() ?? string.Empty;
+        string strLinks = results.Headers.Where(x => x.Key == "Link").Select(x => string.Join(',', x.Value)).FirstOrDefault() ?? string.Empty;
+        IEnumerable<string> PrevAndNextLinks = strLinks.Split(',');
+        string strLink = PrevAndNextLinks.Where(x => x.Contains("rel=\"next\"")).FirstOrDefault() ?? string.Empty;
+
         int poslt = strLink.IndexOf('<');
         int posgt = strLink.IndexOf('>');
         int lenUrl = posgt - poslt - 1;
         bool LinkMissing = lenUrl <= 0;
-        if (LinkMissing) // turns out there is a previous and a next ex: rel="previous"
+        if (LinkMissing || DevCountExit++ > 3) // turns out there is a previous and a next ex: rel="previous"
         { 
             data.UrlCommand = string.Empty;
             return data;
