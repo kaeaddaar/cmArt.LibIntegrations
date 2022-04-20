@@ -128,7 +128,7 @@ namespace cmArt.LibIntegrations.SerializationService
 
         }
 
-        private static List<string> GetCachedFileNamesFromDirectory(string directory, string TableName)
+        public static List<string> GetCachedFileNamesFromDirectory(string directory, string TableName)
         {
             Console.WriteLine("GetCachedFilesInDirectory (Begin), checking for files in " +
                 TableName);

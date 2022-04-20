@@ -23,6 +23,7 @@ using cmArt.LibIntegrations.SerializationService;
 using cmArt.Portal.Data.ShopifyData;
 using cmArt.Portal.Data.GenericSerialization;
 using cmArt.LibIntegrations.FileNamesService;
+using cmArt.LibIntegrations.ApiCallerService;
 
 namespace cmArt.Portal.API
 {
@@ -68,16 +69,58 @@ namespace cmArt.Portal.API
             }
 
             string args = req.Headers["args"];
-            dynamic Arguments = (dynamic)JsonConvert.DeserializeObject<dynamic>(args);
-            string PathAndFile = Arguments.PathAndFile ?? string.Empty;
-            bool fileExists = File.Exists(PathAndFile ?? string.Empty);
-            FileNameService fpn = new FileNameService(PathAndFile);
-            string folder = fpn.GetPath();
+            GenericSerializationCallData data = (GenericSerializationCallData)JsonConvert.DeserializeObject<GenericSerializationCallData>(args);
+            
+            string folder = data.CashedFilesDirectory ?? string.Empty;
 
             bool folderExists = Directory.Exists(folder);
             if (!folderExists)
             { return new BadRequestObjectResult("Folder Doesn't Exist: " + folder); }
 
+            List<string> FileNames = GenericSerialization<dynamic>.GetCachedFileNamesFromDirectory(folder, "shopify_price_rule");
+            string strFileNames = string.Empty;
+            try
+            {
+                strFileNames = Newtonsoft.Json.JsonConvert.SerializeObject(FileNames);
+            } 
+            catch (Exception e)
+            {
+                return new OkObjectResult(e);
+            }
+
+            string results = strFileNames;
+            return new OkObjectResult(results);
+        }
+            [FunctionName("GenericSerialization_ReadFromFile")]
+        public static async Task<IActionResult> Run_ReadFromFile
+        (
+            [HttpTrigger(AuthorizationLevel.Function, "post"
+                , Route = "ReadFromFile")] HttpRequest req
+            , ILogger log
+        //, string TableNameIn
+        )
+        {
+            string content = string.Empty;
+            using (var sr = new StreamReader(req.Body))
+            {
+                content = await sr.ReadToEndAsync();
+            }
+
+            string args = req.Headers["args"];
+            dynamic Arguments = (dynamic)JsonConvert.DeserializeObject<dynamic>(args);
+            string PathAndFile = Arguments.PathAndFile ?? string.Empty;
+           
+            bool fileExists = File.Exists(PathAndFile ?? string.Empty);
+            FileNameService fpn = new FileNameService(PathAndFile);
+            string folder = fpn.GetPath();
+
+            if (!fileExists)
+            { return new OkObjectResult("File Doesn't Exist: " + PathAndFile); }
+
+            bool folderExists = Directory.Exists(folder);
+            if (!folderExists)
+            { return new BadRequestObjectResult("Folder Doesn't Exist: " + folder); }
+            
             string results = File.ReadAllText(PathAndFile);
             return new OkObjectResult(results);
         }

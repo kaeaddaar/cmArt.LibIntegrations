@@ -83,7 +83,7 @@ namespace cmArt.Portal.API.Services
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
-
+            
             string AllowUpdate = req.Query["AllowUpdate"];
             AllowUpdate = AllowUpdate ?? data?.AllowUpdate;
 

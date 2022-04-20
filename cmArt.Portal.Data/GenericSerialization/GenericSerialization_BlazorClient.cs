@@ -3,6 +3,8 @@ using cmArt.LibIntegrations.SerializationService;
 using cmArt.Reece.ShopifyConnector;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -20,28 +22,142 @@ namespace cmArt.Portal.Data.GenericSerialization
             throw new NotImplementedException();
         }
 
-        public List<string> GetCachedFileNamesFromDirectory(string directory, string TableName)
-        {
-            throw new NotImplementedException();
-        }
-        public async Task<List<T>> ReadOrDeserializeTableAsync(string TableName, string CachedFilesDirectory, int RecordsPerPage)
+        public async Task<List<string>> GetCachedFileNamesFromDirectoryAsync(string CachedFilesDirectory, string TableName)
         {
             Func<string, int> fLog = (x) => { Console.WriteLine(x); return 1; };
             ApiCallData callData = new ApiCallData();
-            callData.UrlCommand = "/api/ReadOrDeserializeTable";
-            callData.Body = GetArgs_Json(TableName: TableName, CachedFilesDirectory: CachedFilesDirectory, RecordsPerPage: RecordsPerPage);
+            callData.UrlCommand = "/api/GetCachedFileNamesFromDirectory";
+            callData.Args = GetArgs_Json(TableName: TableName, CachedFilesDirectory: CachedFilesDirectory, RecordsPerPage: 0);
+            callData.Body = string.Empty;
+
+            string strResults = await this.MakeApiPostCallAsync(callData, fLog);
+            List<string> results = new List<string>();
+            try
+            {
+                results = System.Text.Json.JsonSerializer.Deserialize<List<string>>(strResults);
+            }
+            catch (Exception e)
+            {
+                Console.Write(e.ToString());
+            }
+            return results ?? new List<string>();
+        }
+        public List<string> GetCachedFileNamesFromDirectory(string CachedFilesDirectory, string TableName)
+        {
+            Func<string, int> fLog = (x) => { Console.WriteLine(x); return 1; };
+            ApiCallData callData = new ApiCallData();
+            callData.UrlCommand = "/api/GetCachedFileNamesFromDirectory";
+            callData.Body = GetArgs_Json(TableName: TableName, CachedFilesDirectory: CachedFilesDirectory, RecordsPerPage: 0);
+
+            string strResults = this.MakeApiPostCall(callData, fLog);
+            List<string> results = new List<string>();
+            try
+            {
+                results = System.Text.Json.JsonSerializer.Deserialize<List<string>>(strResults);
+            }
+            catch (Exception e)
+            {
+                Console.Write(e.ToString());
+            }
+            return results ?? new List<string>();
+        }
+        public async Task<List<T>> ReadOrDeserializeTablePageAsync(string PathAndFile)
+        {
+            Func<string, int> fLog = (x) => { Console.WriteLine(x); return 1; };
+            ApiCallData callData = new ApiCallData();
+            dynamic args = new System.Dynamic.ExpandoObject();
+            args.PathAndFile = PathAndFile;
+
+            callData.UrlCommand = "/api/ReadFromFile";
+            callData.Body = string.Empty;
+            callData.Args = Newtonsoft.Json.JsonConvert.SerializeObject(args) ?? string.Empty;
 
             string strResults = await this.MakeApiPostCallAsync(callData, fLog);
             List<T> records = new List<T>();
             try
             {
-                records = System.Text.Json.JsonSerializer.Deserialize<List<T>>(strResults);
+                //records = System.Text.Json.JsonSerializer.Deserialize<List<T>>(strResults);
+                records = Newtonsoft.Json.JsonConvert.DeserializeObject<List<T>>(strResults);
             }
             catch (Exception e)
             {
                 Console.Write(e.ToString());
             }
             return records ?? new List<T>();
+        }
+        public async Task<List<T>> ReadOrDeserializeTableAsync(string TableName, string CachedFilesDirectory, int RecordsPerPage)
+        {
+            //Func<string, int> fLog = (x) => { Console.WriteLine(x); return 1; };
+            //ApiCallData callData = new ApiCallData();
+            //callData.UrlCommand = "/api/ReadOrDeserializeTable";
+            //callData.Body = GetArgs_Json(TableName: TableName, CachedFilesDirectory: CachedFilesDirectory, RecordsPerPage: RecordsPerPage);
+
+            //string strResults = await this.MakeApiPostCallAsync(callData, fLog);
+            //List<T> records = new List<T>();
+            //try
+            //{
+            //    records = System.Text.Json.JsonSerializer.Deserialize<List<T>>(strResults);
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.Write(e.ToString());
+            //}
+            //return records ?? new List<T>();
+
+            //-----
+            bool cachedDataExists = false;
+
+            string directory = $"{CachedFilesDirectory}";
+            IEnumerable<string> Cachedfiles = await GetCachedFileNamesFromDirectoryAsync(CachedFilesDirectory, TableName);
+
+            cachedDataExists = Cachedfiles.Count() > 0;
+            string filePathAndName = string.Empty;
+            string fileContents = string.Empty;
+            List<T> rows = new List<T>();
+
+            var options = new JsonSerializerOptions
+            {
+                ReadCommentHandling = JsonCommentHandling.Skip,
+                AllowTrailingCommas = true,
+            };
+
+            if (cachedDataExists)
+            {
+                Console.Write($"Loading {TableName} from Cache: ");
+                Cachedfiles = Cachedfiles.Select(x => x.ToUpper());
+                // load from cache
+                for (int pageNum = 1; pageNum <= Cachedfiles.Count(); pageNum++)
+                {
+                    Console.Write($" - Load Pg {pageNum}");
+                    filePathAndName = $"{CachedFilesDirectory}tbl{TableName}_page{pageNum}.json";
+                    filePathAndName = filePathAndName.ToUpper();
+                    if (Cachedfiles.Contains(filePathAndName))
+                    {
+                        //fileContents = await ReadOrDeserializeTablePageAsync(filePathAndName);
+                        //List<T> TableRecords = new List<T>();
+                        List<T> TableRecords = await ReadOrDeserializeTablePageAsync(filePathAndName);
+                        foreach (T row in TableRecords)
+                        {
+                            rows.Add(row);
+                        }
+                    }
+                }
+                Console.WriteLine("");
+                Console.WriteLine($"ReadOrSerializeTable for {TableName} Complete");
+                return rows;
+            }
+            else
+            {
+                Console.WriteLine($"Cached Data Doesn't Exist for \"{TableName}\"");
+                //Console.Write($"Loading {TableName} from Database.");
+                //List<T> TableRecords = Load_Table_FromDatabase();
+                //GenericSerialization<T>.SerializeToJSON(TableRecords, TableName, CachedFilesDirectory, RecordsPerPage);
+                //Console.Write($"Finished Loading {TableName} from Database.");
+                //return TableRecords;
+                return new List<T>();
+            }
+
+
         }
 
         public List<T> ReadOrDeserializeTable(string TableName, string CachedFilesDirectory, int RecordsPerPage)
