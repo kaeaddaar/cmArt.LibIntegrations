@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
-
+using System.Threading.Tasks;
 
 namespace cmArt.LibIntegrations.ApiCallerService
 {
@@ -46,6 +46,72 @@ namespace cmArt.LibIntegrations.ApiCallerService
             return $"Quitting after {_maxAttempts} tries to get MakeApiCall. Messages: {messages}. " +
                 $"RequestUri: {requestMessage.RequestUri}. Content: {requestMessage.Content}. Method: {requestMessage.Method}";
         }
+        private async Task<string> MakeApiCallAsync(HttpClient client, HttpRequestMessage requestMessage, int maxAttempts)
+        {
+            int attempts = 0;
+            int _maxAttempts = maxAttempts;
+            string messages = string.Empty;
+            while (attempts < _maxAttempts)
+            {
+                try
+                {
+                    attempts++;
+                    var response = await client.SendAsync(requestMessage);
+                    //response.EnsureSuccessStatusCode();
+                    string responseBody = response.Content.ReadAsStringAsync().Result ?? string.Empty;
+                    return responseBody;
+                }
+                catch (Exception e)
+                {
+                    System.Threading.Thread.Sleep(100 * attempts);
+                    // try again. but maybe do some logging
+                    messages += e.Message + Environment.NewLine;
+                }
+            }
+            return $"Quitting after {_maxAttempts} tries to get MakeApiCall. Messages: {messages}. " +
+                $"RequestUri: {requestMessage.RequestUri}. Content: {requestMessage.Content}. Method: {requestMessage.Method}";
+        }
+        protected async Task<string> MakeApiPostCallAsync(ApiCallData data, Func<string, int> MakeLogEntry)
+        {
+            string urlCommand = data.UrlCommand;
+            string content = data.Body;
+            try
+            {
+                MakeLogEntry("urlCommand: " + urlCommand);
+                MakeLogEntry("content: " + content);
+            }
+            catch (Exception e)
+            {
+                return "Error in MapApiPostCall_Unsecured while trying to MakeLogEntry. Message: " + e.Message;
+            }
+
+            HttpClient client = new HttpClient();
+
+            Uri baseUri = new Uri(_ApiConnectorData.Url + urlCommand);
+            client.BaseAddress = baseUri;
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.ConnectionClose = true;
+
+            string clientId = _ApiConnectorData.UserName;
+            string clientSecret = _ApiConnectorData.Password;
+
+            var authenticationString = $"{clientId}:{clientSecret}";
+            var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
+
+            HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, baseUri);
+            requestMessage.Content = new StringContent(content);
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+            requestMessage.Headers.Add("args", data.Args);
+
+            string responseBody = await MakeApiCallAsync(client, requestMessage, 10);
+            ////make the request
+            //var task = client.SendAsync(requestMessage);
+            //var response = task.Result;
+            ////response.EnsureSuccessStatusCode();
+            //string responseBody = response.Content.ReadAsStringAsync().Result ?? string.Empty;
+
+            return responseBody;
+        }
         protected string MakeApiPostCall(ApiCallData data, Func<string, int> MakeLogEntry)
         {
             string urlCommand = data.UrlCommand;
@@ -76,6 +142,7 @@ namespace cmArt.LibIntegrations.ApiCallerService
             HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, baseUri);
             requestMessage.Content = new StringContent(content);
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+            requestMessage.Headers.Add("args", data.Args);
 
             string responseBody = MakeApiCall(client, requestMessage, 10);
             ////make the request

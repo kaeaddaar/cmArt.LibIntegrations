@@ -22,7 +22,7 @@ namespace cmArt.LibIntegrations.SerializationService
             IEnumerable<string> Cachedfiles = GetCachedFileNamesFromDirectory(CachedFilesDirectory, TableName);
 
             cachedDataExists = Cachedfiles.Count() > 0;
-            string fileName = string.Empty;
+            string filePathAndName = string.Empty;
             string fileContents = string.Empty;
             List<T> rows = new List<T>();
 
@@ -35,16 +35,25 @@ namespace cmArt.LibIntegrations.SerializationService
             if (cachedDataExists)
             {
                 Console.Write($"Loading {TableName} from Cache: ");
+                Cachedfiles = Cachedfiles.Select(x => x.ToUpper());
                 // load from cache
                 for (int pageNum = 1; pageNum <= Cachedfiles.Count(); pageNum++)
                 {
                     Console.Write($" - Load Pg {pageNum}");
-                    fileName = $"{CachedFilesDirectory}\\tbl{TableName}_page{pageNum}.json";
-                    if (Cachedfiles.Contains(fileName))
+                    filePathAndName = $"{CachedFilesDirectory}tbl{TableName}_page{pageNum}.json";
+                    filePathAndName = filePathAndName.ToUpper();
+                    if (Cachedfiles.Contains(filePathAndName))
                     {
-                        fileContents = File.ReadAllText(fileName);
-                        List<T> TableRecords;
-                        TableRecords = JsonSerializer.Deserialize<List<T>>(fileContents, options);
+                        fileContents = File.ReadAllText(filePathAndName);
+                        List<T> TableRecords = new List<T>();
+                        try
+                        {
+                            TableRecords = JsonSerializer.Deserialize<List<T>>(fileContents, options);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.ToString());
+                        }
                         foreach (T row in TableRecords)
                         {
                             rows.Add(row);

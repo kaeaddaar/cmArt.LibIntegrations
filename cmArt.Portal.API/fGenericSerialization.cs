@@ -22,39 +22,92 @@ using cmArt.Portal.API.Models;
 using cmArt.LibIntegrations.SerializationService;
 using cmArt.Portal.Data.ShopifyData;
 using cmArt.Portal.Data.GenericSerialization;
+using cmArt.LibIntegrations.FileNamesService;
 
 namespace cmArt.Portal.API
 {
     public class fGenericSerialization
     {
-        [FunctionName("GenericSerialization_ReadOrDeserializeTable")]
-        public static async Task<IActionResult> Run_WebInventory
+        //[FunctionName("GenericSerialization_ReadOrDeserializeTable")]
+        //public static async Task<IActionResult> Run_ReadOrDeserializeTable
+        //(
+        //    [HttpTrigger(AuthorizationLevel.Function, "post"
+        //        , Route = "ReadOrDeserializeTable")] HttpRequest req
+        //    , ILogger log
+        //    //, string TableNameIn
+        //)   
+        //{
+        //    // This endpoint should only grab a page of results and pass them on
+        //    string content = string.Empty;
+        //    using (var sr = new StreamReader(req.Body))
+        //    {
+        //        content = await sr.ReadToEndAsync();
+        //    }
+        //    GenericSerializationCallData data = System.Text.Json.JsonSerializer.Deserialize<GenericSerializationCallData>(content);
+
+        //    //List<shopify_price_rule> PriceRules = GenericSerialization<shopify_price_rule>.ReadOrDeserializeTable(data.TableName, data.CashedFilesDirectory, data.RecordsPerPage);
+        //    List<dynamic> PriceRules = GenericSerialization<dynamic>.ReadOrDeserializeTable(data.TableName, data.CashedFilesDirectory, data.RecordsPerPage);
+
+        //    // get the table and return the results
+        //    return new OkObjectResult("ReadOrDeserializeTable");
+
+        //}
+        [FunctionName("GenericSerialization_GetCachedFileNamesFromDirectory")]
+        public static async Task<IActionResult> Run_GetCachedFileNamesFromDirectory
         (
             [HttpTrigger(AuthorizationLevel.Function, "post"
-                , Route = "ReadOrDeserializeTable")] HttpRequest req
+                , Route = "GetCachedFileNamesFromDirectory")] HttpRequest req
             , ILogger log
-            //, string TableNameIn
-        )   
+        //, string TableNameIn
+        )
         {
             string content = string.Empty;
             using (var sr = new StreamReader(req.Body))
             {
                 content = await sr.ReadToEndAsync();
             }
-            GenericSerializationCallData data = System.Text.Json.JsonSerializer.Deserialize<GenericSerializationCallData>(content);
 
-            List<shopify_price_rule> PriceRules = GenericSerialization<shopify_price_rule>.ReadOrDeserializeTable(data.TableName, data.CashedFilesDirectory, data.RecordsPerPage);
+            string args = req.Headers["args"];
+            dynamic Arguments = (dynamic)JsonConvert.DeserializeObject<dynamic>(args);
+            string PathAndFile = Arguments.PathAndFile ?? string.Empty;
+            bool fileExists = File.Exists(PathAndFile ?? string.Empty);
+            FileNameService fpn = new FileNameService(PathAndFile);
+            string folder = fpn.GetPath();
 
-            //string CachedFilesDirectory = req.Headers.Where(x => x.Key == "CachedFilesDirectory")
-            //    .Select(x => string.Join(',', x.Value)).FirstOrDefault() ?? string.Empty;
-            //string strRecordsPerPage = req.Headers.Where(x => x.Key == "RecordsPerPage")
-            //    .Select(x => string.Join(',', x.Value)).FirstOrDefault() ?? string.Empty;
-            //int RecordsPerPage = 0;
-            //int.TryParse(strRecordsPerPage, out RecordsPerPage);
+            bool folderExists = Directory.Exists(folder);
+            if (!folderExists)
+            { return new BadRequestObjectResult("Folder Doesn't Exist: " + folder); }
 
-            // get the table and return the results
-            return new OkObjectResult("ReadOrDeserializeTable");
+            string results = File.ReadAllText(PathAndFile);
+            return new OkObjectResult(results);
+        }
+        [FunctionName("GenericSerialization_SaveToFile")]
+        public static async Task<IActionResult> Run_SaveToFile
+        (
+            [HttpTrigger(AuthorizationLevel.Function, "post"
+                , Route = "SaveToFile")] HttpRequest req
+            , ILogger log
+        //, string TableNameIn
+        )
+        {
+            string content = string.Empty;
+            using (var sr = new StreamReader(req.Body))
+            {
+                content = await sr.ReadToEndAsync();
+            }
 
+            string args = req.Headers["args"];
+            dynamic Arguments = (dynamic)JsonConvert.DeserializeObject<dynamic>(args);
+            string PathAndFile = Arguments.PathAndFile ?? string.Empty;
+            bool fileExists = File.Exists(PathAndFile ?? string.Empty);
+            FileNameService fpn = new FileNameService(PathAndFile);
+            string folder = fpn.GetPath();
+
+            bool folderExists = Directory.Exists(folder);
+            if (!folderExists)
+            { return new BadRequestObjectResult("Folder Doesn't Exist: " + folder); }
+            File.WriteAllText(PathAndFile, content);
+            return new OkObjectResult("Contents written to disk in file: " + PathAndFile);
         }
     }
 }

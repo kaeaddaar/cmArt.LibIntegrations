@@ -11,10 +11,12 @@ namespace cmArt.LibIntegrations.ApiCallerService
     {
         public string UrlCommand { get; set; }
         public string Body { get; set; }
+        public string Args { get; set; }
         public ApiCallData CopyFrom(ApiCallData from)
         {
             this.UrlCommand = from.UrlCommand ?? string.Empty;
             this.Body = from.Body ?? string.Empty;
+            this.Args = from.Args ?? string.Empty;
             return this;
         }
     }

@@ -1,4 +1,5 @@
 ﻿@page "/shopifypricerules"
+@using System.Text.Json
 @using cmArt.Portal.Data
 @using cmArt.Portal.Data.GenericSerialization
 @using cmArt.Reece.ShopifyConnector
@@ -11,7 +12,8 @@
 @inject GenericSerialization_BlazorClient<shopify_price_rule> shopifyPriceRuleToFile
 
 <h3>ShopifyPriceRules</h3>
-<button @onclick="LoadPricesList">Load Prices List</button>
+<button @onclick="LoadPricesList">Load Prices List From Shopify</button>
+<button @onclick="LoadPricesListCache">Load Prices List From Cache</button>
 <button @onclick="SavePricesToFile">Save Prices To File</button>
 Record Count: @records.Count()
 <br />
@@ -79,8 +81,12 @@ Page Count: @PageCount
         conn.Password = string.Empty;
 
         shopifyPriceRuleToFile.init(conn);
-        List<shopify_price_rule> fileNames = shopifyPriceRuleToFile.ReadOrDeserializeTable("TableName", "C:\\temp\\test", 10);
-
+        GenericSerialization_BlazorClient<dynamic> client = 
+           new GenericSerialization_BlazorClient<dynamic>();
+        client.init(conn);
+        int count = records.Count();
+        client.SerializeToJSON(records.ToList(), "shopify_price_rule", "C:\\temp\\test\\", 1000);
+        //List<shopify_price_rule> fileNames = shopifyPriceRuleToFile.ReadOrDeserializeTable("TableName", "C:\\temp\\test", 100);
 
         //Document doc = new Document();
         //doc.id = new Guid("ed5f1fc0-aedb-4c42-8962-25708480457a");
@@ -90,6 +96,19 @@ Page Count: @PageCount
         //int lenRecords_Json = records_Json.Length;
         //int lenDocumentValue = doc.documentValue.Length;
         //DocumentController.Add(doc.id, doc, new Dictionary<string, string>());
+    }
+    public async void LoadPricesListCache()
+    {
+        GenericSerialization_BlazorClient<dynamic> client = new GenericSerialization_BlazorClient<dynamic>();
+        ApiConnectorData conn = new ApiConnectorData();
+        conn.Url = "http://localhost:7071";
+        conn.UserName = string.Empty;
+        conn.Password = string.Empty;
+        client.init(conn);
+
+        List<dynamic> tmpList = await client.ReadOrDeserializeTableAsync("shopify_price_rule", "C:\\temp\\test\\", 1000);
+        records = tmpList;
+        StateHasChanged();
     }
     public async void LoadPricesList()
     {
@@ -133,8 +152,10 @@ Page Count: @PageCount
 
         HttpResponseMessage results = await ReeceShopifyAzFunc.MakeApiGetCallGeneric(ApiConnectorData_Json, ApiCallData_Json);
         string strResults = results.Content.ReadAsStringAsync().Result;
-        dynamic tmp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(strResults);
+
+        dynamic tmp = Newtonsoft.Json.Linq.JObject.Parse(strResults);
         //string TestSerialize = Newtonsoft.Json.JsonConvert.SerializeObject(tmp);
+        
         records = tmp.price_rules;
 
         //string strLink = results.Headers.Where(x => x.Key == "Link").Select(x => string.Join(',', x.Value)).FirstOrDefault() ?? string.Empty;
@@ -160,8 +181,8 @@ Page Count: @PageCount
             results = await ReeceShopifyAzFunc.MakeApiGetCallGeneric(ApiConnectorData_Json, ApiCallData_Json);
             strResults = results.Content.ReadAsStringAsync().Result;
             data = GetNextPage_ApiCallData(results, connData, data);
-
-            dynamic tmpPage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(strResults);
+            dynamic tmpPage = (dynamic)Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(strResults);
+            //dynamic tmpPage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(strResults);
             foreach(var tmpPageItem in tmpPage.price_rules) { _records.Add(tmpPageItem); }
 
             UrlCommands.Add("Page (" + PageCount + ") UrlCommand: " + data.UrlCommand);
@@ -181,6 +202,7 @@ Page Count: @PageCount
         int lenUrl = posgt - poslt - 1;
         bool LinkMissing = lenUrl <= 0;
         if (LinkMissing || DevCountExit++ > 3) // turns out there is a previous and a next ex: rel="previous"
+        //if (LinkMissing) // turns out there is a previous and a next ex: rel="previous"
         { 
             data.UrlCommand = string.Empty;
             return data;
