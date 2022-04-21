@@ -98,7 +98,7 @@ namespace cmArt.Portal.API
         [FunctionName("MakeApiGetCall_Shopify")]
         public static async Task<IActionResult> RunMakeApiGetCall
         (
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "MakeShopifyApiGetCall")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", "delete", Route = "MakeShopifyApiGetCall")] HttpRequest req,
             ILogger log
         )
         {
@@ -138,7 +138,13 @@ namespace cmArt.Portal.API
             var authenticationString = $"{clientId}:{clientSecret}";
             var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
 
-            HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, baseUri);
+            HttpRequestMessage requestMessage = null;
+            string method = req.Method;
+            if (method == "GET")
+            { requestMessage = new HttpRequestMessage(HttpMethod.Get, baseUri); }
+            if (method == "DELETE")
+            { requestMessage = new HttpRequestMessage(HttpMethod.Delete, baseUri); }
+
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
             req.HttpContext.Response.Headers.Add("cmArtTry100000", "Test123");
             requestMessage.Content = new StringContent(content);
@@ -155,57 +161,8 @@ namespace cmArt.Portal.API
 
             string ExternalContent = response.Content.ReadAsStringAsync().Result;
 
-            //ContentResult returned = new ContentResult();
-            //returned.Content = ApiCallResults;
-            //returned.ContentType = "application/json";
-            //foreach (var item in response.Headers)
-            //{
-            //    string key = item.Key;
-            //    string value = item.Value.FirstOrDefault();
-            //    req.HttpContext.Response.Headers.Add(key, value);
-            //}
             return new OkObjectResult(ExternalContent);
-            //return returned;
-
-            ////make the request
-            //var task = client.SendAsync(requestMessage);
-            //var response = task.Result;
-            //response.EnsureSuccessStatusCode();
-
-            //string responseBody = response.Content.ReadAsStringAsync().Result;
-
-            //// --
-            //foreach(var item in response.Headers)
-            //{
-            //    string key = item.Key;
-            //    string value = item.Value.FirstOrDefault();
-            //}
-            //// --
-            //req.HttpContext.Response.Headers.Add("ink", "Test123");
-            //return new OkObjectResult(responseBody);
-            ////return (IActionResult) new customActionResult(responseBody);
         }
-        //class customActionResult : ActionResult
-        //{
-        //    string _responseBody;
-        //    public customActionResult(string responseBody)
-        //    {
-        //        _responseBody = responseBody ?? string.Empty;
-        //    }
-        //    public void ExecuteResult(ActionContext context)
-        //    {
-        //        context.HttpContext.Response.Headers.Add("testSync", "test2");
-        //        context.HttpContext.Response.Body = new MemoryStream(Encoding.UTF8.GetBytes(_responseBody));
-        //        //base.ExecuteResult(context);
-        //    }
-        //    public Task ExecuteResultAsync(ActionContext context)
-        //    {
-        //        context.HttpContext.Response.Headers.Add("test", "test1");
-        //        context.HttpContext.Response.Body = new MemoryStream(Encoding.UTF8.GetBytes(_responseBody));
-
-        //        //return base.ExecuteResultAsync(context);
-        //    }
-        //}
 
     }
     
