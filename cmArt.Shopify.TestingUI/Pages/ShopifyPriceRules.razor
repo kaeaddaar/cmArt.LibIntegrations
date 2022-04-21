@@ -1,5 +1,6 @@
 ﻿@page "/shopifypricerules"
 @using System.Text.Json
+@using System.Dynamic
 @using cmArt.Portal.Data
 @using cmArt.Portal.Data.GenericSerialization
 @using cmArt.Reece.ShopifyConnector
@@ -15,12 +16,39 @@
 <button @onclick="LoadPricesList">Load Prices List From Shopify</button>
 <button @onclick="LoadPricesListCache">Load Prices List From Cache</button>
 <button @onclick="SavePricesToFile">Save Prices To File</button>
+<button @onclick="FilterOnlyDuplicates">Filter For Duplicates Only</button>
+<button @onclick="FilterOnlyDuplicatesWithBlankDiscounts">Filter For Duplicates with blank discounts Only</button>
+<button @onclick="DeleteBlankDiscounts">Delete Duplicates With Blank Discounts</button>
 
 Record Count: @records.Count()
 <br />
 Page Count: @PageCount
 <br />
 @json_results
+<br />
+<table>
+    <tr>
+        <td>currentRecord.title</td>
+        <td>@current_title</td>
+    </tr>
+    <tr>
+        <td>currentRecord.value</td>
+        <td>@current_value</td>
+    </tr>
+    <tr>
+        <td>currentRecord.id</td>
+        <td>@current_id</td>
+    </tr>
+    <tr>
+        <td>currentRecord.value_type</td>
+        <td>@current_value_type</td>
+    </tr>
+    <tr>
+        <td>discount_json</td>
+        <td>@discount_json</td>
+    </tr>
+</table>
+
 <table>
     <tr>
         <td>record.title</td>
@@ -50,6 +78,30 @@ Page Count: @PageCount
     private List<dynamic> _records;
     private List<string> _UrlCommands;
     private string _json_results;
+    private dynamic _currentRecord;
+    const string MissingMsg = "missing";
+    private string _discount_json;
+
+    public dynamic currentRecord
+    {
+        get { return _currentRecord ?? GetBlankRecord(); }
+        set { _currentRecord = value ?? GetBlankRecord(); }
+    }
+    public dynamic current_id { get { return currentRecord.id ?? MissingMsg; } }
+    public dynamic current_title { get { return currentRecord.title ?? MissingMsg; } }
+    public dynamic current_value { get { return currentRecord.value ?? MissingMsg; } }
+    public dynamic current_value_type { get { return currentRecord.value_type ?? MissingMsg; } }
+    public string discount_json { get { return _discount_json ?? string.Empty; } set { _discount_json = value ?? string.Empty; } }
+
+    private dynamic GetBlankRecord()
+    {
+        dynamic blank = new ExpandoObject();
+        blank.title = string.Empty;
+        blank.value = string.Empty;
+        blank.id = string.Empty;
+        blank.value_type = string.Empty;
+        return blank;
+    }
     public string json_results
     {
         get { return _json_results ?? string.Empty; }
@@ -72,8 +124,30 @@ Page Count: @PageCount
             _UrlCommands = value ?? _UrlCommands ?? new List<string>();
         }
     }
+    public async Task DeleteBlankDiscounts()
+    {
+        
+    }
+    public async Task FilterOnlyDuplicates()
+    {
+        var rs = records.Select(x => new shopify_price_rule() { id = x.id ?? string.Empty, title = x.title ?? string.Empty, value = x.value ?? string.Empty, value_type = x.value_type ?? string.Empty });
+        records = rs.GroupBy(x => x.title)
+              .Where(g => g.Count() > 1)
+              .SelectMany(y => y)
+              .ToList();
+    }
+    public async Task FilterOnlyDuplicatesWithBlankDiscounts()
+    {
+        var rs = records.Select(x => new shopify_price_rule() { id = x.id ?? string.Empty, title = x.title ?? string.Empty, value = x.value ?? string.Empty, value_type = x.value_type ?? string.Empty });
+        records = rs.GroupBy(x => x.title)
+              .Where(g => g.Count() > 1)
+              .SelectMany(y => y)
+              .ToList();
+    }
     public async Task shopify_get_discount_codes_for_price_rule(dynamic record)
     {
+        currentRecord = record ?? GetBlankRecord();
+
         ApiCallerBase api = new ApiCallerBase();
         ApiCallData data = new ApiCallData();
         ApiConnectorData connData = new ApiConnectorData();
@@ -89,9 +163,11 @@ Page Count: @PageCount
         string strData = Newtonsoft.Json.JsonConvert.SerializeObject(data);
         HttpResponseMessage results = await ReeceShopifyAzFunc.MakeApiGetCallGeneric(ApiConnectorData_Json: strConnData, ApiCallData_Json: strData);
         string strResults = results.Content.ReadAsStringAsync().Result;
-
+        
+        discount_json = strResults; // show the discount info we found
+        
         dynamic tmp = Newtonsoft.Json.Linq.JObject.Parse(strResults);
-
+             
         if (tmp == null)
         { Console.WriteLine("tmp is null but should contain discount codes for price_rule id: " + id); }
 
