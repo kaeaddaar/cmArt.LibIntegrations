@@ -212,7 +212,15 @@ namespace cmArt.Reece.ShopifyConnector
                 requestMessage_Delay.Headers.Add("ApiConnectorData_Json", ApiConnectorData_Json);
                 requestMessage_Delay.Headers.Add("ApiCallData_Json", ApiCallData_Json);
 
-                HttpResponseMessage response_Delay = await client.SendAsync(requestMessage);
+                client = new HttpClient();
+                client.Timeout = TimeSpan.FromMinutes(Api_Timeout_Max);
+
+                baseUri = new Uri(_BaseUrl);
+                client.BaseAddress = baseUri;
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.ConnectionClose = true;
+
+                HttpResponseMessage response_Delay = await client.SendAsync(requestMessage_Delay);
                 response = response_Delay;
             }
             response.EnsureSuccessStatusCode();
@@ -264,13 +272,20 @@ namespace cmArt.Reece.ShopifyConnector
             if (response.StatusCode == HttpStatusCode.TooManyRequests)
             {
                 await Task.Delay(510); // just over half a second
-
-                var requestMessage_Delay = new HttpRequestMessage(HttpMethod.Delete, baseUri);
+                HttpRequestMessage requestMessage_Delay = new HttpRequestMessage(HttpMethod.Delete, baseUri);
                 //requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
                 requestMessage_Delay.Headers.Add("ApiConnectorData_Json", ApiConnectorData_Json);
                 requestMessage_Delay.Headers.Add("ApiCallData_Json", ApiCallData_Json);
 
-                HttpResponseMessage response_Delay = await client.SendAsync(requestMessage);
+                client = new HttpClient();
+                client.Timeout = TimeSpan.FromMinutes(Api_Timeout_Max);
+
+                baseUri = new Uri(_BaseUrl);
+                client.BaseAddress = baseUri;
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.ConnectionClose = true;
+
+                HttpResponseMessage response_Delay = await client.SendAsync(requestMessage_Delay);
                 response = response_Delay;
             }
             response.EnsureSuccessStatusCode();
