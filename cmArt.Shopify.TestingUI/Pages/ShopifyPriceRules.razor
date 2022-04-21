@@ -15,6 +15,7 @@
 <button @onclick="LoadPricesList">Load Prices List From Shopify</button>
 <button @onclick="LoadPricesListCache">Load Prices List From Cache</button>
 <button @onclick="SavePricesToFile">Save Prices To File</button>
+
 Record Count: @records.Count()
 <br />
 Page Count: @PageCount
@@ -26,6 +27,7 @@ Page Count: @PageCount
         <td>record.value</td>
         <td>record.id</td>
         <td>record.value_type</td>
+        <td>action</td>
     </tr>
     @foreach (var record in records)
     {
@@ -34,6 +36,7 @@ Page Count: @PageCount
         <td>@record.value</td>
         <td>@record.id</td>
         <td>@record.value_type</td>
+        <td><button @onclick="async () => await shopify_get_discount_codes_for_price_rule(record)">Get Discount Codes For Price Rule</button></td>
     </tr>
     }
 </table>
@@ -68,6 +71,34 @@ Page Count: @PageCount
         {
             _UrlCommands = value ?? _UrlCommands ?? new List<string>();
         }
+    }
+    public async Task shopify_get_discount_codes_for_price_rule(dynamic record)
+    {
+        ApiCallerBase api = new ApiCallerBase();
+        ApiCallData data = new ApiCallData();
+        ApiConnectorData connData = new ApiConnectorData();
+        connData.Url = "https://deltawaterproducts.myshopify.com";
+        connData.UserName = "ed84bfc1c2687d7d6f357717fe977dd6";
+        connData.Password = "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";
+
+        string id = record.id;
+        data.UrlCommand = "/admin/api/2022-01/price_rules/" + id.ToString() + "/discount_codes.json";
+        data.Body = string.Empty;
+
+        string strConnData = Newtonsoft.Json.JsonConvert.SerializeObject(connData);
+        string strData = Newtonsoft.Json.JsonConvert.SerializeObject(data);
+        HttpResponseMessage results = await ReeceShopifyAzFunc.MakeApiGetCallGeneric(ApiConnectorData_Json: strConnData, ApiCallData_Json: strData);
+        string strResults = results.Content.ReadAsStringAsync().Result;
+
+        dynamic tmp = Newtonsoft.Json.Linq.JObject.Parse(strResults);
+
+        if (tmp == null)
+        { Console.WriteLine("tmp is null but should contain discount codes for price_rule id: " + id); }
+
+        if (tmp.price_rules == null)
+        { Console.WriteLine("List of Price Rules was null"); }
+
+        StateHasChanged();
     }
     public async void SavePricesToFile()
     {
@@ -122,19 +153,11 @@ Page Count: @PageCount
         data.UrlCommand = "/admin/api/2022-01/price_rules.json?limit=250";
         data.Body = string.Empty;
 
-        //string ApiConnectorData_Json = System.Text.Json.JsonSerializer.Serialize(connData, typeof(ApiConnectorData));
-        //string ApiCallData_Json = System.Text.Json.JsonSerializer.Serialize(data, typeof(ApiCallData));
-
-        //string results = await ReeceShopifyAzFunc.MakeApiGetCallGeneric(ApiConnectorData_Json, ApiCallData_Json);
-
-        //var tmp = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(results);
         dynamic tmp = await GetAllPriceRules(api, connData, data);
         if (tmp == null)
         { Console.WriteLine("tmp which should contain List of Price Rules was null"); }
         if (tmp.price_rules == null)
         { Console.WriteLine("List of Price Rules was null"); }
-
-        //records = tmp.price_rules;
 
         StateHasChanged();
     }
@@ -201,8 +224,9 @@ Page Count: @PageCount
         int posgt = strLink.IndexOf('>');
         int lenUrl = posgt - poslt - 1;
         bool LinkMissing = lenUrl <= 0;
-        if (LinkMissing || DevCountExit++ > 3) // turns out there is a previous and a next ex: rel="previous"
-        //if (LinkMissing) // turns out there is a previous and a next ex: rel="previous"
+
+        //if (LinkMissing || DevCountExit++ > 3) // turns out there is a previous and a next ex: rel="previous"
+        if (LinkMissing) // turns out there is a previous and a next ex: rel="previous"
         { 
             data.UrlCommand = string.Empty;
             return data;
