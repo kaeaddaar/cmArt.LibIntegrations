@@ -226,6 +226,64 @@ namespace cmArt.Reece.ShopifyConnector
             //return responseBody;
 
         }
+        public static async Task<HttpResponseMessage> MakeApiDeleteCallGeneric
+        (
+            string ApiConnectorData_Json
+            , string ApiCallData_Json
+            , string BaseUrl = "http://localhost:7071/api/MakeShopifyApiGetCall"
+        )
+        {
+            LogInfo("BaseUrl: " + BaseUrl);
+            string _BaseUrl = BaseUrl ?? String.Empty;
+            LogInfo("_BaseUrl: " + _BaseUrl);
+            LogInfo("ApiConnectorData_Json: " + ApiConnectorData_Json);
+            LogInfo("ApiCallData_Json: " + ApiCallData_Json);
+
+            //LogApiCalls("urlCommand(Get - Secured): " + urlCommand);
+            HttpClient client = new HttpClient();
+            client.Timeout = TimeSpan.FromMinutes(Api_Timeout_Max);
+
+            Uri baseUri = new Uri(_BaseUrl);
+            client.BaseAddress = baseUri;
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.ConnectionClose = true;
+
+            //string clientId = clintIdIn ?? string.Empty;
+            //string clientSecret = clientSecretIn ?? string.Empty;
+
+            //var authenticationString = $"{clientId}:{clientSecret}";
+            //var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Delete, baseUri);
+            //requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+            requestMessage.Headers.Add("ApiConnectorData_Json", ApiConnectorData_Json);
+            requestMessage.Headers.Add("ApiCallData_Json", ApiCallData_Json);
+
+            HttpResponseMessage response = await client.SendAsync(requestMessage);
+
+            if (response.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                await Task.Delay(510); // just over half a second
+
+                var requestMessage_Delay = new HttpRequestMessage(HttpMethod.Delete, baseUri);
+                //requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+                requestMessage_Delay.Headers.Add("ApiConnectorData_Json", ApiConnectorData_Json);
+                requestMessage_Delay.Headers.Add("ApiCallData_Json", ApiCallData_Json);
+
+                HttpResponseMessage response_Delay = await client.SendAsync(requestMessage);
+                response = response_Delay;
+            }
+            response.EnsureSuccessStatusCode();
+            return response;
+            //string responseBody = response.Content.ReadAsStringAsync().Result;
+
+            //string PageInfo = response.Headers.Where(x => x.Key == "Link").Select(x => string.Join(',', x.Value)).FirstOrDefault() ?? string.Empty;
+
+            //LogInfo("responseBody: " + responseBody);
+            //LogApiCalls("responseBody: " + responseBody);
+            //return responseBody;
+
+        }
         public static async Task<string> MakeApiGetCall
         (
             string urlCommand

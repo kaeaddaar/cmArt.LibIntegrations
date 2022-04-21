@@ -17,7 +17,6 @@
 <button @onclick="LoadPricesListCache">Load Prices List From Cache</button>
 <button @onclick="SavePricesToFile">Save Prices To File</button>
 <button @onclick="FilterOnlyDuplicates">Filter For Duplicates Only</button>
-<button @onclick="FilterOnlyDuplicatesWithBlankDiscounts">Filter For Duplicates with blank discounts Only</button>
 <button @onclick="DeleteBlankDiscounts">Delete Duplicates With Blank Discounts</button>
 
 Record Count: @records.Count()
@@ -126,17 +125,39 @@ Page Count: @PageCount
     }
     public async Task DeleteBlankDiscounts()
     {
-        
+        foreach (var rec in records)
+        {
+            string strResults = await GetDiscount(rec);
+            dynamic tmp = Newtonsoft.Json.Linq.JObject.Parse(strResults);
+            IEnumerable<dynamic> codes = tmp.discount_codes;
+            bool IsMissing_discount_codes = codes.Count() == 0;
+            string responses = string.Empty;
+            if (IsMissing_discount_codes)
+            {
+                responses += await delete_price_rule(rec);
+            }
+        }
+    }
+    private async Task<string> delete_price_rule(dynamic recordIn)
+    {
+        ApiCallerBase api = new ApiCallerBase();
+        ApiCallData data = new ApiCallData();
+        ApiConnectorData connData = new ApiConnectorData();
+        connData.Url = "https://deltawaterproducts.myshopify.com";
+        connData.UserName = "ed84bfc1c2687d7d6f357717fe977dd6";
+        connData.Password = "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";
+
+        string id = recordIn.id;
+        data.UrlCommand = "/admin/api/2022-01/price_rules/" + id.ToString() + "/discount_codes.json";
+        data.Body = string.Empty;
+
+        string strConnData = Newtonsoft.Json.JsonConvert.SerializeObject(connData);
+        string strData = Newtonsoft.Json.JsonConvert.SerializeObject(data);
+        HttpResponseMessage results = await ReeceShopifyAzFunc.MakeApiDeleteCallGeneric(ApiConnectorData_Json: strConnData, ApiCallData_Json: strData);
+        string strResults = results.Content.ReadAsStringAsync().Result;
+        return strResults;
     }
     public async Task FilterOnlyDuplicates()
-    {
-        var rs = records.Select(x => new shopify_price_rule() { id = x.id ?? string.Empty, title = x.title ?? string.Empty, value = x.value ?? string.Empty, value_type = x.value_type ?? string.Empty });
-        records = rs.GroupBy(x => x.title)
-              .Where(g => g.Count() > 1)
-              .SelectMany(y => y)
-              .ToList();
-    }
-    public async Task FilterOnlyDuplicatesWithBlankDiscounts()
     {
         var rs = records.Select(x => new shopify_price_rule() { id = x.id ?? string.Empty, title = x.title ?? string.Empty, value = x.value ?? string.Empty, value_type = x.value_type ?? string.Empty });
         records = rs.GroupBy(x => x.title)
@@ -148,6 +169,23 @@ Page Count: @PageCount
     {
         currentRecord = record ?? GetBlankRecord();
 
+        string strResults = await GetDiscount(record);
+
+        discount_json = strResults; // show the discount info we found
+
+        dynamic tmp = Newtonsoft.Json.Linq.JObject.Parse(strResults);
+
+        string id = record.id;
+        if (tmp == null)
+        { Console.WriteLine("tmp is null but should contain discount codes for price_rule id: " + id); }
+
+        if (tmp.price_rules == null)
+        { Console.WriteLine("List of Price Rules was null"); }
+
+        StateHasChanged();
+    }
+    private async Task<string> GetDiscount(dynamic record)
+    {
         ApiCallerBase api = new ApiCallerBase();
         ApiCallData data = new ApiCallData();
         ApiConnectorData connData = new ApiConnectorData();
@@ -163,18 +201,7 @@ Page Count: @PageCount
         string strData = Newtonsoft.Json.JsonConvert.SerializeObject(data);
         HttpResponseMessage results = await ReeceShopifyAzFunc.MakeApiGetCallGeneric(ApiConnectorData_Json: strConnData, ApiCallData_Json: strData);
         string strResults = results.Content.ReadAsStringAsync().Result;
-        
-        discount_json = strResults; // show the discount info we found
-        
-        dynamic tmp = Newtonsoft.Json.Linq.JObject.Parse(strResults);
-             
-        if (tmp == null)
-        { Console.WriteLine("tmp is null but should contain discount codes for price_rule id: " + id); }
-
-        if (tmp.price_rules == null)
-        { Console.WriteLine("List of Price Rules was null"); }
-
-        StateHasChanged();
+        return strResults;
     }
     public async void SavePricesToFile()
     {
