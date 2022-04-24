@@ -205,7 +205,7 @@ namespace cmArt.Reece.ShopifyConnector
 
             if (response.StatusCode == HttpStatusCode.TooManyRequests)
             {
-                await Task.Delay(510); // just over half a second
+                await Task.Delay(850); // just over half a second
 
                 var requestMessage_Delay = new HttpRequestMessage(HttpMethod.Get, baseUri);
                 //requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
@@ -271,7 +271,7 @@ namespace cmArt.Reece.ShopifyConnector
 
             if (response.StatusCode == HttpStatusCode.TooManyRequests)
             {
-                await Task.Delay(510); // just over half a second
+                await Task.Delay(850); // just over half a second
                 HttpRequestMessage requestMessage_Delay = new HttpRequestMessage(HttpMethod.Delete, baseUri);
                 //requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
                 requestMessage_Delay.Headers.Add("ApiConnectorData_Json", ApiConnectorData_Json);

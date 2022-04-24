@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\cmArt.Reece.ShopifyConnector\cmArt.Reece.ShopifyConnector.csproj" />
     <ProjectReference Include="..\cmArt.Shopify.App\cmArt.Shopify.App.csproj" />
   </ItemGroup>
 

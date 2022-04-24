@@ -64,6 +64,7 @@ Page Count: @PageCount
         <td>@record.id</td>
         <td>@record.value_type</td>
         <td><button @onclick="async () => await shopify_get_discount_codes_for_price_rule(record)">Get Discount Codes For Price Rule</button></td>
+        <td><button @onclick="async () => await delete_price_rule(record)">Delete Price Rule</button></td>
     </tr>
     }
 </table>
@@ -148,7 +149,7 @@ Page Count: @PageCount
         connData.Password = "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";
 
         string id = recordIn.id;
-        data.UrlCommand = "/admin/api/2022-01/price_rules/" + id.ToString() + "/discount_codes.json";
+        data.UrlCommand = "/admin/api/2022-01/price_rules/" + id.ToString() + ".json";
         data.Body = string.Empty;
 
         string strConnData = Newtonsoft.Json.JsonConvert.SerializeObject(connData);

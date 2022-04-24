@@ -29,18 +29,6 @@ namespace cmArt.Portal.API
 
     public static class Controller_Shopify
     {
-        //private static IConfigurationRoot config;
-        //private static StaticSettings settings;
-
-        //private static void SetupSettings()
-        //{
-        //    config = new ConfigurationBuilder()
-        //        .AddJsonFile("appsettings_portalapi.json", optional: false, reloadOnChange: true)
-        //        .Build();
-
-        //    settings = new StaticSettings(config, "Controller_Shopify");
-        //}
-
         [FunctionName("MakeApiPostCall_Shopify")]
         public static async Task<IActionResult> RunMakeApiPostCall
         (
