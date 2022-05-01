@@ -175,7 +175,7 @@ namespace cmArt.Shopify.App
             }
             else
             {
-                Cache_Products_Prices_And_Quantities_From_SystemFive();
+                Cache_Products_Prices_And_Quantities_From_SystemFive_To_AzureSQL();
                 GetShopifyData();
                 CacheShopifyData();
                 map_Product = ProduceVennMap(map_Product);
@@ -631,6 +631,7 @@ namespace cmArt.Shopify.App
         }
         private static void Cache_And_Overwrite_Products_Prices_And_Quantities()
         {
+            logger.LogInformation("Begin Cache_And_Overwrite_Products_Prices_And_Quantities()");
             CachingPattern_Shopify_Product cacheShopify_Product = new CachingPattern_Shopify_Product("PocoProductsAdapted", settings);
             PrevDataLoad_Product = cacheShopify_Product._01_GetPrev();
             cacheShopify_Product._02_SaveNewestToCache(PocoProductsAdapted);
@@ -647,8 +648,9 @@ namespace cmArt.Shopify.App
             API_Prices = PrevDataLoad_Prices;
             API_Quantities = PrevDataLoad_Quantities;
         }
-        private static void Cache_Products_Prices_And_Quantities_From_SystemFive()
+        private static void Cache_Products_Prices_And_Quantities_From_SystemFive_To_AzureSQL()
         {
+            logger.LogInformation("Begin Cache_Products_Prices_And_Quantities_From_SystemFive_To_AzureSQL()");
             CachingPattern_Shopify_Product cacheShopify_Product = new CachingPattern_Shopify_Product("PocoProductsAdapted", settings);
             cacheShopify_Product._02_SaveNewestToCache(PocoProductsAdapted);
 

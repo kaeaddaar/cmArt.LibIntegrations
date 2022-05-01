@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.Extensions.Logging;
+using System.IO;
 
 
 namespace cmArt.Shopify.App
@@ -17,7 +18,20 @@ namespace cmArt.Shopify.App
         public static void Main(string[] args)
         {
             Args = args;
-            CreateHostBuilder(args).Build().Run();
+            try
+            {
+                CreateHostBuilder(args).Build().Run();
+            }
+            catch (Exception ex)
+            {
+                string folder = AppDomain.CurrentDomain.BaseDirectory;
+                bool folderExists = System.IO.Directory.Exists(folder);
+                if (folderExists)
+                {
+                    File.AppendAllText(folder + "\\log.txt", ex.ToString());
+                }
+                throw ex;
+            }
         }
 
         // https://wakeupandcode.com/tag/worker-service/
