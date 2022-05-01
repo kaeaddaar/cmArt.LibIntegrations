@@ -204,6 +204,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public static string Quantities_Add(IEnumerable<Shopify_Quantities> QuantitiesList)
         {
+            LogInfo("Begin Quantities_Add(IEnumerable<Shopify_Quantities> QuantitiesList)");
             string strQuantitiesList = string.Empty;
             string results = string.Empty;
             foreach (var qtys in QuantitiesList)
@@ -227,6 +228,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public static string Quantities_Edit(IEnumerable<Shopify_Quantities> QuantitiesList)
         {
+            LogInfo("Begin Quantities_Edit(IEnumerable<Shopify_Quantities> QuantitiesList)");
             string strQuantitiesList = string.Empty;
             string results = string.Empty;
             foreach (var qtys in QuantitiesList)
@@ -250,6 +252,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public static string Prices_Add(IEnumerable<Shopify_Prices> PricesList)
         {
+            LogInfo("Begin Prices_Add(IEnumerable<Shopify_Prices> PricesList)");
             IEnumerable<Shopify_Prices> _PricesList = PricesList ?? new List<Shopify_Prices>();
             string results = string.Empty;
             foreach (Shopify_Prices prices in PricesList)
@@ -279,6 +282,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public static string Prices_Edit(IEnumerable<Shopify_Prices> PricesList)
         {
+            LogInfo("Begin Prices_Edit(IEnumerable<Shopify_Prices> PricesList)");
             IEnumerable<Shopify_Prices> _PricesList = PricesList ?? new List<Shopify_Prices>();
             string results = string.Empty;
             foreach (Shopify_Prices prices in PricesList)
@@ -337,6 +341,7 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public static string Products_Delete(IEnumerable<Shopify_Product> ProductsToDelete)
         {
+            LogInfo("Begin Products_Delete(IEnumerable<Shopify_Product> ProductsToDelete)");
             try
             { 
                 List<Shopify_Product> prods = new List<Shopify_Product>(ProductsToDelete);
@@ -353,11 +358,13 @@ namespace cmArt.Reece.ShopifyConnector
         }
         public static string Products_Add(IEnumerable<Shopify_Product> NewProducts)
         {
+            LogInfo("Begin Products_Add(IEnumerable<Shopify_Product> NewProducts)");
             int pageSize = 10;
             int page = 0;
             int count = NewProducts.Count();
             int StartAt = page * pageSize;
             string results = string.Empty;
+            LogInfo_Write("Page: ");
             do
             {
                 try
@@ -373,12 +380,15 @@ namespace cmArt.Reece.ShopifyConnector
                     return msg;
                 }
                 page++;
+                LogInfo_Write(page + ",");
                 StartAt = page * pageSize;
             } while (StartAt <= count);
+            LogInfo("(" + page + ")");
             return results;
         }
         public static string Products_Edit(IEnumerable<Shopify_Product> ProductsToEdit)
         {
+            LogInfo("Begin Products_Edit(IEnumerable<Shopify_Product> ProductsToEdit)");
             IEnumerable<Shopify_Product> _ProductsToEdit = ProductsToEdit ?? new List<Shopify_Product>();
             int total = _ProductsToEdit.Count();
             int pageSize = 10;
@@ -386,7 +396,8 @@ namespace cmArt.Reece.ShopifyConnector
             int pageMin = pageNum * pageSize - pageSize + 1;
             int pageMax = pageNum * pageSize;
             string results = string.Empty;
-            while(pageMin <= total)
+            LogInfo_Write("Page: ");
+            while (pageMin <= total)
             {
                 IEnumerable<Shopify_Product> PageOfProductsToEdit = _ProductsToEdit.Skip(pageMin - 1).Take(pageSize);
                 try
@@ -403,9 +414,11 @@ namespace cmArt.Reece.ShopifyConnector
                     return msg;
                 }
                 pageNum++;
+                LogInfo_Write(pageNum + ",");
                 pageMin = pageNum * pageSize - pageSize + 1;
                 pageMax = pageNum * pageSize;
             }
+            LogInfo("(" + pageNum + ")");
             return "No Records Processed";
         }
         public static IEnumerable<Shopify_Product> GetAllShopify_Products()
