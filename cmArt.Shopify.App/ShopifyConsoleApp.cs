@@ -457,100 +457,148 @@ namespace cmArt.Shopify.App
         }
         private static bool AtOrAfterTimeToRun()
         {
-            DateTime dtNow = DateTime.Now;
-            int hrs = 0;
-            int.TryParse(settings.Hours, out hrs);
-            int mins = 0;
-            int.TryParse(settings.Minutes, out mins);
-
-            bool IsAtOrAfterTimeToRun = false;
-            if (dtNow.Hour == hrs)
+            try
             {
-                if (dtNow.Minute >= mins)
+                DateTime dtNow = DateTime.Now;
+                int hrs = 0;
+                int.TryParse(settings.Hours, out hrs);
+                int mins = 0;
+                int.TryParse(settings.Minutes, out mins);
+
+                bool IsAtOrAfterTimeToRun = false;
+                if (dtNow.Hour == hrs)
+                {
+                    if (dtNow.Minute >= mins)
+                    {
+                        IsAtOrAfterTimeToRun = true;
+                    }
+                }
+                if (dtNow.Hour > hrs)
                 {
                     IsAtOrAfterTimeToRun = true;
                 }
+                LogInfo_AtOrAfter($"AtOrAfterTimeToRun - Hour: {hrs}, Minutes: {mins}, AtOrAfter: {IsAtOrAfterTimeToRun}");
+                return IsAtOrAfterTimeToRun;
             }
-            if (dtNow.Hour > hrs)
+            catch (Exception ex)
             {
-                IsAtOrAfterTimeToRun = true;
+                logger.LogInformation("Error occurred in \"" + MethodBase.GetCurrentMethod() + "\" Error message: " + ex.Message);
+                return false; // return false if we error out, tell calling routine it's not time to run.
             }
-            LogInfo_AtOrAfter($"AtOrAfterTimeToRun - Hour: {hrs}, Minutes: {mins}, AtOrAfter: {IsAtOrAfterTimeToRun}");
-            return IsAtOrAfterTimeToRun;
-
         }
 
         private static void SetupLogging()
         {
-            LogToFile logger_ToFile = new LogToFile();
-            logger_ToFile.Init(settings.LogfilePath + "\\Integration_LogFile.txt");
-            logger = logger_ToFile;
+            try
+            {
+                LogToFile logger_ToFile = new LogToFile();
+                logger_ToFile.Init(settings.LogfilePath + "\\Integration_LogFile.txt");
+                logger = logger_ToFile;
 
-            LogToFile logger_ToFile_AtOrAfter = new LogToFile();
-            logger_ToFile_AtOrAfter.Init(settings.LogfilePath + "\\AtOrAfter_Sync.txt", false);
-            logger_AtOrAfter = logger_ToFile_AtOrAfter;
+                LogToFile logger_ToFile_AtOrAfter = new LogToFile();
+                logger_ToFile_AtOrAfter.Init(settings.LogfilePath + "\\AtOrAfter_Sync.txt", false);
+                logger_AtOrAfter = logger_ToFile_AtOrAfter;
+            }
+            catch (Exception ex)
+            {
+                logger.LogInformation("Error occurred in \"" + MethodBase.GetCurrentMethod() + "\" Error message: " + ex.Message);
+            }
         }
         private static void SetupLogging_ForDoWork()
         {
-            LogToFile logger_ToFile_ApiCalls = new LogToFile();
-            logger_ToFile_ApiCalls.Init(settings.LogfilePath + "\\ApiCalls.txt", false);
-            logger_ApiCalls = logger_ToFile_ApiCalls;
+            try
+            {
+                LogToFile logger_ToFile_ApiCalls = new LogToFile();
+                logger_ToFile_ApiCalls.Init(settings.LogfilePath + "\\ApiCalls.txt", false);
+                logger_ApiCalls = logger_ToFile_ApiCalls;
+            }
+            catch (Exception ex)
+            {
+                logger.LogInformation("Error occurred in \"" + MethodBase.GetCurrentMethod() + "\" Error message: " + ex.Message);
+            }
         }
         private static void SetupSettings()
         {
-            config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
+            try
+            {
+                config = new ConfigurationBuilder()
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .Build();
 
-            settings = new StaticSettings(config);
+                settings = new StaticSettings(config);
+            }
+            catch (Exception ex)
+            {
+                string MethodName = MethodBase.GetCurrentMethod().ToString();
+                logger.LogInformation("Error occurred in \"" + MethodName + "\" Error message: " + ex.Message);
+                logger.LogInformation($"\"{MethodName}\" is required for successful operation, re-throwing error");
+                throw ex;
+            }
         }
         private static void DisplaySettings()
         {
-            config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
+            try
+            {
+                config = new ConfigurationBuilder()
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .Build();
 
-            settings = new StaticSettings(config);
+                settings = new StaticSettings(config);
 
-            logger.LogInformation($"CachedFiles: {settings.CachedFiles}");
-            logger.LogInformation($"CSVFiles: {settings.CSVFiles}");
-            logger.LogInformation($"OutputDirectory: {settings.OutputDirectory}");
-            logger.LogInformation($"DSNinfo: {settings.DSNinfo}");
-            logger.LogInformation($"Cachinginfo: {settings.Cachinginfo}");
-            logger.LogInformation($"SupressUpload: {settings.SupressUpload}");
-            logger.LogInformation($"LogfilePath: {settings.LogfilePath}");
-            logger.LogInformation($"Hours: {settings.Hours}");
-            logger.LogInformation($"Minutes: {settings.Minutes}");
-            logger.LogInformation($"Seconds: {settings.Seconds}");
-            logger.LogInformation($"errormail: {settings.errormail}");
-            logger.LogInformation($"smtpaddress: {settings.smtpaddress}");
-            logger.LogInformation($"smtpport: {settings.smtpport}");
-            logger.LogInformation($"enableSSL: {settings.enableSSL}");
-            logger.LogInformation($"fromemailaddress: {settings.fromemailaddress}");
-            logger.LogInformation($"fromemailpassword: {settings.fromemailpassword}");
-            logger.LogInformation($"RunAs: {settings.RunAs}");
+                logger.LogInformation($"CachedFiles: {settings.CachedFiles}");
+                logger.LogInformation($"CSVFiles: {settings.CSVFiles}");
+                logger.LogInformation($"OutputDirectory: {settings.OutputDirectory}");
+                logger.LogInformation($"DSNinfo: {settings.DSNinfo}");
+                logger.LogInformation($"Cachinginfo: {settings.Cachinginfo}");
+                logger.LogInformation($"SupressUpload: {settings.SupressUpload}");
+                logger.LogInformation($"LogfilePath: {settings.LogfilePath}");
+                logger.LogInformation($"Hours: {settings.Hours}");
+                logger.LogInformation($"Minutes: {settings.Minutes}");
+                logger.LogInformation($"Seconds: {settings.Seconds}");
+                logger.LogInformation($"errormail: {settings.errormail}");
+                logger.LogInformation($"smtpaddress: {settings.smtpaddress}");
+                logger.LogInformation($"smtpport: {settings.smtpport}");
+                logger.LogInformation($"enableSSL: {settings.enableSSL}");
+                logger.LogInformation($"fromemailaddress: {settings.fromemailaddress}");
+                logger.LogInformation($"fromemailpassword: {settings.fromemailpassword}");
+                logger.LogInformation($"RunAs: {settings.RunAs}");
+            }
+            catch (Exception ex)
+            {
+                logger.LogInformation("Error occurred in \"" + MethodBase.GetCurrentMethod() + "\" Error message: " + ex.Message);
+            }
         }
         private static void SetupArgs(string[] args)
         {
-            _args = args ?? new string[] { };
-            _args = args.Select(c => c.ToUpper()).ToArray();
-
-            PreventApiAddsNEdits = _args.Contains("PREVENTADDSANDEDITS") || _args.Contains("PREVENTADDSNEDITS") || settings.SupressUpload.ToUpper() == "SUPRESS";
-            PreventProduct = !(_args.Contains("PRODUCTS") || _args.Contains("PRODUCT")) && _args.Count() > 0;
-            PreventPrices = !(_args.Contains("DISCOUNTS") || _args.Contains("DISCOUNT")) && _args.Count() > 0;
-            PreventQuantities = !(_args.Contains("INVENTORY") || _args.Contains("INVENTORYITEMS") || _args.Contains("INVENTORYITEM")) && _args.Count() > 0;
-
-            if (PreventApiAddsNEdits) { logger.LogInformation("PREVENTADDSANDEDITS or PREVENTADDSNEDITS found in arguments, adds and edits will be prevented"); }
-            if (PreventProduct) { logger.LogInformation("PRODUCTS or PRODUCT not found in arguments so we will prevent them from being sent to Shopify"); }
-            if (PreventPrices) { logger.LogInformation("DISCOUNTS or DISCOUNT not found in arguments so we will prevent them from being sent to Shopify"); }
-            if (PreventQuantities)
+            try
             {
-                logger.LogInformation("INVENTORY or INVENTORYITEMS or INVENTORYITEM not found in arguments so we will prevent them from "
-                    + "being sent to Shopify");
+                _args = args ?? new string[] { };
+                _args = args.Select(c => c.ToUpper()).ToArray();
+
+                PreventApiAddsNEdits = _args.Contains("PREVENTADDSANDEDITS") || _args.Contains("PREVENTADDSNEDITS") || settings.SupressUpload.ToUpper() == "SUPRESS";
+                PreventProduct = !(_args.Contains("PRODUCTS") || _args.Contains("PRODUCT")) && _args.Count() > 0;
+                PreventPrices = !(_args.Contains("DISCOUNTS") || _args.Contains("DISCOUNT")) && _args.Count() > 0;
+                PreventQuantities = !(_args.Contains("INVENTORY") || _args.Contains("INVENTORYITEMS") || _args.Contains("INVENTORYITEM")) && _args.Count() > 0;
+
+                if (PreventApiAddsNEdits) { logger.LogInformation("PREVENTADDSANDEDITS or PREVENTADDSNEDITS found in arguments, adds and edits will be prevented"); }
+                if (PreventProduct) { logger.LogInformation("PRODUCTS or PRODUCT not found in arguments so we will prevent them from being sent to Shopify"); }
+                if (PreventPrices) { logger.LogInformation("DISCOUNTS or DISCOUNT not found in arguments so we will prevent them from being sent to Shopify"); }
+                if (PreventQuantities)
+                {
+                    logger.LogInformation("INVENTORY or INVENTORYITEMS or INVENTORYITEM not found in arguments so we will prevent them from "
+                        + "being sent to Shopify");
+                }
+                RunAsSelfCompare = (settings.RunAs.ToUpper() == "SELFCOMPARE".ToUpper());
+                RunSyncOnce = (settings.RunAs.ToUpper() == "RunSyncOnce".ToUpper());
+                RunAsSyncService = (settings.RunAs.ToUpper() == "SYNC".ToUpper());
             }
-            RunAsSelfCompare = (settings.RunAs.ToUpper() == "SELFCOMPARE".ToUpper());
-            RunSyncOnce = (settings.RunAs.ToUpper() == "RunSyncOnce".ToUpper());
-            RunAsSyncService = (settings.RunAs.ToUpper() == "SYNC".ToUpper());
+            catch (Exception ex)
+            {
+                string MethodName = MethodBase.GetCurrentMethod().ToString();
+                logger.LogInformation("Error occurred in \"" + MethodName + "\" Error message: " + ex.Message);
+                logger.LogInformation($"\"{MethodName}\" is required for successful operation, re-throwing error");
+                throw ex;
+            }
         }
         private static void GetSystem5Data()
         {
@@ -579,75 +627,112 @@ namespace cmArt.Shopify.App
         private static void DemoPrep_TurnOnEcommFlagForTop3InventoryItemsOfEachCategory()
         {
             logger.LogInformation("Performing Demo Prep step - Setting Ecomm to Y for top 3 items of each category.");
-            IEnumerable<IGrouping<string, IS5InvAssembled>> grouped = InvAss.OrderBy(x => x.Inv.Cat).GroupBy(x => x.Inv.Cat);
-            foreach(var group in grouped)
+            try
             {
-                IEnumerable<IS5InvAssembled> tmpGroup = group.Take(3);
-                foreach(var item in tmpGroup)
+                IEnumerable<IGrouping<string, IS5InvAssembled>> grouped = InvAss.OrderBy(x => x.Inv.Cat).GroupBy(x => x.Inv.Cat);
+                foreach(var group in grouped)
                 {
-                    item.Inv.Ecommerce = "Y";
+                    IEnumerable<IS5InvAssembled> tmpGroup = group.Take(3);
+                    foreach(var item in tmpGroup)
+                    {
+                        item.Inv.Ecommerce = "Y";
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                logger.LogInformation("Error occurred in \"" + MethodBase.GetCurrentMethod() + "\" Error message: " + ex.Message);
             }
             logger.LogInformation("Finished Performing Demo Prep step");
         }
         private static void FilterForECommAndSave()
         {
-            logger.LogInformation("Filtering for Ecommerce equals Y");
-            ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y");
-            Reports.SaveReport(ECommInvAss, "EcommProduct_From_SystemFive", settings, logger);
-            //string strECommInvAss = SerializeForExport(ECommInvAss);
-            //File.WriteAllText(settings.OutputDirectory + "\\strEcommInvAss.txt", strECommInvAss);
+            try
+            {
+                logger.LogInformation("Filtering for Ecommerce equals Y");
+                ECommInvAss = InvAss.Where(prod => prod.Inv.Ecommerce == "Y");
+                Reports.SaveReport(ECommInvAss, "EcommProduct_From_SystemFive", settings, logger);
+                //string strECommInvAss = SerializeForExport(ECommInvAss);
+                //File.WriteAllText(settings.OutputDirectory + "\\strEcommInvAss.txt", strECommInvAss);
+            }
+            catch (Exception ex)
+            {
+                string MethodName = MethodBase.GetCurrentMethod().ToString();
+                logger.LogInformation("Error occurred in \"" + MethodName + "\" Error message: " + ex.Message);
+                logger.LogInformation($"\"{MethodName}\" is required for successful operation, re-throwing error");
+                throw ex;
+            }
         }
         private static void Transform_Assembled_Inventory_To_Products_Prices_And_Quantities()
         {
-            // Use facade to create data load format from Assembled Inventory Data
-            logger.LogInformation("Begin converting Assembled Inventory Records to the Shopify Data Load Format via an adapter.");
-            adapters = ECommInvAss.Select(Inv =>
+            try
             {
-                AdaptToShopifyDataLoadFormat tmp = new AdaptToShopifyDataLoadFormat();
-                tmp.Init(Inv);
-                return tmp;
+                // Use facade to create data load format from Assembled Inventory Data
+                logger.LogInformation("Begin converting Assembled Inventory Records to the Shopify Data Load Format via an adapter.");
+                adapters = ECommInvAss.Select(Inv =>
+                {
+                    AdaptToShopifyDataLoadFormat tmp = new AdaptToShopifyDataLoadFormat();
+                    tmp.Init(Inv);
+                    return tmp;
+                }
+                );
+
+                logger.LogInformation(" -- Get products from adapter");
+                PocoProductsAdapted = adapters.Select(x => x.AsShopify_Product());
+                prods = PocoProductsAdapted;
+                Reports.SaveReport(prods, "FromSystem5_Products", settings, logger);
+
+                logger.LogInformation(" -- Get prices from adapter");
+                PocoPricesAdapted = adapters.Select(x => x.AsShopify_Prices());
+                prices = PocoPricesAdapted;
+                Reports.SaveReport(prices, "FromSystem5_Prices", settings, logger);
+
+                logger.LogInformation(" -- Get quantities from adapter");
+                PocoQuantitiesAdapted = adapters.Select(x => x.AsShopify_Quantities());
+                quantities = PocoQuantitiesAdapted;
+                Reports.SaveReport(quantities, "FromSystem5_Quantities", settings, logger);
+
+                // The old way - DNU unless you need to convert back to the adapter later on
+                //prods = adapters.Select(x => (IShopify_Product)x);
+                //prices = adapters.Select(x => (IShopify_Prices)x);
+                //quantities = adapters.Select(x => (IShopify_Quantities)x);
             }
-            );
-
-            logger.LogInformation(" -- Get products from adapter");
-            PocoProductsAdapted = adapters.Select(x => x.AsShopify_Product());
-            prods = PocoProductsAdapted;
-            Reports.SaveReport(prods, "FromSystem5_Products", settings, logger);
-
-            logger.LogInformation(" -- Get prices from adapter");
-            PocoPricesAdapted = adapters.Select(x => x.AsShopify_Prices());
-            prices = PocoPricesAdapted;
-            Reports.SaveReport(prices, "FromSystem5_Prices", settings, logger);
-
-            logger.LogInformation(" -- Get quantities from adapter");
-            PocoQuantitiesAdapted = adapters.Select(x => x.AsShopify_Quantities());
-            quantities = PocoQuantitiesAdapted;
-            Reports.SaveReport(quantities, "FromSystem5_Quantities", settings, logger);
-
-            // The old way - DNU unless you need to convert back to the adapter later on
-            //prods = adapters.Select(x => (IShopify_Product)x);
-            //prices = adapters.Select(x => (IShopify_Prices)x);
-            //quantities = adapters.Select(x => (IShopify_Quantities)x);
+            catch (Exception ex)
+            {
+                logger.LogInformation("Error occurred in \"" + MethodBase.GetCurrentMethod() + "\" Error message: " + ex.Message);
+                string MethodName = MethodBase.GetCurrentMethod().ToString();
+                logger.LogInformation($"\"{MethodName}\" is required for successful operation, re-throwing error");
+                throw ex;
+            }
         }
         private static void Cache_And_Overwrite_Products_Prices_And_Quantities()
         {
-            logger.LogInformation("Begin Cache_And_Overwrite_Products_Prices_And_Quantities()");
-            CachingPattern_Shopify_Product cacheShopify_Product = new CachingPattern_Shopify_Product("PocoProductsAdapted", settings);
-            PrevDataLoad_Product = cacheShopify_Product._01_GetPrev();
-            cacheShopify_Product._02_SaveNewestToCache(PocoProductsAdapted);
+            try
+            {
+                logger.LogInformation("Begin Cache_And_Overwrite_Products_Prices_And_Quantities()");
+                CachingPattern_Shopify_Product cacheShopify_Product = new CachingPattern_Shopify_Product("PocoProductsAdapted", settings);
+                PrevDataLoad_Product = cacheShopify_Product._01_GetPrev();
+                cacheShopify_Product._02_SaveNewestToCache(PocoProductsAdapted);
 
-            CachingPattern_Shopify_Quantities cacheShopify_Quantities = new CachingPattern_Shopify_Quantities("PocoQuantitiesAdapted", settings);
-            PrevDataLoad_Quantities = cacheShopify_Quantities._01_GetPrev();
-            cacheShopify_Quantities._02_SaveNewestToCache(PocoQuantitiesAdapted);
+                CachingPattern_Shopify_Quantities cacheShopify_Quantities = new CachingPattern_Shopify_Quantities("PocoQuantitiesAdapted", settings);
+                PrevDataLoad_Quantities = cacheShopify_Quantities._01_GetPrev();
+                cacheShopify_Quantities._02_SaveNewestToCache(PocoQuantitiesAdapted);
 
-            CachingPattern_Shopify_Prices cacheShopify_Prices = new CachingPattern_Shopify_Prices("PocoPricesAdapted", settings);
-            PrevDataLoad_Prices = cacheShopify_Prices._01_GetPrev();
-            cacheShopify_Prices._02_SaveNewestToCache(PocoPricesAdapted);
+                CachingPattern_Shopify_Prices cacheShopify_Prices = new CachingPattern_Shopify_Prices("PocoPricesAdapted", settings);
+                PrevDataLoad_Prices = cacheShopify_Prices._01_GetPrev();
+                cacheShopify_Prices._02_SaveNewestToCache(PocoPricesAdapted);
 
-            API_Products = PrevDataLoad_Product;
-            API_Prices = PrevDataLoad_Prices;
-            API_Quantities = PrevDataLoad_Quantities;
+                API_Products = PrevDataLoad_Product;
+                API_Prices = PrevDataLoad_Prices;
+                API_Quantities = PrevDataLoad_Quantities;
+            }
+            catch (Exception ex)
+            {
+                logger.LogInformation("Error occurred in \"" + MethodBase.GetCurrentMethod() + "\" Error message: " + ex.Message);
+                string MethodName = MethodBase.GetCurrentMethod().ToString();
+                logger.LogInformation($"\"{MethodName}\" is required for successful operation, re-throwing error");
+                throw ex;
+            }
         }
         private static void Cache_Products_Prices_And_Quantities_From_SystemFive_To_AzureSQL()
         {
@@ -852,21 +937,28 @@ namespace cmArt.Shopify.App
         }
         private static void CheckForDuplicates()
         {
-            var Duplicates_Products = API_Products.GroupBy(x => x.PartNumber).Where(x => x.Count() > 1).Select(x => x.Key);
-            var Duplicates_Prices = API_Prices.GroupBy(x => x.PartNumber).Where(x => x.Count() > 1).Select(x => x.Key);
-            var Duplicates_Quantities = API_Quantities.GroupBy(x => x.PartNumber).Where(x => x.Count() > 1).Select(x => x.Key);
+            try
+            {
+                var Duplicates_Products = API_Products.GroupBy(x => x.PartNumber).Where(x => x.Count() > 1).Select(x => x.Key);
+                var Duplicates_Prices = API_Prices.GroupBy(x => x.PartNumber).Where(x => x.Count() > 1).Select(x => x.Key);
+                var Duplicates_Quantities = API_Quantities.GroupBy(x => x.PartNumber).Where(x => x.Count() > 1).Select(x => x.Key);
 
-            string Products = string.Join(Environment.NewLine, Duplicates_Products);
-            string Prices = string.Join(Environment.NewLine, Duplicates_Prices);
-            string Quantities = string.Join(Environment.NewLine, Duplicates_Quantities);
+                string Products = string.Join(Environment.NewLine, Duplicates_Products);
+                string Prices = string.Join(Environment.NewLine, Duplicates_Prices);
+                string Quantities = string.Join(Environment.NewLine, Duplicates_Quantities);
 
-            File.WriteAllText(settings.OutputDirectory + "\\DuplicateProducts.txt", Products);
-            File.WriteAllText(settings.OutputDirectory + "\\DuplicatePrices.txt", Prices);
-            File.WriteAllText(settings.OutputDirectory + "\\DuplicateQuantities.txt", Quantities);
+                File.WriteAllText(settings.OutputDirectory + "\\DuplicateProducts.txt", Products);
+                File.WriteAllText(settings.OutputDirectory + "\\DuplicatePrices.txt", Prices);
+                File.WriteAllText(settings.OutputDirectory + "\\DuplicateQuantities.txt", Quantities);
 
-            var Duplicates_S5InvAss = InvAss.GroupBy(x => x.Inv.Part).Where(x => x.Count() > 1).Select(x => x.Key);
-            string Inv = string.Join(Environment.NewLine, Duplicates_S5InvAss);
-            File.WriteAllText(settings.OutputDirectory + "\\DuplicateS5Inventory.txt", Inv);
+                var Duplicates_S5InvAss = InvAss.GroupBy(x => x.Inv.Part).Where(x => x.Count() > 1).Select(x => x.Key);
+                string Inv = string.Join(Environment.NewLine, Duplicates_S5InvAss);
+                File.WriteAllText(settings.OutputDirectory + "\\DuplicateS5Inventory.txt", Inv);
+            }
+            catch (Exception ex)
+            {
+                logger.LogInformation("Error occurred in \"" + MethodBase.GetCurrentMethod() + "\" Error message: " + ex.Message);
+            }
         }
         private static void GetEqualityFunctions()
         {
@@ -1376,7 +1468,6 @@ namespace cmArt.Shopify.App
             IEnumerable<IS5InvAssembled> InvAss = InvRaw.ToAssembled();
             return InvAss;
         }
-
 
     }
 }
