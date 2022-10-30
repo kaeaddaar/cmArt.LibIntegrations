@@ -6,6 +6,8 @@ using System.Linq;
 
 namespace UnitTestReeceShopifyApi
 {
+    // The following link will take you to the resource group containing azure functions and other resources being used for testing. This way the tests can be available to external developers.
+    // playinfc@hotmail.ca login: https://portal.azure.com/#@cliffcmartme.onmicrosoft.com/resource/subscriptions/6e23037b-b2da-4c0b-91d1-97e7fc4522dc/resourceGroups/DeltaShopifyIntegrationTests/overview
     [TestClass]
     public class IntegrationTests
     {
