@@ -79,6 +79,7 @@ namespace cmArt.Shopify.App
         //FilterForECommAndSave()
         private static IEnumerable<IS5InvAssembled> ECommInvAss;
         //CreateDataLoadLists()
+        private static TrackUpdateProcess tracker; // start tracking here
         private static IEnumerable<AdaptToShopifyDataLoadFormat> adapters;
         private static IEnumerable<Shopify_Product> PocoProductsAdapted;
         private static IEnumerable<Shopify_Prices> PocoPricesAdapted;
@@ -160,7 +161,7 @@ namespace cmArt.Shopify.App
             logger.LogInformation("Loading Inventory From System Five");
 
             GetSystem5Data();
-
+            var countInvAss = InvAss.Where(x => x.Inv.Ecommerce == "Y").Count();
             DemoPrep_TurnOnEcommFlagForTop3InventoryItemsOfEachCategory();
 
             FilterForECommAndSave();
@@ -676,11 +677,13 @@ namespace cmArt.Shopify.App
                     return tmp;
                 }
                 );
-
+                tracker = new TrackUpdateProcess();
+                
                 logger.LogInformation(" -- Get products from adapter");
                 PocoProductsAdapted = adapters.Select(x => x.AsShopify_Product());
                 prods = PocoProductsAdapted;
                 Reports.SaveReport(prods, "FromSystem5_Products", settings, logger);
+                tracker.Save_PocoProductsAdapted(PocoProductsAdapted);
 
                 logger.LogInformation(" -- Get prices from adapter");
                 PocoPricesAdapted = adapters.Select(x => x.AsShopify_Prices());
