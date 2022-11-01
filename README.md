@@ -3,6 +3,7 @@
 - This is a solution containing the shared code for multiple apps that connect to System Five by Windward Software.
 - The biggest thing the code that connects to System Five does is assemble Inventory data into a usable entity and provide methods to calculate things like price schedules and quantities.
 - IMPORTNAT: A migration to .Net6 has occurred search for cmArt.LibIntegrations.Tools for the .6 version of the code in the cmArt.LibIntegrations namespace. (some code may have been moved to move relevant places. ex: pricing calculations logic moved to the library that handles those calculations)
+  - Link to demos including a couple examples of using the new .Net6 code: https://github.com/cmArt-Solutions/DemosAndPocs 
 - A major challenge of library conflicts was introduced to the project as we started introducing .Net5 and .Net6 projects into the mix.
 
 # cmArt.Shopify.App
