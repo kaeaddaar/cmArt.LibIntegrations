@@ -47,6 +47,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Portal.API", "cmArt.P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmArt.Portal.Data", "cmArt.Portal.Data\cmArt.Portal.Data.csproj", "{24B54786-FEF7-4CFE-B8E2-E35800E819CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShopifyS5IntegrationTheme", "ShopifyS5IntegrationTheme\ShopifyS5IntegrationTheme.csproj", "{5966761E-53A5-41FA-8555-1612F18744C1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -141,6 +143,10 @@ Global
 		{24B54786-FEF7-4CFE-B8E2-E35800E819CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24B54786-FEF7-4CFE-B8E2-E35800E819CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24B54786-FEF7-4CFE-B8E2-E35800E819CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5966761E-53A5-41FA-8555-1612F18744C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5966761E-53A5-41FA-8555-1612F18744C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5966761E-53A5-41FA-8555-1612F18744C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5966761E-53A5-41FA-8555-1612F18744C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

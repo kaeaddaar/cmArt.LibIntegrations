@@ -1,0 +1,10 @@
+{{ content_for_index }}
+{% if customer == null %}
+<script>
+  jQuery( "[aria-label='xxcmArtMember_Loginxx']" ).text("Please Login")
+</script>
+{% else %}
+<script>
+    jQuery( "[aria-label='xxcmArtMember_Loginxx']" ).text("Hello {{ customer.first_name}}")
+</script>
+{% endif %}
