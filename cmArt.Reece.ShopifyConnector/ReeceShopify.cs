@@ -11,6 +11,9 @@ using System.Net;
 using System.Text;
 using System.IO;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using System.Threading;
+using cmArt.LibIntegrations.ApiCallerService;
 
 namespace cmArt.Reece.ShopifyConnector
 {
@@ -91,7 +94,7 @@ namespace cmArt.Reece.ShopifyConnector
             return result;
         }
 
-        private static string MakeApiPostCall(string urlCommand, string content)
+        private static string MakeApiPostCall(string urlCommand, string content, string SessionId = "")
         {
             LogApiCalls("urlCommand(Post): " + urlCommand);
             LogApiCalls("content: " + content);
@@ -120,34 +123,81 @@ namespace cmArt.Reece.ShopifyConnector
             response.EnsureSuccessStatusCode();
             string responseBody = response.Content.ReadAsStringAsync().Result;
 
-            //// Sync Call
-            //WebRequest request = HttpWebRequest.Create(baseUri);
-            //request.ContentType = "application/json, charset=utf-8";
-            //request.Method = "POST";
-
-            //string encoded = System.Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1")
-            //                               .GetBytes(clientId + ":" + clientSecret));
-            //request.Headers.Add("Authorization", "Basic " + encoded);
-
-            //ASCIIEncoding encoding = new ASCIIEncoding();
-            //byte[] data = encoding.GetBytes(content);
-            //request.ContentLength = data.Length;
-            //Stream newStream = request.GetRequestStream(); //open connection
-            //newStream.Write(data, 0, data.Length); // Send the data.
-            //newStream.Close();
-
-            //string text;
-            //var responseSync = (HttpWebResponse)request.GetResponse();
-
-            //using (var sr = new StreamReader(responseSync.GetResponseStream()))
-            //{
-            //    text = sr.ReadToEnd();
-            //}
-
-            //LogApiCalls("responseBody: " + text);
-            //return text;
             LogApiCalls("responseBody: " + responseBody);
             return responseBody;
+        }
+        public static string MakeApiPostCall(ApiCallFormData data, Func<string, int> MakeLogEntry, string ContentType = "", string fileNameAndPath = "")
+        {
+            string urlCommand = data.UrlCommand;
+            Dictionary<string, string> content = data.Body;
+            try
+            {
+                MakeLogEntry("urlCommand: " + urlCommand);
+                foreach (var item in content) { MakeLogEntry("content." + item.Key + ": \"" + item.Value + "\""); }
+            }
+            catch (Exception e)
+            {
+                return "Error in MapApiPostCall_Unsecured while trying to MakeLogEntry. Message: " + e.Message;
+            }
+
+            HttpClient client = new HttpClient();
+
+            Uri baseUri = new Uri(BaseUrl + urlCommand);
+            client.BaseAddress = baseUri;
+            client.DefaultRequestHeaders.Clear();
+
+            client.DefaultRequestHeaders.ConnectionClose = true;
+
+            string clientId = "shopravi";
+            string clientSecret = "H9pPG9yW58cMP45e";
+
+            var authenticationString = $"{clientId}:{clientSecret}";
+            var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
+
+            HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, baseUri);
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+
+            var formContent = new MultipartFormDataContent();
+
+            foreach (var item in content)
+            {
+                formContent.Add(new StringContent(item.Value), item.Key);
+            }
+            if (File.Exists(fileNameAndPath))
+            {
+                formContent.Add(new StreamContent(File.OpenRead(fileNameAndPath)), "file");
+            }
+
+            requestMessage.Content = formContent;
+            string responseBody = MakeApiCall(client, requestMessage, 10);
+
+            return responseBody;
+        }
+        private static string MakeApiCall(HttpClient client, HttpRequestMessage requestMessage, int maxAttempts)
+        {
+            int attempts = 0;
+            int _maxAttempts = maxAttempts;
+            string messages = string.Empty;
+            while (attempts < _maxAttempts)
+            {
+                try
+                {
+                    attempts++;
+                    var task = client.SendAsync(requestMessage);
+                    var response = task.Result;
+                    //response.EnsureSuccessStatusCode();
+                    string responseBody = response.Content.ReadAsStringAsync().Result ?? string.Empty;
+                    return responseBody;
+                }
+                catch (Exception e)
+                {
+                    System.Threading.Thread.Sleep(100 * attempts);
+                    // try again. but maybe do some logging
+                    messages += e.Message + Environment.NewLine;
+                }
+            }
+            return $"Quitting after {_maxAttempts} tries to get MakeApiCall. Messages: {messages}. " +
+                $"RequestUri: {requestMessage.RequestUri}. Content: {requestMessage.Content}. Method: {requestMessage.Method}";
         }
 
         private static string MakeApiGetCall_Unsecured(string urlCommand)
@@ -225,6 +275,79 @@ namespace cmArt.Reece.ShopifyConnector
 
             }
             return results;
+        }
+        public static string CloseOldSession()
+        {
+            throw new NotImplementedException();
+        }
+        public static string OpenSession()
+        {
+            string NewSessionId = Guid.NewGuid().ToString();
+            string SessionIdJson = "{ \"SessionId\": \"" + NewSessionId + "\"}";
+
+            ApiCallFormData data = new ApiCallFormData();
+            data.UrlCommand = "/product/list";
+            data.Body = new Dictionary<string, string>();
+            data.Body.Add("SESSIONID", Guid.NewGuid().ToString());
+            Func<string, int> fLog = (x) => { Console.WriteLine(x); return 1; };
+
+            var strResults = MakeApiPostCall(data, fLog);
+            var results = JObject.Parse(strResults);
+            var message = results["message"] ?? string.Empty;
+            if (message.ToString() == "Update Successful")
+            { return strResults.ToString(); }
+
+            int count = 0;
+            int delayTicks = 10000;
+            int maxCount = 90;
+            string FirstTime;
+            DateTime LastRanTime;
+            DateTime FirstRanTime = new DateTime();
+            DateTime PrevRanTime = new DateTime();
+            bool firstPass = true;
+            while (count < 90)
+            {
+                Thread.Sleep(delayTicks);
+                strResults = MakeApiPostCall("/sessions/open", SessionIdJson);
+                results = JObject.Parse(strResults);
+                message = results["message"] ?? string.Empty;
+                var LastRan = results["Session"]["LastCallTime"];
+                DateTime.TryParse(LastRan.ToString(), out LastRanTime);
+                if (firstPass)
+                {
+                    firstPass = false;
+                    DateTime.TryParse(LastRan.ToString(), out FirstRanTime);
+                }
+
+                if (message.ToString() == "Update Successful")
+                {
+                    string SessionId = results["SessionId"].ToString() ?? string.Empty;
+                    return SessionId; 
+                }
+                bool TimeHasPassed;
+                if (message.ToString() == "Error Message: Session is open and Session IDs are not the same")
+                {
+                    bool MoreThan15MinutesHasPassed = DateTime.UtcNow - LastRanTime > TimeSpan.FromMinutes(15);
+                    if (MoreThan15MinutesHasPassed)
+                    {
+                        // close existing session so we can re-open the new session.
+                        // 01 - Get current SessionId
+                        // 02 - Close the SessionId
+                        return "Error Message: Session failed to be released by the API. The API should return \"Update Successful\" and an updated session";
+                    }
+                }
+
+                TimeHasPassed = PrevRanTime < LastRanTime;
+                if (TimeHasPassed)
+                {
+                    // reset PrevRanTime
+                    PrevRanTime = LastRanTime;
+                }
+
+            }
+
+            return $"Session failed to be opened within {delayTicks/1000/60* maxCount} minutes";
+
         }
         public static string Quantities_Edit(IEnumerable<Shopify_Quantities> QuantitiesList)
         {

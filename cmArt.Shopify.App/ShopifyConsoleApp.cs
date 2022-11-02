@@ -897,6 +897,8 @@ namespace cmArt.Shopify.App
             changes = changes ?? new List<Changes_View>();
 
             ReeceShopify.AddLogger(logger, logger_ApiCalls);
+            string OpenSession_Results = ReeceShopify.OpenSession();
+
             GetShopifyData_Reece_Products();
             GetShopifyData_Reece_Prices();
             GetShopifyData_Reece_Quantities();

@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace cmArt.LibIntegrations.ApiCallerService
 {
@@ -150,6 +151,53 @@ namespace cmArt.LibIntegrations.ApiCallerService
             //var response = task.Result;
             ////response.EnsureSuccessStatusCode();
             //string responseBody = response.Content.ReadAsStringAsync().Result ?? string.Empty;
+
+            return responseBody;
+        }
+        protected string MakeApiPostCall(ApiCallFormData data, Func<string, int> MakeLogEntry, string ContentType = "", string fileNameAndPath = "")
+        {
+            string urlCommand = data.UrlCommand;
+            Dictionary<string, string> content = data.Body;
+            try
+            {
+                MakeLogEntry("urlCommand: " + urlCommand);
+                foreach (var item in content) { MakeLogEntry("content." + item.Key + ": \"" + item.Value + "\""); }
+            }
+            catch (Exception e)
+            {
+                return "Error in MapApiPostCall_Unsecured while trying to MakeLogEntry. Message: " + e.Message;
+            }
+
+            HttpClient client = new HttpClient();
+
+            Uri baseUri = new Uri(_ApiConnectorData.Url + urlCommand);
+            client.BaseAddress = baseUri;
+            client.DefaultRequestHeaders.Clear();
+
+            client.DefaultRequestHeaders.ConnectionClose = true;
+
+            string clientId = _ApiConnectorData.UserName;
+            string clientSecret = _ApiConnectorData.Password;
+
+            var authenticationString = $"{clientId}:{clientSecret}";
+            var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
+
+            HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, baseUri);
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+
+            var formContent = new MultipartFormDataContent();
+
+            foreach (var item in content)
+            {
+                formContent.Add(new StringContent(item.Value), item.Key);
+            }
+            if (File.Exists(fileNameAndPath))
+            {
+                formContent.Add(new StreamContent(File.OpenRead(fileNameAndPath)), "file");
+            }
+
+            requestMessage.Content = formContent;
+            string responseBody = MakeApiCall(client, requestMessage, 10);
 
             return responseBody;
         }

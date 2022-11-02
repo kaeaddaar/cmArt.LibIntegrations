@@ -16,6 +16,10 @@ using System.Threading.Tasks;
 
 namespace cmArt.Reece.ShopifyConnector
 {
+    /// <summary>
+    /// This class is used when talking to Reece's API through a Blazor app. Essentially I proxy the calls through an azure function.
+    /// WARNING: Prior to 2022-10-30 this is set up to run through localhost calls and I still haven't changed this. 
+    /// </summary>
     public class ReeceShopifyAzFunc
      {
         protected static ILogger _logger;
