@@ -96,6 +96,7 @@ namespace cmArt.Shopify.App
         private static Func<IShopify_Prices, IShopify_Prices, bool> fEquals_Prices;
         private static Func<IShopify_Quantities, IShopify_Quantities, bool> fEquals_Quantities;
         private static Func<IShopify_Product, IShopify_Product, bool> fEquals_Product;
+        private static string OpenSession_Results;
         //GetShopifyData_Reece_Products()
         private static IEnumerable<Shopify_Product> API_Products;
         private static IEnumerable<Shopify_Prices> API_Prices;
@@ -219,11 +220,11 @@ namespace cmArt.Shopify.App
                     if (sendAllProductsToBeEdited)
                     {
                         IEnumerable<Shopify_Product> objProds = prods.Select(x => x.AsShopify_Product());
-                        Product_Edit_Results = ReeceShopify.Products_Edit(objProds);
+                        Product_Edit_Results = ReeceShopify.Products_Edit(objProds, OpenSession_Results);
                     }
                     else
                     {
-                        Product_Edit_Results = ReeceShopify.Products_Edit(changedProducts);
+                        Product_Edit_Results = ReeceShopify.Products_Edit(changedProducts, OpenSession_Results);
                     }
 
                     string FileNameChangedProducts = settings.OutputDirectory + "\\changedProducts.json.txt";
@@ -243,7 +244,7 @@ namespace cmArt.Shopify.App
                 {
                     logger.LogInformation("Performing Edits on Changed Prices");
                     logger.LogInformation($"Number of Changed Prices {changedPrices.Count()}");
-                    Prices_Edit_Results = ReeceShopify.Prices_Edit(changedPrices);
+                    Prices_Edit_Results = ReeceShopify.Prices_Edit(changedPrices, OpenSession_Results);
                     string FileNameChangedPrices = settings.OutputDirectory + "\\changedPrices.json.txt";
                     string content = System.Text.Json.JsonSerializer.Serialize(changedPrices.ToList(), typeof(List<Shopify_Prices>));
                     System.IO.File.WriteAllText(FileNameChangedPrices, content);
@@ -256,7 +257,7 @@ namespace cmArt.Shopify.App
                 {
                     logger.LogInformation("Performing Edits on Changed Quantities");
                     logger.LogInformation($"Number of Changed Quantities: {changedQuantities.Count()}");
-                    Quantities_Edit_Results = ReeceShopify.Quantities_Edit(changedQuantities);
+                    Quantities_Edit_Results = ReeceShopify.Quantities_Edit(changedQuantities, OpenSession_Results);
                     string FileNameChangedQuantities = settings.OutputDirectory + "\\changedQuantities.json.txt";
                     string content = System.Text.Json.JsonSerializer.Serialize(changedQuantities.ToList(), typeof(List<Shopify_Quantities>));
                     System.IO.File.WriteAllText(FileNameChangedQuantities, content);
@@ -286,7 +287,7 @@ namespace cmArt.Shopify.App
                 {
                     logger.LogInformation("Performing Products_Add on NewProducts");
                     logger.LogInformation($"Number of records in NewProducts: {NewProducts.Count()}");
-                    string Product_Add_Results = ReeceShopify.Products_Add(NewProducts);
+                    string Product_Add_Results = ReeceShopify.Products_Add(NewProducts, OpenSession_Results);
                 }
                 else { logger.LogInformation("Prevented adding of NewProducts"); }
             }
@@ -320,7 +321,7 @@ namespace cmArt.Shopify.App
 
                     foreach (var page in Pages_Prices)
                     {
-                        string strTempPrice_Add_Results = ReeceShopify.Prices_Add(NewPrices);
+                        string strTempPrice_Add_Results = ReeceShopify.Prices_Add(NewPrices, OpenSession_Results);
                         Prices_Add_Results += strTempPrice_Add_Results;
                     }
                 }
@@ -353,7 +354,7 @@ namespace cmArt.Shopify.App
                     logger.LogInformation($"Number of records in NewQuantities: {NewQuantities.Count()}");
                     foreach (var page in Pages_Quantities)
                     {
-                        string tmpString = ReeceShopify.Quantities_Add(page);
+                        string tmpString = ReeceShopify.Quantities_Add(page, OpenSession_Results);
                         Quantities_Add_Results += tmpString;
                     }
                 }
@@ -789,7 +790,7 @@ namespace cmArt.Shopify.App
             API_Products = new List<Shopify_Product>();
             try
             {
-                API_Products = ReeceShopify.GetAllShopify_Products();
+                API_Products = ReeceShopify.GetAllShopify_Products(OpenSession_Results);
                 logger.LogInformation($"Saving Shopify Products for ShopifyAPI_Products");
                 try
                 {
@@ -815,7 +816,7 @@ namespace cmArt.Shopify.App
             IEnumerable<tmpShopify_Prices> tmpPrices = new List<tmpShopify_Prices>();
             try
             {
-                tmpPrices = ReeceShopify.GetAlltmpShopify_Prices();
+                tmpPrices = ReeceShopify.GetAlltmpShopify_Prices(OpenSession_Results);
                 string FileOrTableName = "ShopifyAPI_Prices";
                 logger.LogInformation($"Saving Shopify Prices to file: {FileOrTableName}");
                 try
@@ -857,7 +858,7 @@ namespace cmArt.Shopify.App
             IEnumerable<tmpShopify_Quantities> tmpApi_Quantities = new List<tmpShopify_Quantities>();
             try
             {
-                tmpApi_Quantities = ReeceShopify.GetAlltmpShopify_Quantities();
+                tmpApi_Quantities = ReeceShopify.GetAlltmpShopify_Quantities(OpenSession_Results);
                 string FileOrTableName = "ShopifyAPI_Quantities";
                 logger.LogInformation($"Saving Shopify Quantities to file: {FileOrTableName}");
                 try
@@ -897,7 +898,7 @@ namespace cmArt.Shopify.App
             changes = changes ?? new List<Changes_View>();
 
             ReeceShopify.AddLogger(logger, logger_ApiCalls);
-            string OpenSession_Results = ReeceShopify.OpenSession();
+            OpenSession_Results = ReeceShopify.OpenSession();
 
             GetShopifyData_Reece_Products();
             GetShopifyData_Reece_Prices();
@@ -1217,7 +1218,7 @@ namespace cmArt.Shopify.App
             IEnumerable<Shopify_Product> ToDelete = map_Product.TOnly.Select(x => x.Item1);
             foreach(var record in ToDelete)
             {
-                ReeceShopify.Products_Delete(ToDelete);
+                ReeceShopify.Products_Delete(ToDelete, OpenSession_Results);
             }
         }
         private static void PauseToGiveSomeTimeForNewProductsToLoad(int numNewProducts)

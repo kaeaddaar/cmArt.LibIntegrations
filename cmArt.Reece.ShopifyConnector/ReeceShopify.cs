@@ -94,7 +94,7 @@ namespace cmArt.Reece.ShopifyConnector
             return result;
         }
 
-        private static string MakeApiPostCall(string urlCommand, string content, string SessionId = "")
+        private static string MakeApiPostCall(string urlCommand, string content, string SessionId)
         {
             LogApiCalls("urlCommand(Post): " + urlCommand);
             LogApiCalls("content: " + content);
@@ -252,9 +252,60 @@ namespace cmArt.Reece.ShopifyConnector
             LogApiCalls("responseBody: " + responseBody);
             return responseBody;
         }
-        public static string Quantities_Add(IEnumerable<Shopify_Quantities> QuantitiesList)
+        private static string MakeApiGetCall(ApiCallFormData data, Func<string, int> MakeLogEntry)
+        {
+            string urlCommand = data.UrlCommand;
+            Dictionary<string, string> content = data.Body;
+            try
+            {
+                MakeLogEntry("urlCommand: " + urlCommand);
+                foreach (var item in content) { MakeLogEntry("content." + item.Key + ": \"" + item.Value + "\""); }
+            }
+            catch (Exception e)
+            {
+                return "Error in MapApiPostCall_Unsecured while trying to MakeLogEntry. Message: " + e.Message;
+            }
+            LogApiCalls("urlCommand(Get - Secured): " + data.UrlCommand);
+            HttpClient client = new HttpClient();
+            client.Timeout = TimeSpan.FromMinutes(Api_Timeout_Max);
+
+            Uri baseUri = new Uri(BaseUrl + data.UrlCommand);
+            client.BaseAddress = baseUri;
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.ConnectionClose = true;
+
+            string clientId = "shopravi";
+            string clientSecret = "H9pPG9yW58cMP45e";
+
+            var authenticationString = $"{clientId}:{clientSecret}";
+            var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, baseUri);
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+
+            var formContent = new MultipartFormDataContent();
+
+            foreach (var item in content)
+            {
+                formContent.Add(new StringContent(item.Value), item.Key);
+            }
+
+            requestMessage.Content = formContent;
+
+            var task = client.SendAsync(requestMessage);
+            var response = task.Result;
+            response.EnsureSuccessStatusCode();
+            string responseBody = response.Content.ReadAsStringAsync().Result;
+
+            LogApiCalls("responseBody: " + responseBody);
+            return responseBody;
+        }
+        public static string Quantities_Add(IEnumerable<Shopify_Quantities> QuantitiesList, string SessionId)
         {
             LogInfo("Begin Quantities_Add(IEnumerable<Shopify_Quantities> QuantitiesList)");
+            string ApiSessionId = GetSession();
+            if (ApiSessionId != SessionId) { throw new Exception($"Sessions no longer match. API SessionId is {ApiSessionId}, while the SessionId we are using is {SessionId}"); }
+
             string strQuantitiesList = string.Empty;
             string results = string.Empty;
             foreach (var qtys in QuantitiesList)
@@ -265,7 +316,7 @@ namespace cmArt.Reece.ShopifyConnector
                     List<Shopify_Quantities> tmpQuantitiesList = new List<Shopify_Quantities>();
                     tmpQuantitiesList.Add(qtys);
                     strQuantitiesList = System.Text.Json.JsonSerializer.Serialize(tmpQuantitiesList.ToList(), typeof(List<Shopify_Quantities>));
-                    results += MakeApiPostCall("/inventory/create", strQuantitiesList);
+                    results += MakeApiPostCall("/inventory/create", strQuantitiesList, SessionId);
                 }
                 catch (Exception e)
                 {
@@ -285,17 +336,20 @@ namespace cmArt.Reece.ShopifyConnector
             string NewSessionId = Guid.NewGuid().ToString();
             string SessionIdJson = "{ \"SessionId\": \"" + NewSessionId + "\"}";
 
-            ApiCallFormData data = new ApiCallFormData();
-            data.UrlCommand = "/product/list";
-            data.Body = new Dictionary<string, string>();
-            data.Body.Add("SESSIONID", Guid.NewGuid().ToString());
+            ApiCallData data = new ApiCallData();
+            data.UrlCommand = "/sessions/open";
+            data.Body = SessionIdJson;
+
             Func<string, int> fLog = (x) => { Console.WriteLine(x); return 1; };
 
-            var strResults = MakeApiPostCall(data, fLog);
+            var strResults = MakeApiPostCall(data.UrlCommand, data.Body, NewSessionId);
             var results = JObject.Parse(strResults);
             var message = results["message"] ?? string.Empty;
             if (message.ToString() == "Update Successful")
-            { return strResults.ToString(); }
+            {
+                string SessionId = (results["Session"]["SessionId"] ?? string.Empty).ToString() ?? string.Empty;
+                return SessionId;
+            }
 
             int count = 0;
             int delayTicks = 10000;
@@ -308,7 +362,7 @@ namespace cmArt.Reece.ShopifyConnector
             while (count < 90)
             {
                 Thread.Sleep(delayTicks);
-                strResults = MakeApiPostCall("/sessions/open", SessionIdJson);
+                strResults = MakeApiPostCall("/sessions/open", SessionIdJson, NewSessionId);
                 results = JObject.Parse(strResults);
                 message = results["message"] ?? string.Empty;
                 var LastRan = results["Session"]["LastCallTime"];
@@ -351,9 +405,28 @@ namespace cmArt.Reece.ShopifyConnector
             return $"Session failed to be opened within {delayTicks/1000/60* maxCount} minutes";
 
         }
-        public static string Quantities_Edit(IEnumerable<Shopify_Quantities> QuantitiesList)
+        public static string GetSession()
+        {
+            string NewSessionId = Guid.NewGuid().ToString();
+            string SessionIdJson = "{ \"SessionId\": \"" + NewSessionId + "\"}";
+
+            ApiCallFormData data = new ApiCallFormData();
+            data.UrlCommand = "/sessions/list";
+            data.Body = new Dictionary<string, string>();
+            data.Body.Add("SESSIONID", Guid.NewGuid().ToString());
+            Func<string, int> fLog = (x) => { Console.WriteLine(x); return 1; };
+
+            var strResults = MakeApiGetCall(data, fLog);
+            var results = JArray.Parse(strResults);
+            var SessionId = results[0]["SessionId"] ?? string.Empty;
+            return SessionId.ToString();
+        }
+        public static string Quantities_Edit(IEnumerable<Shopify_Quantities> QuantitiesList, string SessionId)
         {
             LogInfo("Begin Quantities_Edit(IEnumerable<Shopify_Quantities> QuantitiesList)");
+            string ApiSessionId = GetSession();
+            if (ApiSessionId != SessionId) { throw new Exception($"Sessions no longer match. API SessionId is {ApiSessionId}, while the SessionId we are using is {SessionId}"); }
+
             string strQuantitiesList = string.Empty;
             string results = string.Empty;
             foreach (var qtys in QuantitiesList)
@@ -364,7 +437,7 @@ namespace cmArt.Reece.ShopifyConnector
                     List<Shopify_Quantities> tmpQuantitiesList = new List<Shopify_Quantities>();
                     tmpQuantitiesList.Add(qtys);
                     strQuantitiesList = System.Text.Json.JsonSerializer.Serialize(tmpQuantitiesList.ToList(), typeof(List<Shopify_Quantities>));
-                    results += MakeApiPostCall("/inventory/edit", strQuantitiesList);
+                    results += MakeApiPostCall("/inventory/edit", strQuantitiesList, SessionId);
                 }
                 catch (Exception e)
                 {
@@ -375,9 +448,12 @@ namespace cmArt.Reece.ShopifyConnector
             }
             return results;
         }
-        public static string Prices_Add(IEnumerable<Shopify_Prices> PricesList)
+        public static string Prices_Add(IEnumerable<Shopify_Prices> PricesList, string SessionId)
         {
             LogInfo("Begin Prices_Add(IEnumerable<Shopify_Prices> PricesList)");
+            string ApiSessionId = GetSession();
+            if (ApiSessionId != SessionId) { throw new Exception($"Sessions no longer match. API SessionId is {ApiSessionId}, while the SessionId we are using is {SessionId}"); }
+
             IEnumerable<Shopify_Prices> _PricesList = PricesList ?? new List<Shopify_Prices>();
             string results = string.Empty;
             foreach (Shopify_Prices prices in PricesList)
@@ -395,7 +471,7 @@ namespace cmArt.Reece.ShopifyConnector
                 }
                 try
                 {
-                    results += MakeApiPostCall("/discount/create", strPricesList);
+                    results += MakeApiPostCall("/discount/create", strPricesList, SessionId);
                 }
                 catch (Exception e)
                 {
@@ -405,9 +481,12 @@ namespace cmArt.Reece.ShopifyConnector
             }
             return results;
         }
-        public static string Prices_Edit(IEnumerable<Shopify_Prices> PricesList)
+        public static string Prices_Edit(IEnumerable<Shopify_Prices> PricesList, string SessionId)
         {
             LogInfo("Begin Prices_Edit(IEnumerable<Shopify_Prices> PricesList)");
+            string ApiSessionId = GetSession();
+            if (ApiSessionId != SessionId) { throw new Exception($"Sessions no longer match. API SessionId is {ApiSessionId}, while the SessionId we are using is {SessionId}"); }
+
             IEnumerable<Shopify_Prices> _PricesList = PricesList ?? new List<Shopify_Prices>();
             string results = string.Empty;
             foreach (Shopify_Prices prices in PricesList)
@@ -423,38 +502,50 @@ namespace cmArt.Reece.ShopifyConnector
                 {
                     LogInfo("Failed to serialize PricesList in preparation to call to /discounts/edit. Message: " + e.Message);
                 }
-                results += MakeApiPostCall("/discount/edit", strPricesList);
+                results += MakeApiPostCall("/discount/edit", strPricesList, SessionId);
             }
             return results;
         }
-        public static string Products_Sync()
+        public static string Products_Sync(string SessionId)
         {
             LogInfo("Products_Sync()");
+            string ApiSessionId = GetSession();
+            if (ApiSessionId != SessionId) { throw new Exception($"Sessions no longer match. API SessionId is {ApiSessionId}, while the SessionId we are using is {SessionId}"); }
+
             string results = MakeApiGetCall("/product/shopify") ?? string.Empty;
             return results;
         }
-        public static string Discounts_Sync()
+        public static string Discounts_Sync(string SessionId)
         {
             LogInfo("Discounts_Sync()");
+            string ApiSessionId = GetSession();
+            if (ApiSessionId != SessionId) { throw new Exception($"Sessions no longer match. API SessionId is {ApiSessionId}, while the SessionId we are using is {SessionId}"); }
+
             string results = MakeApiGetCall("/discount/shopify") ?? string.Empty;
             return results;
         }
-        public static string Inventory_Sync()
+        public static string Inventory_Sync(string SessionId)
         {
             LogInfo("Inventory_Sync()");
+            string ApiSessionId = GetSession();
+            if (ApiSessionId != SessionId) { throw new Exception($"Sessions no longer match. API SessionId is {ApiSessionId}, while the SessionId we are using is {SessionId}"); }
+
             string results = MakeApiGetCall("/inventory/shopify") ?? string.Empty;
             return results;
         }
-        public static string Products_DeleteAll()
+        public static string Products_DeleteAll(string SessionId)
         {
             LogInfo("Products_DeleteAll()");
+            string ApiSessionId = GetSession();
+            if (ApiSessionId != SessionId) { throw new Exception($"Sessions no longer match. API SessionId is {ApiSessionId}, while the SessionId we are using is {SessionId}"); }
+
             try
             {
                 //get all products
-                IEnumerable<Shopify_Product> allProducts = GetAllShopify_Products();
+                IEnumerable<Shopify_Product> allProducts = GetAllShopify_Products(SessionId);
 
                 //delete all of them
-                string results = Products_Delete(allProducts);
+                string results = Products_Delete(allProducts, SessionId);
                 return results;
             }
             catch (Exception e)
@@ -464,14 +555,17 @@ namespace cmArt.Reece.ShopifyConnector
                 return msg;
             }
         }
-        public static string Products_Delete(IEnumerable<Shopify_Product> ProductsToDelete)
+        public static string Products_Delete(IEnumerable<Shopify_Product> ProductsToDelete, string SessionId)
         {
             LogInfo("Begin Products_Delete(IEnumerable<Shopify_Product> ProductsToDelete)");
+            string ApiSessionId = GetSession();
+            if (ApiSessionId != SessionId) { throw new Exception($"Sessions no longer match. API SessionId is {ApiSessionId}, while the SessionId we are using is {SessionId}"); }
+
             try
             { 
                 List<Shopify_Product> prods = new List<Shopify_Product>(ProductsToDelete);
                 string strEditProducts = JsonSerializer.Serialize(prods, typeof(List<Shopify_Product>));
-                string results = MakeApiPostCall("/product/delete/", strEditProducts);
+                string results = MakeApiPostCall("/product/delete/", strEditProducts, SessionId);
                 return results;
             }
             catch (Exception e)
@@ -481,9 +575,12 @@ namespace cmArt.Reece.ShopifyConnector
                 return msg;
             }
         }
-        public static string Products_Add(IEnumerable<Shopify_Product> NewProducts)
+        public static string Products_Add(IEnumerable<Shopify_Product> NewProducts, string SessionId)
         {
             LogInfo("Begin Products_Add(IEnumerable<Shopify_Product> NewProducts)");
+            string ApiSessionId = GetSession();
+            if (ApiSessionId != SessionId) { throw new Exception($"Sessions no longer match. API SessionId is {ApiSessionId}, while the SessionId we are using is {SessionId}"); }
+
             int pageSize = 10;
             int page = 0;
             int count = NewProducts.Count();
@@ -496,7 +593,7 @@ namespace cmArt.Reece.ShopifyConnector
                 {
                     List<Shopify_Product> prods = NewProducts.Skip(StartAt).Take(pageSize).ToList();
                     string strNewProducts = JsonSerializer.Serialize(prods, typeof(List<Shopify_Product>));
-                    results += MakeApiPostCall("/product/add/", strNewProducts) ?? string.Empty;
+                    results += MakeApiPostCall("/product/add/", strNewProducts, SessionId) ?? string.Empty;
                 }
                 catch (Exception e)
                 {
@@ -511,9 +608,12 @@ namespace cmArt.Reece.ShopifyConnector
             LogInfo("(" + page + ")");
             return results;
         }
-        public static string Products_Edit(IEnumerable<Shopify_Product> ProductsToEdit)
+        public static string Products_Edit(IEnumerable<Shopify_Product> ProductsToEdit, string SessionId)
         {
             LogInfo("Begin Products_Edit(IEnumerable<Shopify_Product> ProductsToEdit)");
+            string ApiSessionId = GetSession();
+            if (ApiSessionId != SessionId) { throw new Exception($"Sessions no longer match. API SessionId is {ApiSessionId}, while the SessionId we are using is {SessionId}"); }
+
             IEnumerable<Shopify_Product> _ProductsToEdit = ProductsToEdit ?? new List<Shopify_Product>();
             int total = _ProductsToEdit.Count();
             int pageSize = 10;
@@ -529,7 +629,7 @@ namespace cmArt.Reece.ShopifyConnector
                 { 
                     List<Shopify_Product> prods = new List<Shopify_Product>(PageOfProductsToEdit);
                     string strEditProducts = JsonSerializer.Serialize(prods, typeof(List<Shopify_Product>));
-                    string tmpResults = MakeApiPostCall("/product/edit/", strEditProducts);
+                    string tmpResults = MakeApiPostCall("/product/edit/", strEditProducts, SessionId);
                     results += tmpResults;
                 }
                 catch (Exception e)
@@ -546,10 +646,13 @@ namespace cmArt.Reece.ShopifyConnector
             LogInfo("(" + pageNum + ")");
             return "No Records Processed";
         }
-        public static IEnumerable<Shopify_Product> GetAllShopify_Products()
+        public static IEnumerable<Shopify_Product> GetAllShopify_Products(string SessionId)
         {
             LogInfo("GetAllShopify_Products()");
-            Products_Sync();
+            string ApiSessionId = GetSession();
+            if (ApiSessionId != SessionId) { throw new Exception($"Sessions no longer match. API SessionId is {ApiSessionId}, while the SessionId we are using is {SessionId}"); }
+
+            Products_Sync(SessionId);
             string results = MakeApiGetCall("/product/list");
             List<tmpShopify_Product> Data = new List<tmpShopify_Product>();
             try
@@ -562,10 +665,13 @@ namespace cmArt.Reece.ShopifyConnector
             }
             return Data.Select(p => p.AsShopify_Product());
         }
-        public static IEnumerable<tmpShopify_Prices> GetAlltmpShopify_Prices()
+        public static IEnumerable<tmpShopify_Prices> GetAlltmpShopify_Prices(string SessionId)
         {
             LogInfo("GetAlltmpShopify_Prices()");
-            Discounts_Sync();
+            string ApiSessionId = GetSession();
+            if (ApiSessionId != SessionId) { throw new Exception($"Sessions no longer match. API SessionId is {ApiSessionId}, while the SessionId we are using is {SessionId}"); }
+
+            Discounts_Sync(SessionId);
             try
             {
                 string results = MakeApiGetCall("/discount/list");
@@ -581,10 +687,13 @@ namespace cmArt.Reece.ShopifyConnector
                 return new List<tmpShopify_Prices>();
             }
         }
-        public static IEnumerable<tmpShopify_Quantities> GetAlltmpShopify_Quantities()
+        public static IEnumerable<tmpShopify_Quantities> GetAlltmpShopify_Quantities(string SessionId)
         {
             LogInfo("GetAlltmpShopify_Quantities()");
-            Inventory_Sync();
+            string ApiSessionId = GetSession();
+            if (ApiSessionId != SessionId) { throw new Exception($"Sessions no longer match. API SessionId is {ApiSessionId}, while the SessionId we are using is {SessionId}"); }
+
+            Inventory_Sync(SessionId);
             string results = MakeApiGetCall("/inventory/list");
             results = results.Replace("\"id\":null,", string.Empty);
             List<tmpShopify_Quantities> Data = new List<tmpShopify_Quantities>();
