@@ -321,8 +321,16 @@ namespace cmArt.Reece.ShopifyConnector
 
                 if (message.ToString() == "Update Successful")
                 {
-                    string SessionId = results["SessionId"].ToString() ?? string.Empty;
-                    return SessionId; 
+                    var tmpSession = results["Session"];
+                    if (tmpSession == null)
+                    {
+                        return "Update Successful";
+                    }
+                    else
+                    {
+                        string SessionId = (results["Session"]["SessionId"] ?? string.Empty).ToString() ?? string.Empty;
+                        return SessionId;
+                    }
                 }
                 bool TimeHasPassed;
                 if (message.ToString() == "Error Message: Session is open and Session IDs are not the same")
@@ -337,12 +345,6 @@ namespace cmArt.Reece.ShopifyConnector
                     }
                 }
 
-                TimeHasPassed = PrevRanTime < LastRanTime;
-                if (TimeHasPassed)
-                {
-                    // reset PrevRanTime
-                    PrevRanTime = LastRanTime;
-                }
 
             }
 
