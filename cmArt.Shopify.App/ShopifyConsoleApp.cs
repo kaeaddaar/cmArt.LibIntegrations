@@ -162,6 +162,7 @@ namespace cmArt.Shopify.App
             logger.LogInformation("Loading Inventory From System Five");
 
             GetSystem5Data();
+
             var countInvAss = InvAss.Where(x => x.Inv.Ecommerce == "Y").Count();
             DemoPrep_TurnOnEcommFlagForTop3InventoryItemsOfEachCategory();
 
@@ -616,6 +617,7 @@ namespace cmArt.Shopify.App
                 {
                     logger.LogInformation("Loading System Five Data via ODBC");
                     InvAss = GetDataFromSystemFive(config);
+                    CacheAssembledInventory();
                 }
 
             }
@@ -625,6 +627,12 @@ namespace cmArt.Shopify.App
                 throw new Exception_WhileGettingData("An error occured Getting Data From System Five.", e);
             }
             logger.LogInformation("Finished - Loading Inventory From Real Windward");
+        }
+        private static void CacheAssembledInventory()
+        {
+            const string TableNameToUse = "S5InventoryAssembled";
+            GenericSerialization<IS5InvAssembled>.RemoveCachedFileNamesFromDirectory(settings.CachedFiles, TableNameToUse);
+            GenericSerialization<IS5InvAssembled>.SerializeToJSON(InvAss.ToList(), TableNameToUse, settings.CachedFiles, 1000);
         }
         private static void DemoPrep_TurnOnEcommFlagForTop3InventoryItemsOfEachCategory()
         {
