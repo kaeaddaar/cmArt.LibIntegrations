@@ -1,6 +1,6 @@
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+app.MapGet("/", () => "See the \"ShopifyThemeFolders\" folder for the theme files exported from Shopify");
 
 app.Run();

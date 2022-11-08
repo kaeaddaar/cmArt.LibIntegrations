@@ -218,16 +218,28 @@
             <div class="product-single__description rte">
             
               <p>{{ product.description }} </p> 
-              <p id="sizeOne"></p>
+              <table id="product_Details"></table>            
               {% assign s5data = product.metafields.custom.s5data %}
               <script>
-                 var s5Data = {{ s5data }};
+                 var s5Data = ({{ s5data }});
+            
+                 var rows = "";
+                 for (const key in s5Data) {
+                      value = s5Data[key];
+                      
+                      if(value){
+                        row = '<tr><td>'+ key+ '</td><td>'+value+'</td></tr>';
+                        rows = rows + row;
+                      }
+                      
 
-                 var size1 = s5Data.size1;
-                 console.log(size1);
-                 jQuery('#sizeOne').text(size1);
-                  
+                  }
+                  console.log(rows); 
+            
+                  jQuery('#product_Details').html(rows);
+
               </script>
+
             </div>
             <div class="product-form__controls-group product-form__controls-group--submit">
               <div class="product-form__item product-form__item--submit

@@ -41,9 +41,8 @@
    
   var price_schedule = '{% for tag in customer.tags %} {{ tag }} {% endfor %}';
   var level = price_schedule.split('-')[1];
-  var level = 12;
   var discount_code = sku +"-"+ level;
-    
+  <script>console.log('test'); </script>  
     
   $.ajax({
       type: 'POST',
@@ -57,7 +56,7 @@
         var c = parseFloat(pieces[1]).toFixed(2);
         //c =(-1)*c;
         var discount_price = c;
-        
+
         console.log(discount_price);
         console.log(regular_price);
         

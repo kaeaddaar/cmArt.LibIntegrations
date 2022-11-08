@@ -7040,3 +7040,11 @@ hr {
 .price--on-sale .price__badge--sale {
     display: none;
 }
+
+ .page-width {
+    max-width: 100%;
+}
+.template-page .medium-up--four-fifths {
+    width: 100%;
+    left: 0 !important;
+}
