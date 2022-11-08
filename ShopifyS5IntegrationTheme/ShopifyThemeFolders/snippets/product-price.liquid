@@ -56,7 +56,7 @@
     {%- endcomment -%}
   <script>
     
-  var sku = "{{ product.title }}";
+  var sku = '{{ product.title }}';
    
   var price_schedule = '{% for tag in customer.tags %} {{ tag }} {% endfor %}';
   var level = price_schedule.split('-')[1];
