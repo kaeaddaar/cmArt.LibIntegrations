@@ -239,8 +239,6 @@
                           + '</td><td>'+value+'</td></tr>';
                         rows = rows + row;
                       }
-                      
-
                   }
                   console.log(rows); 
             
@@ -248,6 +246,29 @@
 
               </script>
 
+<!--
+              <table id="product_Pricing"></table>            
+              {% assign s5pricing = product.metafields.custom.s5pricing %}
+              <script>
+                 var s5Pricing = ({{ s5pricing }});
+            
+                 var rows = "";
+                 for (const key in s5Pricing) {
+                      value = s5Pricing[key];
+                      
+                      if(value){
+                        row = '<tr><td>'+ key + '</td><td>'+value +'</td></tr>';
+                        rows = rows + row;
+                      }
+
+                  }
+                  console.log(rows); 
+            
+                  jQuery('#product_Pricing').html(rows);
+
+              </script>
+-->
+            
             </div>
             <div class="product-form__controls-group product-form__controls-group--submit">
               <div class="product-form__item product-form__item--submit

@@ -49,8 +49,24 @@
       url: "https://aquadragonservices.com/pcr/apitest/shopifydiscountpull.php",
       success: function(response) {
         //console.log(response);
-           
+  
+        {% assign s5pricing = product.metafields.custom.s5pricing %}
+        var s5Pricing = ({{ s5pricing }});
         pieces = response.split("-");
+        console.log("s5Pricing:"+s5Pricing);
+        console.log("response:"+response);
+  
+        var price_schedule = '{% for tag in customer.tags %} {{ tag }} {% endfor %}';
+        var level = price_schedule.split('-')[1];
+        
+        console.log("level:" + level);
+        theResponse = s5Pricing["Schedule-1"];
+        console.log("theResponse:"+theResponse);
+        if (false)
+        {
+          pieces = theResponse.split("-");
+        }
+
         var regular_price = parseFloat(pieces[2]).toFixed(2);
         var c = parseFloat(pieces[1]).toFixed(2);
         //c =(-1)*c;
