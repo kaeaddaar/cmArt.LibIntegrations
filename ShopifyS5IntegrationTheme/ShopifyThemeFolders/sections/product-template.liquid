@@ -228,7 +228,15 @@
                       value = s5Data[key];
                       
                       if(value){
-                        row = '<tr><td>'+ key+ '</td><td>'+value+'</td></tr>';
+                        row = '<tr><td>'+ key.replace("QuantityDept1", "In Stock Kamloops, BC")
+                          .replace("QuantityDept2", "In Stock Kelowna, BC")
+                          .replace("QuantityDept3", "In Stock OK Falls, BC")
+                          .replace("QuantityDept4", "In Stock Taber, AB")
+                          .replace("QuantityDept5", "In Stock Medicine Hat, AB")
+                          .replace("QuantityDept6", "In Stock Duncan, BC")
+                          .replace("QuantityDept7", "In Stock Chilliwack, BC")
+                          .replace("QuantityDept8", "In Stock Department 8")
+                          + '</td><td>'+value+'</td></tr>';
                         rows = rows + row;
                       }
                       
