@@ -31,6 +31,30 @@ namespace UnitTestAssembleS5Inventory
             const decimal sched1 = (decimal)59.99;
             Assert.AreEqual(sched1, prices.Last().Price);
         }
+        [TestMethod]
+        public void Test_Calculating_Regular_And_Sale_Prices_Simple()
+        {
+            S5Inventory InvRaw = Get_Sample_S5Inventory_for_one_Inventory_Item();
+
+            IEnumerable<IS5InvAssembled> InvAss = InvRaw.ToAssembled();
+            var FirstRecord = InvAss.First();
+
+            var Bases = FirstRecord.InvPrices_PerInventry_27.PopulateBasePriceSchedInfo_NoPrice(FirstRecord.Inv, 0, 0, 0);
+            // in CalculateBasePriceSchedules the prices for those base price schedules aren't calculated, but should be
+            var prices = Bases.CalculatePrices(FirstRecord.InvPrices_PerInventry_27);
+
+            const decimal sched0 = (decimal)69.99;
+            Assert.AreEqual(sched0, prices.Where(x => x.Level == 0).First().Price);
+            const decimal sched1 = (decimal)59.99;
+            Assert.AreEqual(sched1, prices.Where(x => x.Level == 1).Last().Price);
+
+            var sale_prices = Bases.CalculateSalePrices(FirstRecord.InvPrices_PerInventry_27);
+
+            const decimal sched0_sale = (decimal)43.5;
+            Assert.AreEqual(sched0_sale, sale_prices.Where(x => x.Level == 0).First().Price);
+            const decimal sched1_sale = (decimal)31.4955;
+            Assert.AreEqual(sched1_sale, sale_prices.Where(x => x.Level == 1).First().Price);
+        }
         private S5Inventory Get_Sample_S5Inventory_for_one_Inventory_Item()
         {
             List<Inventry_27> RawInventoryRecords = new List<Inventry_27>();

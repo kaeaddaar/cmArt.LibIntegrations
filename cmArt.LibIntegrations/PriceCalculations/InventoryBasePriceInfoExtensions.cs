@@ -155,6 +155,97 @@ namespace cmArt.LibIntegrations.PriceCalculations
             return views;
         }
 
+        public static IEnumerable<PriceScheduleView> CalculateSalePrices
+        (
+            this IInventoryBasePriceInfo info
+            , IEnumerable<IInvPrice> invPrices
+        )
+        {
+            double WholesaleCost = info.WholesaleCost;
+            double LandedCost = info.LandedCost();
+
+            double? Price0 = null;
+            double? ListPrice = null;
+            double? CashPrice = null;
+            double? SalePrice = null;
+
+            info.CalculateBasePrices();
+            Price0 = info.RegularPrice_0_Calculated;
+            ListPrice = info.RegularPrice_List_Calculated;
+            CashPrice = info.RegularPrice_Cash_Calculated;
+            SalePrice = info.SalePrice_0_Calculated;
+
+            string info_json = string.Empty;
+            string nl = Environment.NewLine;
+
+            Func<IInvPrice, double> calc = (x) =>
+            {
+                try
+                {
+                    return (double)(decimal)CalcPrice
+                    (
+                        x.SScheduleType
+                        , x.SalePrice
+                        , WholesaleCost
+                        , LandedCost
+                        , CashPrice
+                        , SalePrice
+                        , ListPrice
+                    );
+                }
+                catch (ArgumentNullException e)
+                {
+                    info_json = GetContents(info);
+                    Console.WriteLine($"Error: failed to calculate Web Price" +
+                        $"({info.ScheduleLevel_List}). " + "Details: " + e.Message + nl + info_json);
+                    return 0;
+                }
+                catch (OverflowException e)
+                {
+                    Console.WriteLine($"Error: Overflow exception. x.SalePrice={x.SalePrice}, WholesaleCost={WholesaleCost}" +
+                        $", LandedCost={LandedCost}, SalePrice={SalePrice}, ListPrice={ListPrice}");
+                    return 100000;
+                }
+
+            };
+
+            var views = invPrices.Select
+            (
+                price => new PriceScheduleView()
+                {
+                    Code = price.RScheduleType
+                    , InventoryUnique = price.PartUnique
+                    , Level = price.ScheduleLevel
+                    , Percentage = price.RegularPrice
+                    , Price = (decimal)calc(price)
+                }
+            );
+
+            #region linq above turned into foreach
+            if (false)
+            {
+                List<PriceScheduleView> Vs = new List<PriceScheduleView>();
+
+                foreach (var price in invPrices)
+                {
+                    Vs.Add
+                    (
+                        new PriceScheduleView()
+                        {
+                            Code = price.SScheduleType
+                            , InventoryUnique = price.PartUnique
+                            , Level = price.ScheduleLevel
+                            , Percentage = price.SalePrice
+                            , Price = (decimal)calc(price)
+                        }
+                    );
+                }
+            }
+            #endregion linq above turned into foreach
+
+            return views;
+        }
+
         public static IInventoryBasePriceInfo CalculateBasePrices(this IInventoryBasePriceInfo info)
         {
             double WholesaleCost = info.WholesaleCost;
