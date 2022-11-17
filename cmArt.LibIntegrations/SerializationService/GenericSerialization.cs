@@ -60,18 +60,13 @@ namespace cmArt.LibIntegrations.SerializationService
                         }
                     }
                 }
-                Console.WriteLine("");
-                Console.WriteLine($"ReadOrSerializeTable for {TableName} Complete");
+                //Console.WriteLine("");
+                //Console.WriteLine($"ReadOrSerializeTable for {TableName} Complete");
                 return rows;
             }
             else
             {
-                Console.WriteLine($"Cached Data Doesn't Exist for \"{TableName}\"");
-                //Console.Write($"Loading {TableName} from Database.");
-                //List<T> TableRecords = Load_Table_FromDatabase();
-                //GenericSerialization<T>.SerializeToJSON(TableRecords, TableName, CachedFilesDirectory, RecordsPerPage);
-                //Console.Write($"Finished Loading {TableName} from Database.");
-                //return TableRecords;
+                //Console.WriteLine($"Cached Data Doesn't Exist for \"{TableName}\"");
                 return new List<T>();
             }
 
@@ -130,8 +125,8 @@ namespace cmArt.LibIntegrations.SerializationService
 
         public static List<string> GetCachedFileNamesFromDirectory(string directory, string TableName)
         {
-            Console.WriteLine("GetCachedFilesInDirectory (Begin), checking for files in " +
-                TableName);
+            //Console.WriteLine("GetCachedFilesInDirectory (Begin), checking for files in " +
+            //    TableName);
 
             bool directoryExists = false;
 
@@ -141,8 +136,8 @@ namespace cmArt.LibIntegrations.SerializationService
 
             if (directoryExists)
             {
-                Console.WriteLine($"{files.Count} Cached file(s) found, loading cached files for " +
-                    TableName);
+                //Console.WriteLine($"{files.Count} Cached file(s) found, loading cached files for " +
+                //    TableName);
                 foreach (string file in Directory.GetFiles(directory))
                 {
                     if (file.Contains($"tbl{TableName}_page"))
@@ -155,8 +150,8 @@ namespace cmArt.LibIntegrations.SerializationService
         }
         public static IEnumerable<string> RemoveCachedFileNamesFromDirectory(string directory, string TableName) // returns files removed
         {
-            Console.WriteLine("RemoveCachedFilesInDirectory (Begin), checking for files in " +
-                TableName);
+            //Console.WriteLine("RemoveCachedFilesInDirectory (Begin), checking for files in " +
+            //    TableName);
             IEnumerable<string> files = GetCachedFileNamesFromDirectory(directory, TableName); ;
 
             foreach (var file in files)
