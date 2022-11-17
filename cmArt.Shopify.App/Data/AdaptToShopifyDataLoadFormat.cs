@@ -93,16 +93,33 @@ namespace cmArt.Shopify.App.Data
         {
             get 
             {
-                // build quantities for each department. Consider an All Department Quantities as well
-                if(_InvAss.StokLines_PerInventry_27 is null) { return new List<S5QtyPair>(); }
-                IEnumerable<short> StokDepts = _InvAss.StokLines_PerInventry_27.Select(inv => inv.Department).GroupBy(x => x).Select(y => y.Key);
+                // shopify doesn't split out stock anyway, so to get support for all departments we'll get just a dept 0, but we'll have to map department 0 to something.
+                // shopify doesn't split out stock anyway, so to get support for all departments we'll get just a dept 0, but we'll have to map department 0 to something.
+                bool IsGetAllDepartments = true;
+                bool IsGetEachDepartment = !IsGetAllDepartments;
                 List<S5QtyPair> pairs = new List<S5QtyPair>();
-                foreach(var dept in StokDepts)
+                if (IsGetEachDepartment)
                 {
-                    S5QtyPair tmp = GetInStock(dept);
-                    pairs.Add(tmp);
+                    if (_InvAss.StokLines_PerInventry_27 is null) { return new List<S5QtyPair>(); }
+                    IEnumerable<short> StokDepts = _InvAss.StokLines_PerInventry_27.Select(inv => inv.Department).GroupBy(x => x).Select(y => y.Key);
+                    foreach (var dept in StokDepts)
+                    {
+                        S5QtyPair tmp = GetInStock(dept);
+                        pairs.Add(tmp);
+                    }
                 }
+
+                if (IsGetAllDepartments)
+                {
+                    if (IsGetAllDepartments)
+                    {
+                        S5QtyPair all = GetInStockAllDepts();
+                        pairs.Add(all);
+                    }
+                }
+
                 return pairs;
+                // build quantities for each department. Consider an All Department Quantities as well
             }
             set => throw new NotImplementedException("You can't really load a qty into the records that make the quantity up. Possible, but does it really make sense?");
         }
@@ -119,6 +136,40 @@ namespace cmArt.Shopify.App.Data
             set => throw new NotImplementedException(); 
         }
 
+        private S5QtyPair GetInStockAllDepts() // not dept 0, but all records
+        {
+            _InvAss = _InvAss ?? new S5InvAssembled();
+            decimal tmpQty = (decimal)0;
+            double dblQty = 0;
+            IEnumerable<IStok> StokForDept = _InvAss.StokLines_PerInventry_27;
+            try
+            {
+                dblQty =
+                (
+                    StokForDept.Select(stok => stok.CostQuantity).Sum()
+                    - StokForDept.Where(stok => stok.StockStatus == 39 || stok.StockStatus == 40 || stok.StockStatus == 16 || stok.StockStatus == 17)
+                        .Select(stok => stok.PriceQty)
+                        .Sum()
+                );
+
+            }
+            catch
+            {
+                dblQty = 0;
+            }
+
+            try
+            {
+                tmpQty = (decimal)dblQty;
+            }
+            catch
+            {
+                tmpQty = 0;
+            }
+
+            S5QtyPair pair = new S5QtyPair(0, tmpQty);
+            return pair;
+        }
         private S5QtyPair GetInStock(short Dept)
         {
             _InvAss = _InvAss ?? new S5InvAssembled();

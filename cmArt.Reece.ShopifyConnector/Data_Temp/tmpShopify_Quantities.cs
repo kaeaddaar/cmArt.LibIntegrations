@@ -29,7 +29,7 @@ namespace cmArt.Reece.ShopifyConnector
             Quantities = Quantities ?? new List<tmpS5QtyPair>();
             foreach (tmpS5QtyPair pair in Quantities)
             {
-                if (pair.Location == "62675222726") { pair.Location = "1"; }
+                if (pair.Location == "62675222726") { pair.Location = "0"; }
                 if (pair.Location == "63449497798") { pair.Location = "2"; }
                 if (pair.Location == "63449530566") { pair.Location = "3"; }
                 if (pair.Location == "63449563334") { pair.Location = "4"; }

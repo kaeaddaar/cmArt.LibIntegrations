@@ -17,7 +17,7 @@ namespace cmArt.Reece.ShopifyConnector
         public S5QtyPair AsS5QtyPair()
         {
             short tmpLocation = 0;
-            if (Location == "62675222726") { tmpLocation = 1; }
+            if (Location == "62675222726") { tmpLocation = 0; }
             else if (Location == "63449497798") { tmpLocation = 2; }
             else if (Location == "63449530566") { tmpLocation = 3; }
             else if (Location == "63449563334") { tmpLocation = 4; }

@@ -115,7 +115,7 @@ namespace cmArt.Shopify.App
         //
         private static DateTime dtLastRun;
         private static string dtLastRunPathAndFile;
-
+        private static Guid SessionId;
 
         #endregion variables
         public static void Main_Console(string[] args)
@@ -400,6 +400,10 @@ namespace cmArt.Shopify.App
             File.WriteAllText(FileName, result);
 
             Save_dtLastRun_ToFile();
+
+            logger.LogInformation($"Closing Shopify Management API session: {SessionId}");
+            string CloseSessionResponse = ReeceShopify.CloseSession(SessionId.ToString());
+            logger.LogInformation("Close Session Response: " + Environment.NewLine + CloseSessionResponse);
 
             Console.WriteLine("Done");
             Console.ReadKey();
@@ -907,12 +911,15 @@ namespace cmArt.Shopify.App
 
             ReeceShopify.AddLogger(logger, logger_ApiCalls);
             OpenSession_Results = ReeceShopify.OpenSession();
+            Guid.TryParse(OpenSession_Results, out SessionId);
+            bool IsSessionId = SessionId != Guid.Empty;
+            if (!IsSessionId) { throw new Exception("Failed to get a sessioon, please see following response from the open session call: " + OpenSession_Results); }
 
             GetShopifyData_Reece_Products();
             GetShopifyData_Reece_Prices();
             GetShopifyData_Reece_Quantities();
         }
-        private static void CacheShopifyData()
+        private static void CacheShopifyData() // save to portal
         {
             CachingPattern_Shopify_Product cacheShopify_Product = new CachingPattern_Shopify_Product("ShopifyProducts_ReecesAPI", settings);
             cacheShopify_Product._02_SaveNewestToCache(API_Products);
